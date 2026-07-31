@@ -47,6 +47,7 @@ export function MenuState({
   if (kind === 'loading') {
     return (
       <section
+        id="main-content"
         className="mx-auto flex min-h-[22rem] max-w-xl flex-col items-center justify-center rounded-[2rem] border border-[#12324a]/10 bg-white/70 px-6 py-16 text-center shadow-[0_24px_70px_rgba(18,50,74,0.08)]"
         role="status"
         aria-live="polite"
@@ -73,6 +74,7 @@ export function MenuState({
 
   return (
     <section
+      id="main-content"
       className="mx-auto flex min-h-[22rem] max-w-xl flex-col items-center justify-center rounded-[2rem] border border-[#12324a]/10 bg-white/70 px-6 py-16 text-center shadow-[0_24px_70px_rgba(18,50,74,0.08)]"
       role={kind === 'error' || isInvalidQuery ? 'alert' : 'status'}
       aria-live="polite"

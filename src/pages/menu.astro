@@ -1,0 +1,60 @@
+---
+import { PublicMenu } from '../features/public-menu/components/PublicMenu';
+import { restaurantBrand } from '../config/restaurant-brand';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title={`${restaurantBrand.name} · Menú`}
+  description={`${restaurantBrand.slogan}. Consulta la carta pública de ${restaurantBrand.name}.`}
+>
+  <header class="relative mx-auto max-w-6xl px-5 pb-12 pt-6 sm:px-8 sm:pb-16 sm:pt-8 lg:px-12">
+    <div class="flex items-center justify-between gap-5">
+      <a class="group inline-flex items-center gap-3 rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25" href="/menu">
+        <span class="grid size-14 place-items-center overflow-hidden rounded-2xl bg-white shadow-[0_12px_30px_rgba(18,50,74,0.12)] transition-transform duration-300 group-hover:-rotate-3 sm:size-16">
+          <img class="size-full object-cover" src={restaurantBrand.logoPath} alt="" />
+        </span>
+        <span class="hidden sm:block">
+          <span class="block font-heading text-xl font-semibold tracking-[-0.04em] text-[#12324a]">{restaurantBrand.name}</span>
+          <span class="mt-0.5 block text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#12324a]/50">{restaurantBrand.slogan}</span>
+        </span>
+        <span class="sr-only">Ir al inicio del menú</span>
+      </a>
+      <div class="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[#12324a]/55">
+        <span class="size-2 rounded-full bg-[#e76832]" aria-hidden="true"></span>
+        <span>Carta pública</span>
+      </div>
+    </div>
+
+    <div class="mt-14 grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
+      <div class="max-w-3xl">
+        <p class="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.25em] text-[#e76832]">
+          <span class="h-px w-10 bg-[#e76832]" aria-hidden="true"></span>
+          Menú de la casa
+        </p>
+        <h1 class="max-w-3xl font-heading text-[clamp(3.3rem,10vw,8.5rem)] font-semibold leading-[0.86] tracking-[-0.09em] text-[#12324a]">
+          Sabor que <em class="font-normal text-[#e76832]">viene</em> del mar.
+        </h1>
+        <p class="mt-7 max-w-xl text-base leading-7 text-[#12324a]/70 sm:text-lg sm:leading-8">
+          Descubre una carta pensada para compartir, celebrar y volver a la mesa.
+        </p>
+      </div>
+
+      <div class="relative hidden aspect-square rotate-3 rounded-[2.5rem] border border-[#12324a]/10 bg-[#dcecef] p-5 shadow-[0_24px_70px_rgba(18,50,74,0.12)] lg:block">
+        <div class="absolute -right-4 -top-4 grid size-16 -rotate-6 place-items-center rounded-full bg-[#e76832] text-center text-[0.6rem] font-bold uppercase leading-tight tracking-[0.12em] text-white shadow-lg">
+          <span>Desde<br />el mar</span>
+        </div>
+        <div class="flex size-full items-center justify-center overflow-hidden rounded-[1.9rem] bg-white">
+          <img class="size-full object-cover" src={restaurantBrand.logoPath} alt={`${restaurantBrand.name}, identidad visual`} />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <PublicMenu client:load />
+
+  <footer class="mx-auto flex max-w-6xl flex-col gap-3 border-t border-[#12324a]/15 px-5 py-8 text-xs text-[#12324a]/55 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
+    <p class="font-heading text-lg font-semibold tracking-[-0.03em] text-[#12324a]">{restaurantBrand.name}</p>
+    <p>{restaurantBrand.slogan}</p>
+  </footer>
+</Layout>

@@ -1,23 +1,39 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+---
+import '../styles/global.css';
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'El Molino del Pez · Menú',
+  description = 'Consulta la carta pública de El Molino del Pez.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#12324a" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a
+      class="sr-only fixed left-4 top-4 z-50 rounded-full bg-[#12324a] px-4 py-3 text-sm font-semibold text-white focus:not-sr-only focus:outline-none focus:ring-4 focus:ring-[#e76832]/35"
+      href="#main-content"
+    >
+      Saltar al contenido principal
+    </a>
+    <div class="relative min-h-screen overflow-x-hidden bg-[#f4f0e8] text-[#12324a]">
+      <div class="pointer-events-none absolute -left-32 top-24 size-80 rounded-full bg-[#e76832]/10 blur-3xl" aria-hidden="true"></div>
+      <div class="pointer-events-none absolute -right-36 top-0 size-[28rem] rounded-full bg-[#338faa]/15 blur-3xl" aria-hidden="true"></div>
+      <slot />
+    </div>
+  </body>
+</html>
