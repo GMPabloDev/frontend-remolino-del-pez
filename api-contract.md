@@ -1,6 +1,6 @@
 # API Contract — Reservas de Restaurante
 
-> Documento vivo. Refleja el estado actual del backend. Copiar manualmente al proyecto frontend.
+> Documento vivo. Refleja el estado actual del backend.
 
 ## Errores (todas las rutas)
 
