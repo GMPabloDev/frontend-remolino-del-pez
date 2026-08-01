@@ -1,8 +1,6 @@
 import { requestPublicJson } from '../../public-api/api/request-public-json';
 import { PublicApiClientError } from '../../public-api/contracts/api-error';
 import { publicMenuSchema, type PublicMenu } from '../contracts/public-menu';
-import type { ValidMenuQuery } from '../lib/menu-query';
-
 export { PublicApiClientError as PublicMenuClientError } from '../../public-api/contracts/api-error';
 
 export interface PublicMenuSlugQuery {
@@ -12,10 +10,9 @@ export interface PublicMenuSlugQuery {
 
 export function fetchPublicMenu(
   baseUrl: string,
-  query: PublicMenuSlugQuery | ValidMenuQuery,
+  query: PublicMenuSlugQuery,
 ): Promise<PublicMenu> {
-  const restaurantSlug = 'restaurantSlug' in query ? query.restaurantSlug : query.restaurantId;
-  const branchSlug = 'branchSlug' in query ? query.branchSlug : query.branchId;
+  const { restaurantSlug, branchSlug } = query;
 
   return requestPublicJson(
     baseUrl,

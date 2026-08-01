@@ -1,33 +1,29 @@
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import { z } from 'zod';
 
-export interface ValidMenuQuery {
-  restaurantId: string;
-  branchId: string;
-}
+const menuQuerySchema = z
+  .object({
+    branch: z.string().trim().min(1),
+  })
+  .transform(({ branch }) => ({ branchSlug: branch }));
+
+export type ValidMenuQuery = z.output<typeof menuQuerySchema>;
 
 export type MenuQueryResult =
   | { valid: true; value: ValidMenuQuery }
   | { valid: false; reason: 'missing' | 'invalid' };
 
-function isUuid(value: string | null): value is string {
-  return value !== null && UUID_PATTERN.test(value);
-}
-
 export function readMenuQuery(search: string): MenuQueryResult {
-  const params = new URLSearchParams(search);
-  const restaurantId = params.get('restaurantId');
-  const branchId = params.get('branchId');
+  const rawBranch = new URLSearchParams(search).get('branch');
 
-  if (!restaurantId || !branchId) {
+  if (!rawBranch) {
     return { valid: false, reason: 'missing' };
   }
 
-  if (!isUuid(restaurantId) || !isUuid(branchId)) {
+  const result = menuQuerySchema.safeParse({ branch: rawBranch });
+
+  if (!result.success) {
     return { valid: false, reason: 'invalid' };
   }
 
-  return {
-    valid: true,
-    value: { restaurantId, branchId },
-  };
+  return { valid: true, value: result.data };
 }
