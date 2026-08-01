@@ -25,7 +25,7 @@ export const staffUserSchema = z.object({
 });
 
 export const loginRequestSchema = z.object({
-	email: z.email().trim().toLowerCase(),
+	email: z.string().trim().toLowerCase().pipe(z.email()),
 	password: z.string().min(1).max(128),
 });
 

@@ -6,7 +6,7 @@ export const STAFF_REFRESH_MAX_AGE = 30 * 24 * 60 * 60;
 
 const cookieAttributes = {
 	httpOnly: true,
-	secure: import.meta.env.PROD,
+	secure: import.meta.env.PROD === true,
 	sameSite: "strict" as const,
 	path: STAFF_REFRESH_COOKIE_PATH,
 };
