@@ -1,3 +1,36 @@
 ---
-return Astro.redirect('/menu');
+import { restaurantBrand } from '../config/restaurant-brand';
+import { PublicDiscoveryApp } from '../features/public-discovery/PublicDiscoveryApp';
+import Layout from '../layouts/Layout.astro';
 ---
+
+<Layout
+  title={`${restaurantBrand.name} · Elige tu sucursal`}
+  description={`Encuentra tu sucursal de ${restaurantBrand.name} y consulta su menú.`}
+>
+  <header class="relative mx-auto max-w-6xl px-5 pb-10 pt-6 sm:px-8 sm:pb-14 sm:pt-8 lg:px-12">
+    <div class="flex items-center justify-between gap-5">
+      <a class="group inline-flex items-center gap-3 rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25" href="/">
+        <span class="grid size-14 place-items-center overflow-hidden rounded-2xl bg-white shadow-[0_12px_30px_rgba(18,50,74,0.12)] transition-transform duration-300 group-hover:-rotate-3 sm:size-16">
+          <img class="size-full object-cover" src={restaurantBrand.logoPath} alt="" />
+        </span>
+        <span class="hidden sm:block">
+          <span class="block font-heading text-xl font-semibold tracking-[-0.04em] text-[#12324a]">{restaurantBrand.name}</span>
+          <span class="mt-0.5 block text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#12324a]/50">{restaurantBrand.slogan}</span>
+        </span>
+        <span class="sr-only">Ir al inicio</span>
+      </a>
+      <div class="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[#12324a]/55">
+        <span class="size-2 rounded-full bg-[#e76832]" aria-hidden="true"></span>
+        <span>Reserva tu mesa</span>
+      </div>
+    </div>
+  </header>
+
+  <PublicDiscoveryApp client:load />
+
+  <footer class="mx-auto flex max-w-6xl flex-col gap-3 border-t border-[#12324a]/15 px-5 py-8 text-xs text-[#12324a]/55 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
+    <p class="font-heading text-lg font-semibold tracking-[-0.03em] text-[#12324a]">{restaurantBrand.name}</p>
+    <p>{restaurantBrand.slogan}</p>
+  </footer>
+</Layout>
