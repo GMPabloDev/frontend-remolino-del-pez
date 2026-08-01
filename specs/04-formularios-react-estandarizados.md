@@ -1,6 +1,6 @@
 # SPEC 04 — Formularios React estandarizados y pruebas de comportamiento
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 03
 > **Fecha:** 2026-08-01
 > **Objetivo:** Estandarizar los formularios React con React Hook Form, Zod, resolvers y componentes shadcn, migrando los flujos staff existentes y cubriéndolos con pruebas de comportamiento accesibles.
