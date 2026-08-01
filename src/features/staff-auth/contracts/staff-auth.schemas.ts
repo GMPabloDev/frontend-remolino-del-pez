@@ -6,8 +6,8 @@ export const staffStatusSchema = z.enum(["active", "inactive"]);
 const isoDateTimeSchema = z.iso.datetime({ offset: true });
 const passwordSchema = z
 	.string()
-	.min(10)
-	.max(128)
+	.min(10, "Debe tener al menos 10 caracteres.")
+	.max(128, "No puede superar los 128 caracteres.")
 	.regex(/[A-Z]/, "Debe contener al menos una mayúscula.")
 	.regex(/[a-z]/, "Debe contener al menos una minúscula.")
 	.regex(/\d/, "Debe contener al menos un número.");
@@ -25,8 +25,15 @@ export const staffUserSchema = z.object({
 });
 
 export const loginRequestSchema = z.object({
-	email: z.string().trim().toLowerCase().pipe(z.email()),
-	password: z.string().min(1).max(128),
+	email: z
+		.string()
+		.trim()
+		.toLowerCase()
+		.pipe(z.email("Ingresa un email válido.")),
+	password: z
+		.string()
+		.min(1, "Ingresa tu contraseña.")
+		.max(128, "No puede superar los 128 caracteres."),
 });
 
 export const backendAuthResponseSchema = z.object({
@@ -49,9 +56,15 @@ export const changePasswordRequestSchema = z.object({
 
 export const changePasswordFormSchema = z
 	.object({
-		currentPassword: z.string().min(1).max(128),
+		currentPassword: z
+			.string()
+			.min(1, "Ingresa tu contraseña actual.")
+			.max(128, "No puede superar los 128 caracteres."),
 		newPassword: passwordSchema,
-		confirmNewPassword: z.string().min(1).max(128),
+		confirmNewPassword: z
+			.string()
+			.min(1, "Confirma tu nueva contraseña.")
+			.max(128, "No puede superar los 128 caracteres."),
 	})
 	.refine((input) => input.newPassword === input.confirmNewPassword, {
 		path: ["confirmNewPassword"],
