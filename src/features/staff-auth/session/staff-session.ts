@@ -55,6 +55,11 @@ const anonymousSnapshot: StaffSessionSnapshot = {
 	user: null,
 	accessToken: null,
 };
+const checkingSnapshot: StaffSessionSnapshot = {
+	status: "checking",
+	user: null,
+	accessToken: null,
+};
 
 export function createStaffSession(
 	options: StaffSessionOptions = {},
@@ -64,7 +69,7 @@ export function createStaffSession(
 		options.refreshCoordinator ?? createRefreshCoordinator();
 	const channel = options.channel ?? createStaffAuthChannel();
 	const listeners = new Set<() => void>();
-	let snapshot: StaffSessionSnapshot = anonymousSnapshot;
+	let snapshot: StaffSessionSnapshot = checkingSnapshot;
 	let accessToken: string | null = null;
 
 	const notify = (): void => {
