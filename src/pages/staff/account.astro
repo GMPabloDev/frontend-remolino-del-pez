@@ -1,0 +1,11 @@
+---
+import { StaffAccountApp } from "../../features/staff-auth/StaffAccountApp";
+import StaffPageLayout from "../../layouts/StaffPageLayout.astro";
+---
+
+<StaffPageLayout
+	title="Mi cuenta · El Molino del Pez"
+	description="Configuración de la cuenta staff de El Molino del Pez."
+>
+	<StaffAccountApp client:load />
+</StaffPageLayout>

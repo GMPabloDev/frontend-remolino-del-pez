@@ -1,11 +1,11 @@
 ---
 import { StaffDashboardApp } from "../../features/staff-shell/StaffDashboardApp";
-import Layout from "../../layouts/Layout.astro";
+import StaffPageLayout from "../../layouts/StaffPageLayout.astro";
 ---
 
-<Layout
+<StaffPageLayout
 	title="Panel staff · El Molino del Pez"
 	description="Panel administrativo privado de El Molino del Pez."
 >
 	<StaffDashboardApp client:load />
-</Layout>
+</StaffPageLayout>

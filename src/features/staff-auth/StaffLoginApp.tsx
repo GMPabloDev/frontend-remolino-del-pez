@@ -20,10 +20,12 @@ export function StaffLoginApp() {
 function StaffLoginScreen() {
 	const { session, snapshot } = useStaffAuth();
 	const [returnTo, setReturnTo] = useState<string | null>(null);
+	const [passwordChangedNotice, setPasswordChangedNotice] = useState(false);
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		setReturnTo(sanitizeStaffReturnTo(params.get("returnTo")));
+		setPasswordChangedNotice(params.get("reason") === "password-changed");
 	}, []);
 
 	useEffect(() => {
@@ -73,6 +75,14 @@ function StaffLoginScreen() {
 					<p className="text-sm leading-6 text-[#12324a]/65">
 						Accede a las herramientas administrativas del restaurante.
 					</p>
+					{passwordChangedNotice ? (
+						<p
+							className="rounded-xl border border-[#338faa]/25 bg-[#dcecef] px-4 py-3 text-sm leading-6 text-[#12324a]"
+							role="status"
+						>
+							Tu contraseña fue actualizada. Inicia sesión nuevamente.
+						</p>
+					) : null}
 				</div>
 				<LoginForm
 					onSuccess={() => {
