@@ -1,38 +1,10 @@
-import type {
-  ApiErrorResponse,
-  PublicMenu,
-} from '../contracts/public-menu';
+import { PublicApiClientError, parseApiErrorResponse } from '../../public-api/contracts/api-error';
+import type { PublicMenu } from '../contracts/public-menu';
 import type { ValidMenuQuery } from '../lib/menu-query';
 
-export class PublicMenuClientError extends Error {
-  constructor(
-    public readonly status: number,
-    public readonly code: string,
-    message: string,
-  ) {
-    super(message);
-    this.name = 'PublicMenuClientError';
-  }
-}
+export { PublicApiClientError as PublicMenuClientError } from '../../public-api/contracts/api-error';
 
-function isApiErrorResponse(value: unknown): value is ApiErrorResponse {
-  if (!value || typeof value !== 'object' || !('error' in value)) {
-    return false;
-  }
-
-  const error = value.error;
-
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    'message' in error &&
-    typeof error.code === 'string' &&
-    typeof error.message === 'string'
-  );
-}
-
-async function readError(response: Response): Promise<PublicMenuClientError> {
+async function readError(response: Response): Promise<PublicApiClientError> {
   let payload: unknown;
 
   try {
@@ -41,19 +13,7 @@ async function readError(response: Response): Promise<PublicMenuClientError> {
     payload = undefined;
   }
 
-  if (isApiErrorResponse(payload)) {
-    return new PublicMenuClientError(
-      response.status,
-      payload.error.code,
-      payload.error.message,
-    );
-  }
-
-  return new PublicMenuClientError(
-    response.status,
-    'HTTP_ERROR',
-    'No se pudo cargar el menú.',
-  );
+  return parseApiErrorResponse(response.status, payload);
 }
 
 export async function fetchPublicMenu(
@@ -72,7 +32,7 @@ export async function fetchPublicMenu(
       headers: { Accept: 'application/json' },
     });
   } catch {
-    throw new PublicMenuClientError(
+    throw new PublicApiClientError(
       0,
       'NETWORK_ERROR',
       'No se pudo conectar con el menú.',

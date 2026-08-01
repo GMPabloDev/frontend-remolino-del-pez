@@ -1,38 +1,35 @@
-export type DishAvailability = 'available' | 'sold_out';
+import { z } from 'zod';
 
-export interface PublicMenu {
-  restaurantId: string;
-  branchId: string;
-  categories: PublicMenuCategory[];
-}
+import { publicSlugSchema } from '../../public-discovery/contracts/public-discovery.schemas';
 
-export interface PublicMenuCategory {
-  id: string;
-  name: string;
-  position: number;
-  dishes: PublicDish[];
-}
+export const dishAvailabilitySchema = z.enum(['available', 'sold_out']);
 
-export interface PublicDish {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string | null;
-  ingredients: string[];
-  allergens: string[];
-  position: number;
-  price: string;
-  status: DishAvailability;
-}
+export const publicDishSchema = z.object({
+  id: z.string().min(1),
+  name: z.string(),
+  description: z.string(),
+  imageUrl: z.url().nullable(),
+  ingredients: z.array(z.string()),
+  allergens: z.array(z.string()),
+  position: z.number().int().positive(),
+  price: z.string(),
+  status: dishAvailabilitySchema,
+});
 
-export interface ApiErrorResponse {
-  error: {
-    code: string;
-    message: string;
-    details?: Array<{
-      field: string;
-      code: string;
-      message: string;
-    }>;
-  };
-}
+export const publicMenuCategorySchema = z.object({
+  id: z.string().min(1),
+  name: z.string(),
+  position: z.number().int().positive(),
+  dishes: z.array(publicDishSchema),
+});
+
+export const publicMenuSchema = z.object({
+  restaurantSlug: publicSlugSchema,
+  branchSlug: publicSlugSchema,
+  categories: z.array(publicMenuCategorySchema),
+});
+
+export type DishAvailability = z.infer<typeof dishAvailabilitySchema>;
+export type PublicDish = z.infer<typeof publicDishSchema>;
+export type PublicMenuCategory = z.infer<typeof publicMenuCategorySchema>;
+export type PublicMenu = z.infer<typeof publicMenuSchema>;

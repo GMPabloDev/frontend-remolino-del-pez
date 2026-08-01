@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { PublicMenuClientError } from '../api/public-menu-client';
+import { PublicApiClientError } from '../../public-api/contracts/api-error';
 import type { PublicMenu as PublicMenuData } from '../contracts/public-menu';
 import { getPublicMenu } from '../data/get-public-menu';
 import { CategorySection } from './CategorySection';
@@ -20,7 +20,7 @@ function getQueryResult(): MenuQueryResult {
 }
 
 function getErrorCode(error: unknown): string | undefined {
-  return error instanceof PublicMenuClientError ? error.code : undefined;
+  return error instanceof PublicApiClientError ? error.code : undefined;
 }
 
 export function PublicMenu() {
