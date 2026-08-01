@@ -1,7 +1,7 @@
 import { PublicApiClientError } from '../../public-api/contracts/api-error';
 import type { PublicMenu } from '../contracts/public-menu';
 import type { MenuFixtureScenario } from '../../../config/runtime';
-import type { ValidMenuQuery } from '../lib/menu-query';
+import type { PublicMenuSlugQuery } from '../api/public-menu-client';
 
 const fixtureCategories = [
   {
@@ -87,7 +87,7 @@ const fixtureCategories = [
 
 export function getMenuFixture(
   scenario: MenuFixtureScenario,
-  query: ValidMenuQuery,
+  query: PublicMenuSlugQuery,
 ): Promise<PublicMenu> {
   if (scenario === 'error') {
     return Promise.reject(
@@ -101,15 +101,15 @@ export function getMenuFixture(
 
   if (scenario === 'empty') {
     return Promise.resolve({
-      restaurantId: query.restaurantId,
-      branchId: query.branchId,
+      restaurantSlug: query.restaurantSlug,
+      branchSlug: query.branchSlug,
       categories: [],
     });
   }
 
   return Promise.resolve({
-    restaurantId: query.restaurantId,
-    branchId: query.branchId,
+    restaurantSlug: query.restaurantSlug,
+    branchSlug: query.branchSlug,
     categories: fixtureCategories,
   });
 }
