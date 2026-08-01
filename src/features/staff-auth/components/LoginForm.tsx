@@ -1,6 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useRef } from "react";
+import { type FieldErrors, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { ApiClientError } from "@/lib/api/api-error";
 import {
 	type LoginInput,
@@ -13,11 +22,25 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSubmit, onSuccess }: LoginFormProps) {
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [errorMessage, setErrorMessage] = useState<string | null>(null);
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const errorReference = useRef<HTMLParagraphElement>(null);
+	const {
+		formState: { errors, isSubmitting },
+		clearErrors,
+		handleSubmit,
+		register,
+		reset,
+		setError,
+		setFocus,
+	} = useForm<LoginInput>({
+		defaultValues: {
+			email: "",
+			password: "",
+		},
+		mode: "onSubmit",
+		resolver: zodResolver(loginRequestSchema),
+		shouldFocusError: false,
+	});
+	const errorMessage = errors.root?.server?.message;
 
 	useEffect(() => {
 		if (errorMessage) {
@@ -25,34 +48,64 @@ export function LoginForm({ onSubmit, onSuccess }: LoginFormProps) {
 		}
 	}, [errorMessage]);
 
-	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-		event.preventDefault();
+	async function handleValidSubmit(values: LoginInput): Promise<void> {
 		setErrorMessage(null);
 
-		const result = loginRequestSchema.safeParse({ email, password });
+		try {
+			await onSubmit(values);
+			onSuccess();
+		} catch (error) {
+			const message = getLoginErrorMessage(error);
+			setErrorMessage(message);
+		} finally {
+			reset(
+				{
+					email: values.email,
+					password: "",
+				},
+				{ keepErrors: true },
+			);
+		}
+	}
 
-		if (!result.success) {
-			setErrorMessage("Ingresa un email válido y tu contraseña.");
+	function handleInvalidSubmit(formErrors: FieldErrors<LoginInput>): void {
+		setErrorMessage(null);
+
+		if (formErrors.email) {
+			setFocus("email");
 			return;
 		}
 
-		setIsSubmitting(true);
+		setFocus("password");
+	}
 
-		try {
-			await onSubmit(result.data);
-			onSuccess();
-		} catch (error) {
-			setErrorMessage(getLoginErrorMessage(error));
-		} finally {
-			setIsSubmitting(false);
+	function setErrorMessage(message: string | null): void {
+		if (message) {
+			setRootError(message);
+			return;
 		}
+
+		clearRootError();
+	}
+
+	function setRootError(message: string): void {
+		setError("root.server", {
+			message,
+			type: "server",
+		});
+	}
+
+	function clearRootError(): void {
+		clearErrors("root");
 	}
 
 	return (
 		<form
-			className="space-y-5"
-			onSubmit={(event) => void handleSubmit(event)}
+			className="flex flex-col gap-5"
 			noValidate
+			onSubmit={(event) => {
+				void handleSubmit(handleValidSubmit, handleInvalidSubmit)(event);
+			}}
 		>
 			{errorMessage ? (
 				<p
@@ -66,44 +119,44 @@ export function LoginForm({ onSubmit, onSuccess }: LoginFormProps) {
 				</p>
 			) : null}
 
-			<div className="space-y-2">
-				<label className="block text-sm font-semibold" htmlFor="staff-email">
-					Email
-				</label>
-				<input
-					aria-describedby={errorMessage ? "staff-login-error" : undefined}
-					aria-invalid={Boolean(errorMessage)}
-					autoComplete="email"
-					className="h-12 w-full rounded-xl border border-[#12324a]/15 bg-white px-4 text-sm outline-none transition focus:border-[#e76832] focus:ring-4 focus:ring-[#e76832]/15"
-					disabled={isSubmitting}
-					id="staff-email"
-					name="email"
-					onChange={(event) => setEmail(event.target.value)}
-					placeholder="nombre@restaurante.com"
-					required
-					type="email"
-					value={email}
-				/>
-			</div>
+			<FieldGroup>
+				<Field data-invalid={Boolean(errors.email)}>
+					<FieldLabel htmlFor="staff-email">Email</FieldLabel>
+					<Input
+						aria-describedby={errors.email ? "staff-email-error" : undefined}
+						aria-invalid={Boolean(errors.email)}
+						autoComplete="email"
+						disabled={isSubmitting}
+						id="staff-email"
+						placeholder="nombre@restaurante.com"
+						type="email"
+						{...register("email")}
+					/>
+					<FieldError
+						errors={errors.email ? [errors.email] : undefined}
+						id="staff-email-error"
+					/>
+				</Field>
 
-			<div className="space-y-2">
-				<label className="block text-sm font-semibold" htmlFor="staff-password">
-					Contraseña
-				</label>
-				<input
-					aria-describedby={errorMessage ? "staff-login-error" : undefined}
-					aria-invalid={Boolean(errorMessage)}
-					autoComplete="current-password"
-					className="h-12 w-full rounded-xl border border-[#12324a]/15 bg-white px-4 text-sm outline-none transition focus:border-[#e76832] focus:ring-4 focus:ring-[#e76832]/15"
-					disabled={isSubmitting}
-					id="staff-password"
-					name="password"
-					onChange={(event) => setPassword(event.target.value)}
-					required
-					type="password"
-					value={password}
-				/>
-			</div>
+				<Field data-invalid={Boolean(errors.password)}>
+					<FieldLabel htmlFor="staff-password">Contraseña</FieldLabel>
+					<Input
+						aria-describedby={
+							errors.password ? "staff-password-error" : undefined
+						}
+						aria-invalid={Boolean(errors.password)}
+						autoComplete="current-password"
+						disabled={isSubmitting}
+						id="staff-password"
+						type="password"
+						{...register("password")}
+					/>
+					<FieldError
+						errors={errors.password ? [errors.password] : undefined}
+						id="staff-password-error"
+					/>
+				</Field>
+			</FieldGroup>
 
 			<Button
 				className="h-12 w-full rounded-xl"
