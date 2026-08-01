@@ -1,34 +1,36 @@
 import {
-  QueryClient,
-  QueryClientProvider,
-  type QueryClientConfig,
-} from '@tanstack/react-query';
-import { useState, type PropsWithChildren } from 'react';
+	QueryClient,
+	type QueryClientConfig,
+	QueryClientProvider,
+} from "@tanstack/react-query";
+import { type PropsWithChildren, useState } from "react";
 
-import { PublicApiClientError } from '../contracts/api-error';
+import { PublicApiClientError } from "../contracts/api-error";
 
 const publicQueryClientConfig: QueryClientConfig = {
-  defaultOptions: {
-    queries: {
-      staleTime: 60_000,
-      refetchOnWindowFocus: true,
-      retry: (failureCount, error) => {
-        if (failureCount >= 2 || !(error instanceof PublicApiClientError)) {
-          return false;
-        }
+	defaultOptions: {
+		queries: {
+			staleTime: 60_000,
+			refetchOnWindowFocus: true,
+			retry: (failureCount, error) => {
+				if (failureCount >= 2 || !(error instanceof PublicApiClientError)) {
+					return false;
+				}
 
-        return error.status === 0 || error.status >= 500;
-      },
-    },
-  },
+				return error.status === 0 || error.status >= 500;
+			},
+		},
+	},
 };
 
 export function createPublicQueryClient() {
-  return new QueryClient(publicQueryClientConfig);
+	return new QueryClient(publicQueryClientConfig);
 }
 
 export function PublicQueryProvider({ children }: PropsWithChildren) {
-  const [queryClient] = useState(createPublicQueryClient);
+	const [queryClient] = useState(createPublicQueryClient);
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+	return (
+		<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+	);
 }

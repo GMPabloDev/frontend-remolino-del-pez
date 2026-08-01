@@ -1,83 +1,96 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { PublicApiClientError } from '../../public-api/contracts/api-error';
-import { usePublicMenuQuery } from '../../public-api/query/public-queries';
-import type { PublicMenu as PublicMenuData } from '../contracts/public-menu';
-import { readMenuQuery, type MenuQueryResult } from '../lib/menu-query';
-import { CategorySection } from './CategorySection';
-import { MenuState } from './MenuState';
+import { PublicApiClientError } from "../../public-api/contracts/api-error";
+import { usePublicMenuQuery } from "../../public-api/query/public-queries";
+import type { PublicMenu as PublicMenuData } from "../contracts/public-menu";
+import { type MenuQueryResult, readMenuQuery } from "../lib/menu-query";
+import { CategorySection } from "./CategorySection";
+import { MenuState } from "./MenuState";
 
 function getErrorCode(error: unknown): string | undefined {
-  return error instanceof PublicApiClientError ? error.code : undefined;
+	return error instanceof PublicApiClientError ? error.code : undefined;
 }
 
-function getMenuQueryBranch(queryResult: MenuQueryResult | null): string | null {
-  return queryResult?.valid ? queryResult.value.branchSlug : null;
+function getMenuQueryBranch(
+	queryResult: MenuQueryResult | null,
+): string | null {
+	return queryResult?.valid ? queryResult.value.branchSlug : null;
 }
 
 export function PublicMenu() {
-  const [queryResult, setQueryResult] = useState<MenuQueryResult | null>(null);
-  const branchSlug = getMenuQueryBranch(queryResult);
-  const menuQuery = usePublicMenuQuery(branchSlug);
+	const [queryResult, setQueryResult] = useState<MenuQueryResult | null>(null);
+	const branchSlug = getMenuQueryBranch(queryResult);
+	const menuQuery = usePublicMenuQuery(branchSlug);
 
-  useEffect(() => {
-    setQueryResult(readMenuQuery(window.location.search));
-  }, []);
+	useEffect(() => {
+		setQueryResult(readMenuQuery(window.location.search));
+	}, []);
 
-  if (queryResult === null || menuQuery.isPending) {
-    return <MenuState kind="loading" />;
-  }
+	if (queryResult === null) {
+		return <MenuState kind="loading" />;
+	}
 
-  if (!queryResult.valid) {
-    return <MenuState kind="invalid-query" invalidQueryReason={queryResult.reason} />;
-  }
+	if (!queryResult.valid) {
+		return (
+			<MenuState kind="invalid-query" invalidQueryReason={queryResult.reason} />
+		);
+	}
 
-  if (menuQuery.isError) {
-    return (
-      <MenuState
-        kind="error"
-        errorCode={getErrorCode(menuQuery.error)}
-        onRetry={() => void menuQuery.refetch()}
-      />
-    );
-  }
+	if (menuQuery.isPending) {
+		return <MenuState kind="loading" />;
+	}
 
-  if (!menuQuery.data) {
-    return <MenuState kind="loading" />;
-  }
+	if (menuQuery.isError) {
+		return (
+			<MenuState
+				kind="error"
+				errorCode={getErrorCode(menuQuery.error)}
+				onRetry={() => void menuQuery.refetch()}
+			/>
+		);
+	}
 
-  const menu: PublicMenuData = menuQuery.data;
+	if (!menuQuery.data) {
+		return <MenuState kind="loading" />;
+	}
 
-  if (menu.categories.length === 0) {
-    return <MenuState kind="empty" />;
-  }
+	const menu: PublicMenuData = menuQuery.data;
 
-  return (
-    <main id="main-content" className="mx-auto w-full max-w-6xl px-5 pb-16 sm:px-8 sm:pb-24 lg:px-12">
-      <nav
-        className="mb-4 flex flex-col gap-4 border-y border-[#12324a]/15 py-4 sm:flex-row sm:items-center sm:justify-between"
-        aria-label="Categorías del menú"
-      >
-        <p className="shrink-0 text-xs font-bold uppercase tracking-[0.2em] text-[#12324a]/50">Explora la carta</p>
-        <ul className="flex list-none flex-wrap gap-x-5 gap-y-2 p-0 text-sm font-semibold text-[#12324a]">
-          {menu.categories.map((category) => (
-            <li key={category.id}>
-              <a
-                className="underline decoration-[#e76832]/50 decoration-2 underline-offset-4 transition-colors hover:text-[#e76832] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25"
-                href={`#category-${category.id}`}
-              >
-                {category.name}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+	if (menu.categories.length === 0) {
+		return <MenuState kind="empty" />;
+	}
 
-      <div>
-        {menu.categories.map((category) => (
-          <CategorySection key={category.id} category={category} />
-        ))}
-      </div>
-    </main>
-  );
+	return (
+		<main
+			id="main-content"
+			className="mx-auto w-full max-w-6xl px-5 pb-16 sm:px-8 sm:pb-24 lg:px-12"
+		>
+			<nav
+				className="mb-4 flex flex-col gap-4 border-y border-[#12324a]/15 py-4 sm:flex-row sm:items-center sm:justify-between"
+				aria-label="Categorías del menú"
+			>
+				<p className="shrink-0 text-xs font-bold uppercase tracking-[0.2em] text-[#12324a]/50">
+					Explora la carta
+				</p>
+				<ul className="flex list-none flex-wrap gap-x-5 gap-y-2 p-0 text-sm font-semibold text-[#12324a]">
+					{menu.categories.map((category) => (
+						<li key={category.id}>
+							<a
+								className="underline decoration-[#e76832]/50 decoration-2 underline-offset-4 transition-colors hover:text-[#e76832] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25"
+								href={`#category-${category.id}`}
+							>
+								{category.name}
+							</a>
+						</li>
+					))}
+				</ul>
+			</nav>
+
+			<div>
+				{menu.categories.map((category) => (
+					<CategorySection key={category.id} category={category} />
+				))}
+			</div>
+		</main>
+	);
 }

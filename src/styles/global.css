@@ -1,109 +1,112 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
-@import '@fontsource-variable/geist';
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: Georgia, 'Times New Roman', serif;
-  --font-sans: 'Geist Variable', sans-serif;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+	--font-heading: Georgia, "Times New Roman", serif;
+	--font-sans: "Geist Variable", sans-serif;
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar: var(--sidebar);
+	--color-chart-5: var(--chart-5);
+	--color-chart-4: var(--chart-4);
+	--color-chart-3: var(--chart-3);
+	--color-chart-2: var(--chart-2);
+	--color-chart-1: var(--chart-1);
+	--color-ring: var(--ring);
+	--color-input: var(--input);
+	--color-border: var(--border);
+	--color-destructive: var(--destructive);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-accent: var(--accent);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-secondary: var(--secondary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary: var(--primary);
+	--color-foreground: var(--foreground);
+	--color-background: var(--background);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
 }
 
 :root {
-  --background: #f4f0e8;
-  --foreground: #12324a;
-  --card: #ffffff;
-  --card-foreground: #12324a;
-  --popover: #ffffff;
-  --popover-foreground: #12324a;
-  --primary: #12324a;
-  --primary-foreground: #ffffff;
-  --secondary: #dcecef;
-  --secondary-foreground: #12324a;
-  --muted: #e9e4da;
-  --muted-foreground: #587080;
-  --accent: #e76832;
-  --accent-foreground: #ffffff;
-  --destructive: #b34b25;
-  --border: rgba(18, 50, 74, 0.15);
-  --input: rgba(18, 50, 74, 0.15);
-  --ring: #e76832;
-  --radius: 0.75rem;
-  --sidebar: #f4f0e8;
-  --sidebar-foreground: #12324a;
-  --sidebar-primary: #12324a;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #dcecef;
-  --sidebar-accent-foreground: #12324a;
-  --sidebar-border: rgba(18, 50, 74, 0.15);
-  --sidebar-ring: #e76832;
+	--background: #f4f0e8;
+	--foreground: #12324a;
+	--card: #ffffff;
+	--card-foreground: #12324a;
+	--popover: #ffffff;
+	--popover-foreground: #12324a;
+	--primary: #12324a;
+	--primary-foreground: #ffffff;
+	--secondary: #dcecef;
+	--secondary-foreground: #12324a;
+	--muted: #e9e4da;
+	--muted-foreground: #587080;
+	--accent: #e76832;
+	--accent-foreground: #ffffff;
+	--destructive: #b34b25;
+	--border: rgba(18, 50, 74, 0.15);
+	--input: rgba(18, 50, 74, 0.15);
+	--ring: #e76832;
+	--radius: 0.75rem;
+	--sidebar: #f4f0e8;
+	--sidebar-foreground: #12324a;
+	--sidebar-primary: #12324a;
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: #dcecef;
+	--sidebar-accent-foreground: #12324a;
+	--sidebar-border: rgba(18, 50, 74, 0.15);
+	--sidebar-ring: #e76832;
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
+	* {
+		@apply border-border outline-ring/50;
+	}
 
-  html {
-    @apply font-sans;
-    scroll-behavior: smooth;
-  }
+	html {
+		@apply font-sans;
+		scroll-behavior: smooth;
+	}
 
-  body {
-    @apply m-0 min-h-screen bg-background text-foreground antialiased;
-  }
+	body {
+		@apply m-0 min-h-screen bg-background text-foreground antialiased;
+	}
 
-  ::selection {
-    background: #e76832;
-    color: #ffffff;
-  }
+	::selection {
+		background: #e76832;
+		color: #ffffff;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+	html {
+		scroll-behavior: auto;
+	}
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+	*,
+	*::before,
+	*::after {
+		/* biome-ignore lint/complexity/noImportantStyles: override animations for reduced motion */
+		animation-duration: 0.01ms !important;
+		/* biome-ignore lint/complexity/noImportantStyles: override animations for reduced motion */
+		animation-iteration-count: 1 !important;
+		/* biome-ignore lint/complexity/noImportantStyles: override animations for reduced motion */
+		transition-duration: 0.01ms !important;
+	}
 }
