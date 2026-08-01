@@ -85,6 +85,9 @@ function StaffLoginScreen() {
 					) : null}
 				</div>
 				<LoginForm
+					onSubmit={async (input) => {
+						await session.login(input);
+					}}
 					onSuccess={() => {
 						if (returnTo) {
 							window.location.replace(returnTo);

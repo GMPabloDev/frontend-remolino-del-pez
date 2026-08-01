@@ -2,15 +2,17 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ApiClientError } from "@/lib/api/api-error";
-import { loginRequestSchema } from "../contracts/staff-auth.schemas";
-import { useStaffAuth } from "./StaffAuthProvider";
+import {
+	type LoginInput,
+	loginRequestSchema,
+} from "../contracts/staff-auth.schemas";
 
 interface LoginFormProps {
+	onSubmit: (input: LoginInput) => Promise<void>;
 	onSuccess: () => void;
 }
 
-export function LoginForm({ onSuccess }: LoginFormProps) {
-	const { session } = useStaffAuth();
+export function LoginForm({ onSubmit, onSuccess }: LoginFormProps) {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -37,7 +39,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 		setIsSubmitting(true);
 
 		try {
-			await session.login(result.data);
+			await onSubmit(result.data);
 			onSuccess();
 		} catch (error) {
 			setErrorMessage(getLoginErrorMessage(error));
