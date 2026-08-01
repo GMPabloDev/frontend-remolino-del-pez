@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { type PropsWithChildren, useState } from "react";
 
-import { PublicApiClientError } from "../contracts/api-error";
+import { ApiClientError } from "@/lib/api/api-error";
 
 const publicQueryClientConfig: QueryClientConfig = {
 	defaultOptions: {
@@ -13,7 +13,7 @@ const publicQueryClientConfig: QueryClientConfig = {
 			staleTime: 60_000,
 			refetchOnWindowFocus: true,
 			retry: (failureCount, error) => {
-				if (failureCount >= 2 || !(error instanceof PublicApiClientError)) {
+				if (failureCount >= 2 || !(error instanceof ApiClientError)) {
 					return false;
 				}
 

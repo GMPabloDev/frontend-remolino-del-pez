@@ -40,6 +40,25 @@ export type DiscoveryFixtureScenario =
 	(typeof DISCOVERY_FIXTURE_SCENARIOS)[number];
 export type PublicRuntimeConfig = z.infer<typeof publicEnvironmentSchema>;
 
+const staffEnvironmentSchema = z.object({
+	PUBLIC_API_BASE_URL: z.url().default(DEFAULT_API_BASE_URL),
+	PUBLIC_STAFF_RESTAURANT_ID: z.uuid(),
+});
+
+export type StaffRuntimeConfig = {
+	apiBaseUrl: string;
+	restaurantId: string;
+};
+
 export const runtimeConfig: PublicRuntimeConfig = publicEnvironmentSchema.parse(
 	import.meta.env,
 );
+
+export function getStaffRuntimeConfig(): StaffRuntimeConfig {
+	return staffEnvironmentSchema
+		.transform((environment) => ({
+			apiBaseUrl: environment.PUBLIC_API_BASE_URL.replace(/\/+$/, ""),
+			restaurantId: environment.PUBLIC_STAFF_RESTAURANT_ID,
+		}))
+		.parse(import.meta.env);
+}

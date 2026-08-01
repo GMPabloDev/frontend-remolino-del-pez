@@ -16,32 +16,32 @@ export const apiErrorResponseSchema = z.object({
 
 export type ApiErrorResponse = z.infer<typeof apiErrorResponseSchema>;
 
-export class PublicApiClientError extends Error {
+export class ApiClientError extends Error {
 	constructor(
 		public readonly status: number,
 		public readonly code: string,
 		message: string,
 	) {
 		super(message);
-		this.name = "PublicApiClientError";
+		this.name = "ApiClientError";
 	}
 }
 
 export function parseApiErrorResponse(
 	status: number,
 	payload: unknown,
-): PublicApiClientError {
+): ApiClientError {
 	const result = apiErrorResponseSchema.safeParse(payload);
 
 	if (result.success) {
-		return new PublicApiClientError(
+		return new ApiClientError(
 			status,
 			result.data.error.code,
 			result.data.error.message,
 		);
 	}
 
-	return new PublicApiClientError(
+	return new ApiClientError(
 		status,
 		"INVALID_API_RESPONSE",
 		"El servidor devolvió una respuesta con formato inválido.",

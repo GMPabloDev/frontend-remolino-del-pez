@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { PublicApiClientError } from "../../public-api/contracts/api-error";
+import { ApiClientError } from "@/lib/api/api-error";
 import {
 	usePublicBranchesQuery,
 	usePublicRestaurantQuery,
@@ -9,7 +9,7 @@ import { BranchCard } from "./BranchCard";
 import { DiscoveryState } from "./DiscoveryState";
 
 function getErrorCode(error: unknown): string | undefined {
-	return error instanceof PublicApiClientError ? error.code : undefined;
+	return error instanceof ApiClientError ? error.code : undefined;
 }
 
 export function BranchDiscovery() {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { PublicApiClientError } from "../../public-api/contracts/api-error";
+import { ApiClientError } from "@/lib/api/api-error";
 import { usePublicMenuQuery } from "../../public-api/query/public-queries";
 import type { PublicMenu as PublicMenuData } from "../contracts/public-menu";
 import { type MenuQueryResult, readMenuQuery } from "../lib/menu-query";
@@ -8,7 +8,7 @@ import { CategorySection } from "./CategorySection";
 import { MenuState } from "./MenuState";
 
 function getErrorCode(error: unknown): string | undefined {
-	return error instanceof PublicApiClientError ? error.code : undefined;
+	return error instanceof ApiClientError ? error.code : undefined;
 }
 
 function getMenuQueryBranch(

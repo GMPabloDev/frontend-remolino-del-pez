@@ -1,5 +1,5 @@
+import { ApiClientError } from "@/lib/api/api-error";
 import type { MenuFixtureScenario } from "../../../config/runtime";
-import { PublicApiClientError } from "../../public-api/contracts/api-error";
 import type { PublicMenuSlugQuery } from "../api/public-menu-client";
 import type { PublicMenu } from "../contracts/public-menu";
 
@@ -95,7 +95,7 @@ export function getMenuFixture(
 ): Promise<PublicMenu> {
 	if (scenario === "error") {
 		return Promise.reject(
-			new PublicApiClientError(
+			new ApiClientError(
 				503,
 				"FIXTURE_ERROR",
 				"El menú de demostración no está disponible.",

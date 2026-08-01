@@ -1,5 +1,5 @@
+import { ApiClientError } from "@/lib/api/api-error";
 import type { DiscoveryFixtureScenario } from "../../../config/runtime";
-import { PublicApiClientError } from "../../public-api/contracts/api-error";
 import type {
 	PublicBranch,
 	PublicRestaurant,
@@ -51,7 +51,7 @@ const fixtureBranches: PublicBranch[] = [
 ];
 
 function fixtureError(): never {
-	throw new PublicApiClientError(
+	throw new ApiClientError(
 		503,
 		"FIXTURE_ERROR",
 		"El descubrimiento de demostración no está disponible.",

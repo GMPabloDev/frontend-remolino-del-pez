@@ -1,9 +1,6 @@
 import type { z } from "zod";
 
-import {
-	PublicApiClientError,
-	parseApiErrorResponse,
-} from "../contracts/api-error";
+import { ApiClientError, parseApiErrorResponse } from "@/lib/api/api-error";
 
 export async function requestPublicJson<T>(
 	baseUrl: string,
@@ -19,7 +16,7 @@ export async function requestPublicJson<T>(
 			headers: { Accept: "application/json" },
 		});
 	} catch {
-		throw new PublicApiClientError(0, "NETWORK_ERROR", networkMessage);
+		throw new ApiClientError(0, "NETWORK_ERROR", networkMessage);
 	}
 
 	let payload: unknown;
@@ -37,7 +34,7 @@ export async function requestPublicJson<T>(
 	const result = schema.safeParse(payload);
 
 	if (!result.success) {
-		throw new PublicApiClientError(
+		throw new ApiClientError(
 			response.status,
 			"INVALID_API_RESPONSE",
 			"El servidor devolvió una respuesta con formato inválido.",
