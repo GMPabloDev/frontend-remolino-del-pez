@@ -1,6 +1,7 @@
 # SPEC 01 — Menú público por sucursal
 
 > **Estado:** Implementado
+> **Amended by:** SPEC 02
 > **Depende de:** Ninguna
 > **Fecha:** 2026-07-31
 > **Objetivo:** Crear un menú público responsive por sucursal que consuma el contrato vigente o fixtures de desarrollo y presente la identidad actual de El Molino del Pez.
