@@ -1,44 +1,29 @@
+import { z } from 'zod';
+
 export const MENU_FIXTURE_SCENARIOS = ['populated', 'empty', 'error'] as const;
-
-export type MenuFixtureScenario = (typeof MENU_FIXTURE_SCENARIOS)[number];
-
-export interface PublicRuntimeConfig {
-  apiBaseUrl: string;
-  useMenuFixture: boolean;
-  menuFixtureScenario: MenuFixtureScenario;
-}
+export const DISCOVERY_FIXTURE_SCENARIOS = ['empty', 'single', 'multiple', 'error'] as const;
 
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
-const DEFAULT_FIXTURE_SCENARIO: MenuFixtureScenario = 'populated';
+const DEFAULT_RESTAURANT_SLUG = 'restaurante-olimpico';
 
-function parseBoolean(value: string | undefined, fallback: boolean): boolean {
-  if (value === undefined) {
-    return fallback;
-  }
+const publicEnvironmentSchema = z
+  .object({
+    PUBLIC_API_BASE_URL: z.url().default(DEFAULT_API_BASE_URL),
+    PUBLIC_RESTAURANT_SLUG: z.string().trim().min(1).default(DEFAULT_RESTAURANT_SLUG),
+    PUBLIC_USE_MENU_FIXTURE: z.enum(['true', 'false']).default('false'),
+    PUBLIC_MENU_FIXTURE_SCENARIO: z.enum(MENU_FIXTURE_SCENARIOS).default('populated'),
+    PUBLIC_DISCOVERY_FIXTURE_SCENARIO: z.enum(DISCOVERY_FIXTURE_SCENARIOS).default('multiple'),
+  })
+  .transform((environment) => ({
+    apiBaseUrl: environment.PUBLIC_API_BASE_URL.replace(/\/+$/, ''),
+    restaurantSlug: environment.PUBLIC_RESTAURANT_SLUG,
+    useMenuFixture: environment.PUBLIC_USE_MENU_FIXTURE === 'true',
+    menuFixtureScenario: environment.PUBLIC_MENU_FIXTURE_SCENARIO,
+    discoveryFixtureScenario: environment.PUBLIC_DISCOVERY_FIXTURE_SCENARIO,
+  }));
 
-  return value.toLowerCase() === 'true';
-}
+export type MenuFixtureScenario = (typeof MENU_FIXTURE_SCENARIOS)[number];
+export type DiscoveryFixtureScenario = (typeof DISCOVERY_FIXTURE_SCENARIOS)[number];
+export type PublicRuntimeConfig = z.infer<typeof publicEnvironmentSchema>;
 
-function parseFixtureScenario(value: string | undefined): MenuFixtureScenario {
-  if (value && MENU_FIXTURE_SCENARIOS.includes(value as MenuFixtureScenario)) {
-    return value as MenuFixtureScenario;
-  }
-
-  return DEFAULT_FIXTURE_SCENARIO;
-}
-
-function parseApiBaseUrl(value: string | undefined): string {
-  const baseUrl = value?.trim() || DEFAULT_API_BASE_URL;
-
-  try {
-    return new URL(baseUrl).toString().replace(/\/$/, '');
-  } catch {
-    throw new Error(`PUBLIC_API_BASE_URL no es una URL válida: ${baseUrl}`);
-  }
-}
-
-export const runtimeConfig: PublicRuntimeConfig = {
-  apiBaseUrl: parseApiBaseUrl(import.meta.env.PUBLIC_API_BASE_URL),
-  useMenuFixture: parseBoolean(import.meta.env.PUBLIC_USE_MENU_FIXTURE, false),
-  menuFixtureScenario: parseFixtureScenario(import.meta.env.PUBLIC_MENU_FIXTURE_SCENARIO),
-};
+export const runtimeConfig: PublicRuntimeConfig = publicEnvironmentSchema.parse(import.meta.env);
