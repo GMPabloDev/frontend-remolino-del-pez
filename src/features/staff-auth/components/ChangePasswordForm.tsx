@@ -1,20 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ApiClientError } from "@/lib/api/api-error";
-import { createStaffApiClient } from "../api/staff-api-client";
-import { changePasswordFormSchema } from "../contracts/staff-auth.schemas";
-import { useStaffAuth } from "./StaffAuthProvider";
+import {
+	type ChangePasswordRequest,
+	changePasswordFormSchema,
+} from "../contracts/staff-auth.schemas";
 
 interface ChangePasswordFormProps {
 	onPasswordChanged: () => Promise<void> | void;
+	onSubmit: (input: ChangePasswordRequest) => Promise<void>;
 }
 
 export function ChangePasswordForm({
 	onPasswordChanged,
+	onSubmit,
 }: ChangePasswordFormProps) {
-	const { session } = useStaffAuth();
-	const apiClient = useMemo(() => createStaffApiClient(session), [session]);
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 	const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -48,13 +49,9 @@ export function ChangePasswordForm({
 		setIsSubmitting(true);
 
 		try {
-			await apiClient.requestNoContent("/auth/password", {
-				method: "PATCH",
-				body: JSON.stringify({
-					currentPassword: result.data.currentPassword,
-					newPassword: result.data.newPassword,
-				}),
-				headers: { "Content-Type": "application/json" },
+			await onSubmit({
+				currentPassword: result.data.currentPassword,
+				newPassword: result.data.newPassword,
 			});
 			await onPasswordChanged();
 		} catch (error) {

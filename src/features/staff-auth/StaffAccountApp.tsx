@@ -1,10 +1,14 @@
+import { useMemo } from "react";
+
 import { StaffLayout } from "../staff-shell/components/StaffLayout";
+import { createStaffApiClient } from "./api/staff-api-client";
 import { ChangePasswordForm } from "./components/ChangePasswordForm";
 import { ProtectedStaffRoute } from "./components/ProtectedStaffRoute";
 import {
 	StaffAuthProvider,
 	useStaffAuth,
 } from "./components/StaffAuthProvider";
+import type { ChangePasswordRequest } from "./contracts/staff-auth.schemas";
 import { StaffQueryProvider } from "./query/staff-query-client";
 
 export function StaffAccountApp() {
@@ -19,6 +23,17 @@ export function StaffAccountApp() {
 
 function StaffAccountScreen() {
 	const { session } = useStaffAuth();
+	const apiClient = useMemo(() => createStaffApiClient(session), [session]);
+
+	async function submitPasswordChange(
+		input: ChangePasswordRequest,
+	): Promise<void> {
+		await apiClient.requestNoContent("/auth/password", {
+			method: "PATCH",
+			body: JSON.stringify(input),
+			headers: { "Content-Type": "application/json" },
+		});
+	}
 
 	async function handlePasswordChanged() {
 		await session.logout();
@@ -38,7 +53,10 @@ function StaffAccountScreen() {
 							tendrás que iniciar sesión nuevamente.
 						</p>
 					</div>
-					<ChangePasswordForm onPasswordChanged={handlePasswordChanged} />
+					<ChangePasswordForm
+						onPasswordChanged={handlePasswordChanged}
+						onSubmit={submitPasswordChange}
+					/>
 				</section>
 			</StaffLayout>
 		</ProtectedStaffRoute>
