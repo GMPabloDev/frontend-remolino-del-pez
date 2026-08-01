@@ -1,9 +1,11 @@
+import { useQueryClient } from "@tanstack/react-query";
 import {
 	createContext,
 	type PropsWithChildren,
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 	useSyncExternalStore,
 } from "react";
@@ -23,6 +25,8 @@ const StaffAuthContext = createContext<StaffAuthContextValue | null>(null);
 
 export function StaffAuthProvider({ children }: PropsWithChildren) {
 	const [session] = useState(createStaffSession);
+	const queryClient = useQueryClient();
+	const previousStatus = useRef<StaffSessionSnapshot["status"]>("checking");
 	const snapshot = useSyncExternalStore(
 		session.subscribe,
 		session.getSnapshot,
@@ -33,6 +37,17 @@ export function StaffAuthProvider({ children }: PropsWithChildren) {
 		void session.bootstrap();
 		return () => session.destroy();
 	}, [session]);
+
+	useEffect(() => {
+		if (
+			previousStatus.current === "authenticated" &&
+			snapshot.status !== "authenticated"
+		) {
+			queryClient.clear();
+		}
+
+		previousStatus.current = snapshot.status;
+	}, [queryClient, snapshot.status]);
 
 	const value = useMemo(() => ({ session, snapshot }), [session, snapshot]);
 
