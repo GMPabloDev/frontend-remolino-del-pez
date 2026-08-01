@@ -1,81 +1,54 @@
 import { useEffect, useState } from 'react';
 
 import { PublicApiClientError } from '../../public-api/contracts/api-error';
+import { usePublicMenuQuery } from '../../public-api/query/public-queries';
 import type { PublicMenu as PublicMenuData } from '../contracts/public-menu';
-import { getPublicMenu } from '../data/get-public-menu';
+import { readMenuQuery, type MenuQueryResult } from '../lib/menu-query';
 import { CategorySection } from './CategorySection';
 import { MenuState } from './MenuState';
-import { readMenuQuery, type MenuQueryResult } from '../lib/menu-query';
-
-type MenuLoadState =
-  | { kind: 'loading' }
-  | { kind: 'invalid-query'; reason: 'missing' | 'invalid' }
-  | { kind: 'error'; code?: string }
-  | { kind: 'ready'; menu: PublicMenuData };
-
-const initialState: MenuLoadState = { kind: 'loading' };
-
-function getQueryResult(): MenuQueryResult {
-  return readMenuQuery(window.location.search);
-}
 
 function getErrorCode(error: unknown): string | undefined {
   return error instanceof PublicApiClientError ? error.code : undefined;
 }
 
+function getMenuQueryBranch(queryResult: MenuQueryResult | null): string | null {
+  return queryResult?.valid ? queryResult.value.branchSlug : null;
+}
+
 export function PublicMenu() {
-  const [loadState, setLoadState] = useState<MenuLoadState>(initialState);
-  const [retryCount, setRetryCount] = useState(0);
+  const [queryResult, setQueryResult] = useState<MenuQueryResult | null>(null);
+  const branchSlug = getMenuQueryBranch(queryResult);
+  const menuQuery = usePublicMenuQuery(branchSlug);
 
   useEffect(() => {
-    let cancelled = false;
-    const queryResult = getQueryResult();
+    setQueryResult(readMenuQuery(window.location.search));
+  }, []);
 
-    if (!queryResult.valid) {
-      setLoadState({ kind: 'invalid-query', reason: queryResult.reason });
-      return () => {
-        cancelled = true;
-      };
-    }
-
-    setLoadState({ kind: 'loading' });
-
-    getPublicMenu(queryResult.value)
-      .then((menu) => {
-        if (!cancelled) {
-          setLoadState({ kind: 'ready', menu });
-        }
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) {
-          setLoadState({ kind: 'error', code: getErrorCode(error) });
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [retryCount]);
-
-  if (loadState.kind === 'loading') {
+  if (queryResult === null || menuQuery.isPending) {
     return <MenuState kind="loading" />;
   }
 
-  if (loadState.kind === 'invalid-query') {
-    return <MenuState kind="invalid-query" invalidQueryReason={loadState.reason} />;
+  if (!queryResult.valid) {
+    return <MenuState kind="invalid-query" invalidQueryReason={queryResult.reason} />;
   }
 
-  if (loadState.kind === 'error') {
+  if (menuQuery.isError) {
     return (
       <MenuState
         kind="error"
-        errorCode={loadState.code}
-        onRetry={() => setRetryCount((count) => count + 1)}
+        errorCode={getErrorCode(menuQuery.error)}
+        onRetry={() => void menuQuery.refetch()}
       />
     );
   }
 
-  if (loadState.menu.categories.length === 0) {
+  if (!menuQuery.data) {
+    return <MenuState kind="loading" />;
+  }
+
+  const menu: PublicMenuData = menuQuery.data;
+
+  if (menu.categories.length === 0) {
     return <MenuState kind="empty" />;
   }
 
@@ -87,7 +60,7 @@ export function PublicMenu() {
       >
         <p className="shrink-0 text-xs font-bold uppercase tracking-[0.2em] text-[#12324a]/50">Explora la carta</p>
         <ul className="flex list-none flex-wrap gap-x-5 gap-y-2 p-0 text-sm font-semibold text-[#12324a]">
-          {loadState.menu.categories.map((category) => (
+          {menu.categories.map((category) => (
             <li key={category.id}>
               <a
                 className="underline decoration-[#e76832]/50 decoration-2 underline-offset-4 transition-colors hover:text-[#e76832] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25"
@@ -101,7 +74,7 @@ export function PublicMenu() {
       </nav>
 
       <div>
-        {loadState.menu.categories.map((category) => (
+        {menu.categories.map((category) => (
           <CategorySection key={category.id} category={category} />
         ))}
       </div>

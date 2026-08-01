@@ -1,5 +1,5 @@
 ---
-import { PublicMenu } from '../features/public-menu/components/PublicMenu';
+import { PublicMenuApp } from '../features/public-menu/PublicMenuApp';
 import { restaurantBrand } from '../config/restaurant-brand';
 import Layout from '../layouts/Layout.astro';
 ---
@@ -51,7 +51,7 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </header>
 
-  <PublicMenu client:load />
+  <PublicMenuApp client:load />
 
   <footer class="mx-auto flex max-w-6xl flex-col gap-3 border-t border-[#12324a]/15 px-5 py-8 text-xs text-[#12324a]/55 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
     <p class="font-heading text-lg font-semibold tracking-[-0.03em] text-[#12324a]">{restaurantBrand.name}</p>

@@ -20,9 +20,9 @@ interface MenuStateProps {
 const stateCopy = {
   'invalid-query': {
     eyebrow: 'Enlace incompleto',
-    title: 'Este menú necesita una dirección válida.',
+    title: 'Este menú necesita una sucursal válida.',
     description:
-      'Revisa el enlace compartido e incluye la identificación del restaurante y de la sucursal.',
+      'Revisa el enlace compartido o vuelve al selector para elegir una sucursal activa.',
   },
   empty: {
     eyebrow: 'Carta en preparación',
@@ -69,7 +69,7 @@ export function MenuState({
   const Icon = isInvalidQuery ? Link2Off : kind === 'empty' ? UtensilsCrossed : CircleAlert;
   const detail =
     isInvalidQuery && invalidQueryReason === 'missing'
-      ? 'Faltan los identificadores necesarios para abrir este menú.'
+      ? 'Falta elegir una sucursal para abrir este menú.'
       : copy.description;
 
   return (
@@ -88,7 +88,23 @@ export function MenuState({
       </h2>
       <p className="mt-3 max-w-sm text-sm leading-6 text-[#12324a]/65">{detail}</p>
       {kind === 'error' && errorCode === 'PUBLIC_MENU_NOT_FOUND' ? (
-        <p className="mt-3 text-xs font-medium text-[#12324a]/55">Esta sucursal podría estar temporalmente cerrada.</p>
+        <>
+          <p className="mt-3 text-xs font-medium text-[#12324a]/55">Esta sucursal podría estar temporalmente cerrada.</p>
+          <a
+            className="mt-6 inline-flex min-h-11 items-center rounded-full border border-[#12324a]/15 px-5 text-sm font-semibold text-[#12324a] transition-colors hover:border-[#12324a]/35 hover:bg-[#dcecef] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/35"
+            href="/"
+          >
+            Volver a sucursales
+          </a>
+        </>
+      ) : null}
+      {isInvalidQuery ? (
+        <a
+          className="mt-7 inline-flex min-h-11 items-center rounded-full border border-[#12324a]/15 px-5 text-sm font-semibold text-[#12324a] transition-colors hover:border-[#12324a]/35 hover:bg-[#dcecef] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/35"
+          href="/"
+        >
+          Volver a sucursales
+        </a>
       ) : null}
       {kind === 'error' && onRetry ? (
         <button
