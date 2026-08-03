@@ -29,12 +29,19 @@ const staffQueryClientConfig: QueryClientConfig = {
 	},
 };
 
+let sharedStaffQueryClient: QueryClient | null = null;
+
 export function createStaffQueryClient(): QueryClient {
 	return new QueryClient(staffQueryClientConfig);
 }
 
+function getSharedStaffQueryClient(): QueryClient {
+	sharedStaffQueryClient ??= createStaffQueryClient();
+	return sharedStaffQueryClient;
+}
+
 export function StaffQueryProvider({ children }: PropsWithChildren) {
-	const [queryClient] = useState(createStaffQueryClient);
+	const [queryClient] = useState(getSharedStaffQueryClient);
 
 	return (
 		<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
