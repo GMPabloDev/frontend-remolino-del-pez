@@ -1,0 +1,18 @@
+---
+export const prerender = false;
+
+import { StaffCategoryDetailApp } from "../../../../features/staff-catalog/StaffCategoryDetailApp";
+import StaffPageLayout from "../../../../layouts/StaffPageLayout.astro";
+
+const { categoryId } = Astro.params;
+---
+
+<StaffPageLayout
+	title="Administrar categoría · El Molino del Pez"
+	description="Administra una categoría del catálogo de El Molino del Pez."
+>
+	<StaffCategoryDetailApp
+		categoryId={categoryId ?? ""}
+		client:load
+	/>
+</StaffPageLayout>
