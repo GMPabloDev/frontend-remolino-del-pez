@@ -1,6 +1,7 @@
 # SPEC 03 — Autenticación staff y contexto administrativo
 
 > **Estado:** Implementado
+> **Amended by:** SPEC 05
 > **Depende de:** SPEC 02
 > **Supersedes:** SPEC 02 (Astro completamente estático y ausencia de adaptador server-side)
 > **Fecha:** 2026-08-01
