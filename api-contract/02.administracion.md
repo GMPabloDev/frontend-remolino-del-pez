@@ -220,7 +220,9 @@ Crea el restaurante (**singleton**: solo puede existir uno).
 
 > \* `branch_admin` solo sobre su sucursal; otra → `403 FORBIDDEN`.
 
-`Branch` = `{ id, restaurantId, slug, name, code, address, district, province, department, phone, email, status: "active"|"inactive", createdAt, updatedAt, rules: BranchRules | null, intervals: BranchScheduleInterval[] }`. **`status` siempre en minúsculas.**
+`Branch` = `{ id, restaurantId, slug, name, code, address, district, province, department, phone, email, status: "active"|"inactive", createdAt, updatedAt, rules: BranchRules, intervals: BranchScheduleInterval[] }`. **`status` siempre en minúsculas.**
+
+`BranchRules` **siempre está presente** en la respuesta (`rules` no es nullable): se exigen al crear la sucursal y nunca se pueden eliminar vía update.
 
 `BranchScheduleInterval` = `{ dayOfWeek: 1-7 (1=lunes), startTime: "HH:mm", endTime: "HH:mm" }`. En las respuestas, `intervals` viaja con `startTime`/`endTime` en formato `HH:mm` — mismo formato que acepta `PUT /schedule` y que usa la API pública.
 
@@ -273,7 +275,7 @@ Crea el restaurante (**singleton**: solo puede existir uno).
 
 ### PATCH /restaurants/:restaurantId/branches/:branchId
 
-Todos los campos opcionales; `rules` también parcial (solo los campos enviados).
+Todos los campos opcionales; `rules` también parcial (solo los campos enviados). `email: null` elimina el valor (la sucursal queda sin email).
 
 **Errores:** `404 BRANCH_NOT_FOUND`, `409 BRANCH_CODE_ALREADY_EXISTS`, `403 FORBIDDEN`
 
