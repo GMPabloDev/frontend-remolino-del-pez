@@ -1,0 +1,15 @@
+---
+export const prerender = false;
+
+import { StaffDishDetailApp } from "../../../../features/staff-catalog/StaffDishDetailApp";
+import StaffPageLayout from "../../../../layouts/StaffPageLayout.astro";
+
+const { dishId } = Astro.params;
+---
+
+<StaffPageLayout
+	title="Administrar plato · El Molino del Pez"
+	description="Administra un plato del catálogo de El Molino del Pez."
+>
+	<StaffDishDetailApp dishId={dishId ?? ""} client:load />
+</StaffPageLayout>

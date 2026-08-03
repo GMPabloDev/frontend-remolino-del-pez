@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+
+import { StaffCatalogDishesApp } from "../../../../features/staff-catalog/StaffCatalogDishesApp";
+import StaffPageLayout from "../../../../layouts/StaffPageLayout.astro";
+---
+
+<StaffPageLayout
+	title="Platos · El Molino del Pez"
+	description="Administra los platos del catálogo de El Molino del Pez."
+>
+	<StaffCatalogDishesApp client:load />
+</StaffPageLayout>

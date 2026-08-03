@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+
+import { StaffDishCreateApp } from "../../../../features/staff-catalog/StaffDishCreateApp";
+import StaffPageLayout from "../../../../layouts/StaffPageLayout.astro";
+---
+
+<StaffPageLayout
+	title="Nuevo plato · El Molino del Pez"
+	description="Registra un plato para el catálogo de El Molino del Pez."
+>
+	<StaffDishCreateApp client:load />
+</StaffPageLayout>
