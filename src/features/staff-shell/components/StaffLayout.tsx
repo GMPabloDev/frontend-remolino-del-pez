@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { useStaffAuth } from "@/features/staff-auth/components/StaffAuthProvider";
 import type { StaffUser } from "@/features/staff-auth/contracts/staff-auth.schemas";
 import { removeAllBranchDrafts } from "@/features/staff-branches/lib/staff-branch-drafts";
+import { removeAllStaffTableDrafts } from "@/features/staff-tables/lib/staff-table-drafts";
 
 interface StaffLayoutProps {
 	children: ReactNode;
@@ -31,7 +32,10 @@ export function StaffLayout({
 
 	async function handleLogout() {
 		setIsLoggingOut(true);
-		if (user) removeAllBranchDrafts(user.id);
+		if (user) {
+			removeAllBranchDrafts(user.id);
+			removeAllStaffTableDrafts(user.id);
+		}
 		await session.logout();
 		window.location.replace("/staff/login");
 	}
