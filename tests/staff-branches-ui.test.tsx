@@ -56,6 +56,9 @@ describe("StaffBranchList", () => {
 			2,
 		);
 		expect(
+			screen.getAllByRole("link", { name: "Gestionar mesas" }),
+		).toHaveLength(2);
+		expect(
 			screen
 				.getByRole("button", { name: "Nueva sucursal" })
 				.getAttribute("href"),
