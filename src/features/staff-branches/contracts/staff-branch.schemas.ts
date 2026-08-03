@@ -76,10 +76,10 @@ export const createBranchRequestSchema = z
 		),
 		rules: branchRulesSchema,
 	})
-	.transform((input) => ({
-		...input,
-		...(input.email ? { email: input.email } : {}),
-	}));
+	.transform((input) => {
+		const { email, ...details } = input;
+		return email ? { ...details, email } : details;
+	});
 
 export const updateBranchDetailsRequestSchema = z.object({
 	name: z.string().trim().min(1, "Ingresa el nombre de la sucursal."),

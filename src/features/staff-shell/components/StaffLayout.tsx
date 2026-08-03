@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useStaffAuth } from "@/features/staff-auth/components/StaffAuthProvider";
 import type { StaffUser } from "@/features/staff-auth/contracts/staff-auth.schemas";
+import { removeAllBranchDrafts } from "@/features/staff-branches/lib/staff-branch-drafts";
 
 interface StaffLayoutProps {
 	children: ReactNode;
@@ -18,10 +19,19 @@ export function StaffLayout({
 }: StaffLayoutProps) {
 	const { session, snapshot } = useStaffAuth();
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
+	const [currentPath, setCurrentPath] = useState<string | null>(null);
 	const user = snapshot.user;
+
+	useEffect(() => {
+		const updateCurrentPath = () => setCurrentPath(window.location.pathname);
+		updateCurrentPath();
+		window.addEventListener("popstate", updateCurrentPath);
+		return () => window.removeEventListener("popstate", updateCurrentPath);
+	}, []);
 
 	async function handleLogout() {
 		setIsLoggingOut(true);
+		if (user) removeAllBranchDrafts(user.id);
 		await session.logout();
 		window.location.replace("/staff/login");
 	}
@@ -57,8 +67,24 @@ export function StaffLayout({
 			<div className="mx-auto grid max-w-7xl gap-8 px-5 py-6 sm:px-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:px-12 lg:py-10">
 				<nav aria-label="Navegación staff" className="lg:pt-2">
 					<ul className="flex gap-2 overflow-x-auto lg:block lg:space-y-2">
-						<NavItem href="/staff">Inicio</NavItem>
-						<NavItem href="/staff/account">Mi cuenta</NavItem>
+						<NavItem
+							href="/staff"
+							isActive={isPathActive(currentPath, "/staff")}
+						>
+							Inicio
+						</NavItem>
+						<NavItem
+							href="/staff/account"
+							isActive={isPathActive(currentPath, "/staff/account")}
+						>
+							Mi cuenta
+						</NavItem>
+						<NavItem
+							href="/staff/branches"
+							isActive={isPathActive(currentPath, "/staff/branches")}
+						>
+							Sucursales
+						</NavItem>
 					</ul>
 				</nav>
 
@@ -78,17 +104,32 @@ export function StaffLayout({
 	);
 }
 
-function NavItem({ href, children }: { href: string; children: ReactNode }) {
+function NavItem({
+	href,
+	children,
+	isActive,
+}: {
+	href: string;
+	children: ReactNode;
+	isActive: boolean;
+}) {
 	return (
 		<li>
 			<a
-				className="inline-flex rounded-xl px-4 py-3 text-sm font-semibold text-[#12324a]/70 transition hover:bg-white hover:text-[#12324a] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25"
+				aria-current={isActive ? "page" : undefined}
+				className={`inline-flex rounded-xl px-4 py-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25 ${isActive ? "bg-white text-[#12324a] shadow-[0_8px_24px_rgba(18,50,74,0.08)]" : "text-[#12324a]/70 hover:bg-white hover:text-[#12324a]"}`}
 				href={href}
 			>
 				{children}
 			</a>
 		</li>
 	);
+}
+
+function isPathActive(currentPath: string | null, href: string): boolean {
+	if (!currentPath) return false;
+	if (href === "/staff") return currentPath === href;
+	return currentPath === href || currentPath.startsWith(`${href}/`);
 }
 
 function getRoleLabel(user: StaffUser): string {

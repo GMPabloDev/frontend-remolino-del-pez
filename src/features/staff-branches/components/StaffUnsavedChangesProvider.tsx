@@ -1,5 +1,13 @@
 import type { ReactNode } from "react";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 
 import {
 	AlertDialog,
@@ -90,14 +98,21 @@ export function StaffUnsavedChangesProvider({
 			document.removeEventListener("click", handleInternalLinkClick, true);
 	}, [guard]);
 
-	function registerDirty(section: string, isDirty: boolean): void {
-		setDirtySections((currentSections) => {
-			const nextSections = new Set(currentSections);
-			if (isDirty) nextSections.add(section);
-			else nextSections.delete(section);
-			return nextSections;
-		});
-	}
+	const registerDirty = useCallback(
+		(section: string, isDirty: boolean): void => {
+			setDirtySections((currentSections) => {
+				const alreadyDirty = currentSections.has(section);
+				if (alreadyDirty === isDirty) return currentSections;
+
+				const nextSections = new Set(currentSections);
+				if (isDirty) nextSections.add(section);
+				else nextSections.delete(section);
+				return nextSections;
+			});
+		},
+		[],
+	);
+	const contextValue = useMemo(() => ({ registerDirty }), [registerDirty]);
 
 	function continueNavigation(): void {
 		if (!pendingHref) return;
@@ -110,7 +125,7 @@ export function StaffUnsavedChangesProvider({
 	}
 
 	return (
-		<StaffUnsavedChangesContext.Provider value={{ registerDirty }}>
+		<StaffUnsavedChangesContext.Provider value={contextValue}>
 			{children}
 			<AlertDialog
 				open={pendingHref !== null}

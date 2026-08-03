@@ -62,7 +62,10 @@ export function StaffBranchList({
 					</nav>
 				</div>
 				{canCreate ? (
-					<Button render={<a href="/staff/branches/new" />}>
+					<Button
+						nativeButton={false}
+						render={<a href="/staff/branches/new" />}
+					>
 						<Plus aria-hidden="true" />
 						Nueva sucursal
 					</Button>
@@ -195,7 +198,10 @@ function EmptyBranchState({ canCreate }: { canCreate: boolean }) {
 		<ListStatus
 			action={
 				canCreate ? (
-					<Button render={<a href="/staff/branches/new" />}>
+					<Button
+						nativeButton={false}
+						render={<a href="/staff/branches/new" />}
+					>
 						<Plus aria-hidden="true" />
 						Crear primera sucursal
 					</Button>

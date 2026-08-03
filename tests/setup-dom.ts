@@ -27,6 +27,7 @@ Object.defineProperty(globalObject, "self", {
 });
 
 for (const property of [
+	"Element",
 	"HTMLElement",
 	"HTMLInputElement",
 	"HTMLButtonElement",
