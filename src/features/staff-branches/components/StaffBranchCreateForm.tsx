@@ -42,6 +42,7 @@ import {
 	type StoredBranchDraft,
 	saveBranchDraft,
 } from "../lib/staff-branch-drafts";
+import { useStaffUnsavedChanges } from "./StaffUnsavedChangesProvider";
 
 interface StaffBranchCreateFormProps {
 	userId: string;
@@ -84,6 +85,7 @@ export function StaffBranchCreateForm({
 	});
 	const values = useWatch({ control }) as CreateBranchFormValues;
 	const rootError = errors.root?.server?.message;
+	useStaffUnsavedChanges("new", isDirty);
 
 	useEffect(() => {
 		const storedDraft = readBranchDraft({
@@ -154,7 +156,7 @@ export function StaffBranchCreateForm({
 
 	function recoverDraft() {
 		if (!draft) return;
-		reset(draft.values);
+		reset(draft.values, { keepDefaultValues: true });
 		setDraft(null);
 	}
 

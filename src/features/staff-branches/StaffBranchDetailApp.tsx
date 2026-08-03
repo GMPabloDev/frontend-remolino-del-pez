@@ -15,6 +15,7 @@ import { StaffBranchDetailsForm } from "./components/StaffBranchDetailsForm";
 import { StaffBranchRulesForm } from "./components/StaffBranchRulesForm";
 import { StaffBranchScheduleForm } from "./components/StaffBranchScheduleForm";
 import { StaffBranchStatusControl } from "./components/StaffBranchStatusControl";
+import { StaffUnsavedChangesProvider } from "./components/StaffUnsavedChangesProvider";
 import type { StaffBranch } from "./contracts/staff-branch.schemas";
 import { useStaffBranchQuery } from "./query/staff-branches-query";
 
@@ -37,26 +38,31 @@ function StaffBranchDetailScreen({ branchId }: StaffBranchDetailAppProps) {
 	const branchQuery = useStaffBranchQuery(session, branchId);
 
 	return (
-		<ProtectedStaffRoute>
-			<StaffLayout eyebrow="Gestión de sucursales" title="Administrar sucursal">
-				{branchQuery.isPending ? (
-					<DetailStatus busy message="Cargando la sucursal…" />
-				) : null}
-				{branchQuery.isError ? (
-					<DetailErrorState
-						error={branchQuery.error}
-						onRetry={() => void branchQuery.refetch()}
-					/>
-				) : null}
-				{branchQuery.data && snapshot.user ? (
-					<BranchOverview
-						branch={branchQuery.data}
-						session={session}
-						userId={snapshot.user.id}
-					/>
-				) : null}
-			</StaffLayout>
-		</ProtectedStaffRoute>
+		<StaffUnsavedChangesProvider>
+			<ProtectedStaffRoute>
+				<StaffLayout
+					eyebrow="Gestión de sucursales"
+					title="Administrar sucursal"
+				>
+					{branchQuery.isPending ? (
+						<DetailStatus busy message="Cargando la sucursal…" />
+					) : null}
+					{branchQuery.isError ? (
+						<DetailErrorState
+							error={branchQuery.error}
+							onRetry={() => void branchQuery.refetch()}
+						/>
+					) : null}
+					{branchQuery.data && snapshot.user ? (
+						<BranchOverview
+							branch={branchQuery.data}
+							session={session}
+							userId={snapshot.user.id}
+						/>
+					) : null}
+				</StaffLayout>
+			</ProtectedStaffRoute>
+		</StaffUnsavedChangesProvider>
 	);
 }
 

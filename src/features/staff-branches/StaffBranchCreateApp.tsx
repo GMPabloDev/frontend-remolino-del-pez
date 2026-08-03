@@ -10,6 +10,7 @@ import { StaffQueryProvider } from "@/features/staff-auth/query/staff-query-clie
 import { StaffLayout } from "@/features/staff-shell/components/StaffLayout";
 import { createStaffBranchesClient } from "./api/staff-branches-client";
 import { StaffBranchCreateForm } from "./components/StaffBranchCreateForm";
+import { StaffUnsavedChangesProvider } from "./components/StaffUnsavedChangesProvider";
 import { canCreateStaffBranch } from "./lib/staff-branch-permissions";
 
 export function StaffBranchCreateApp() {
@@ -30,23 +31,28 @@ function StaffBranchCreateScreen() {
 		: false;
 
 	return (
-		<ProtectedStaffRoute>
-			<StaffLayout eyebrow="Gestión de sucursales" title="Nueva sucursal">
-				{snapshot.user && canCreate ? (
-					<section className="max-w-5xl rounded-3xl border border-[#12324a]/10 bg-white/90 p-6 shadow-[0_20px_60px_rgba(18,50,74,0.08)] sm:p-8">
-						<div className="mb-8 space-y-3">
-							<p className="text-sm leading-6 text-[#12324a]/65">
-								Completa los datos y las reglas iniciales. La sucursal se creará
-								inactiva y podrás configurar su horario después.
-							</p>
-						</div>
-						<StaffBranchCreateForm client={client} userId={snapshot.user.id} />
-					</section>
-				) : (
-					<NoCreatePermission />
-				)}
-			</StaffLayout>
-		</ProtectedStaffRoute>
+		<StaffUnsavedChangesProvider>
+			<ProtectedStaffRoute>
+				<StaffLayout eyebrow="Gestión de sucursales" title="Nueva sucursal">
+					{snapshot.user && canCreate ? (
+						<section className="max-w-5xl rounded-3xl border border-[#12324a]/10 bg-white/90 p-6 shadow-[0_20px_60px_rgba(18,50,74,0.08)] sm:p-8">
+							<div className="mb-8 space-y-3">
+								<p className="text-sm leading-6 text-[#12324a]/65">
+									Completa los datos y las reglas iniciales. La sucursal se
+									creará inactiva y podrás configurar su horario después.
+								</p>
+							</div>
+							<StaffBranchCreateForm
+								client={client}
+								userId={snapshot.user.id}
+							/>
+						</section>
+					) : (
+						<NoCreatePermission />
+					)}
+				</StaffLayout>
+			</ProtectedStaffRoute>
+		</StaffUnsavedChangesProvider>
 	);
 }
 

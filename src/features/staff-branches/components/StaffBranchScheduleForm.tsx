@@ -7,8 +7,19 @@ import {
 	type UseFormRegisterReturn,
 	useFieldArray,
 	useForm,
+	useWatch,
 } from "react-hook-form";
 
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -30,8 +41,15 @@ import {
 	branchScheduleFormSchema,
 	toReplaceBranchScheduleRequest,
 } from "../contracts/staff-branch-form.schemas";
-import { removeBranchDraft } from "../lib/staff-branch-drafts";
+import {
+	hasBranchDraftConflict,
+	readBranchDraft,
+	removeBranchDraft,
+	type StoredBranchDraft,
+	saveBranchDraft,
+} from "../lib/staff-branch-drafts";
 import { useReplaceStaffBranchScheduleMutation } from "../query/staff-branches-query";
+import { useStaffUnsavedChanges } from "./StaffUnsavedChangesProvider";
 
 interface StaffBranchScheduleFormProps {
 	branch: StaffBranch;
@@ -56,6 +74,8 @@ export function StaffBranchScheduleForm({
 }: StaffBranchScheduleFormProps) {
 	const errorReference = useRef<HTMLParagraphElement>(null);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+	const [draft, setDraft] =
+		useState<StoredBranchDraft<BranchScheduleFormValues> | null>(null);
 	const replaceMutation = useReplaceStaffBranchScheduleMutation(session);
 	const {
 		control,
@@ -76,11 +96,39 @@ export function StaffBranchScheduleForm({
 		control,
 		name: "intervals",
 	});
+	const values = useWatch({ control }) as BranchScheduleFormValues;
 	const rootError = errors.root?.server?.message;
+	const hasDraftConflict = draft
+		? hasBranchDraftConflict(draft, branch.updatedAt)
+		: false;
+	useStaffUnsavedChanges("schedule", isDirty);
 
 	useEffect(() => {
 		reset(getDefaultValues(branch));
 	}, [branch, reset]);
+
+	useEffect(() => {
+		const storedDraft = readBranchDraft({
+			userId,
+			branchId: branch.id,
+			section: "schedule",
+			valuesSchema: branchScheduleFormSchema,
+		});
+		setDraft(storedDraft);
+	}, [branch.id, userId]);
+
+	useEffect(() => {
+		if (!isDirty) return;
+
+		saveBranchDraft({
+			userId,
+			branchId: branch.id,
+			section: "schedule",
+			baseUpdatedAt: branch.updatedAt,
+			values,
+			valuesSchema: branchScheduleFormSchema,
+		});
+	}, [branch.id, branch.updatedAt, isDirty, userId, values]);
 
 	useEffect(() => {
 		if (rootError) errorReference.current?.focus();
@@ -105,6 +153,7 @@ export function StaffBranchScheduleForm({
 				input: toReplaceBranchScheduleRequest(values),
 			});
 			removeBranchDraft(userId, branch.id, "schedule");
+			setDraft(null);
 			reset(getDefaultValues(updatedBranch));
 			setSuccessMessage("El horario semanal fue guardado.");
 		} catch (error) {
@@ -120,6 +169,17 @@ export function StaffBranchScheduleForm({
 
 		const firstField = getFirstInvalidField(formErrors);
 		if (firstField) setFocus(firstField);
+	}
+
+	function recoverDraft(): void {
+		if (!draft) return;
+		reset(draft.values, { keepDefaultValues: true });
+		setDraft(null);
+	}
+
+	function discardDraft(): void {
+		removeBranchDraft(userId, branch.id, "schedule");
+		setDraft(null);
 	}
 
 	function setScheduleError(error: unknown): void {
@@ -223,6 +283,31 @@ export function StaffBranchScheduleForm({
 					</Button>
 				</div>
 			</form>
+
+			<AlertDialog open={draft !== null} onOpenChange={() => undefined}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{hasDraftConflict
+								? "El horario tiene un borrador desactualizado"
+								: "Encontramos un borrador de horario"}
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							{hasDraftConflict
+								? "La sucursal cambió en el servidor desde que guardaste este horario. ¿Quieres reemplazar esos cambios?"
+								: "Hay un horario semanal que no terminaste de guardar. Puedes recuperarlo o descartarlo."}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel onClick={discardDraft}>
+							Descartar
+						</AlertDialogCancel>
+						<AlertDialogAction onClick={recoverDraft}>
+							Recuperar borrador
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</section>
 	);
 }

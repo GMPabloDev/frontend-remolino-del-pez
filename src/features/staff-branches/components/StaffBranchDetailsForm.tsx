@@ -4,8 +4,19 @@ import {
 	type FieldErrors,
 	type UseFormRegisterReturn,
 	useForm,
+	useWatch,
 } from "react-hook-form";
 
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -25,8 +36,15 @@ import {
 	toUpdateBranchDetailsRequest,
 	updateBranchDetailsFormSchema,
 } from "../contracts/staff-branch-form.schemas";
-import { removeBranchDraft } from "../lib/staff-branch-drafts";
+import {
+	hasBranchDraftConflict,
+	readBranchDraft,
+	removeBranchDraft,
+	type StoredBranchDraft,
+	saveBranchDraft,
+} from "../lib/staff-branch-drafts";
 import { useUpdateStaffBranchDetailsMutation } from "../query/staff-branches-query";
+import { useStaffUnsavedChanges } from "./StaffUnsavedChangesProvider";
 
 interface StaffBranchDetailsFormProps {
 	branch: StaffBranch;
@@ -41,8 +59,11 @@ export function StaffBranchDetailsForm({
 }: StaffBranchDetailsFormProps) {
 	const errorReference = useRef<HTMLParagraphElement>(null);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+	const [draft, setDraft] =
+		useState<StoredBranchDraft<BranchDetailsFormValues> | null>(null);
 	const updateMutation = useUpdateStaffBranchDetailsMutation(session);
 	const {
+		control,
 		formState: { errors, isDirty, isSubmitting },
 		clearErrors,
 		handleSubmit,
@@ -56,11 +77,39 @@ export function StaffBranchDetailsForm({
 		resolver: zodResolver(updateBranchDetailsFormSchema),
 		shouldFocusError: false,
 	});
+	const values = useWatch({ control }) as BranchDetailsFormValues;
 	const rootError = errors.root?.server?.message;
+	const hasDraftConflict = draft
+		? hasBranchDraftConflict(draft, branch.updatedAt)
+		: false;
+	useStaffUnsavedChanges("details", isDirty);
 
 	useEffect(() => {
 		reset(getDefaultValues(branch));
 	}, [branch, reset]);
+
+	useEffect(() => {
+		const storedDraft = readBranchDraft({
+			userId,
+			branchId: branch.id,
+			section: "details",
+			valuesSchema: updateBranchDetailsFormSchema,
+		});
+		setDraft(storedDraft);
+	}, [branch.id, userId]);
+
+	useEffect(() => {
+		if (!isDirty) return;
+
+		saveBranchDraft({
+			userId,
+			branchId: branch.id,
+			section: "details",
+			baseUpdatedAt: branch.updatedAt,
+			values,
+			valuesSchema: updateBranchDetailsFormSchema,
+		});
+	}, [branch.id, branch.updatedAt, isDirty, userId, values]);
 
 	useEffect(() => {
 		if (rootError) errorReference.current?.focus();
@@ -78,6 +127,7 @@ export function StaffBranchDetailsForm({
 				input: toUpdateBranchDetailsRequest(values),
 			});
 			removeBranchDraft(userId, branch.id, "details");
+			setDraft(null);
 			reset(getDefaultValues(updatedBranch));
 			setSuccessMessage("Los datos generales fueron guardados.");
 		} catch (error) {
@@ -93,6 +143,17 @@ export function StaffBranchDetailsForm({
 
 		const firstField = getFirstInvalidField(formErrors);
 		if (firstField) setFocus(firstField);
+	}
+
+	function recoverDraft(): void {
+		if (!draft) return;
+		reset(draft.values, { keepDefaultValues: true });
+		setDraft(null);
+	}
+
+	function discardDraft(): void {
+		removeBranchDraft(userId, branch.id, "details");
+		setDraft(null);
 	}
 
 	function setBranchError(error: unknown): void {
@@ -242,6 +303,31 @@ export function StaffBranchDetailsForm({
 					</Button>
 				</div>
 			</form>
+
+			<AlertDialog open={draft !== null} onOpenChange={() => undefined}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{hasDraftConflict
+								? "El borrador está desactualizado"
+								: "Encontramos un borrador"}
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							{hasDraftConflict
+								? "La sucursal cambió en el servidor desde que guardaste este borrador. ¿Quieres reemplazar esos cambios con tu versión?"
+								: "Hay datos generales que no terminaste de guardar. Puedes recuperarlos o empezar con los datos actuales."}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel onClick={discardDraft}>
+							Descartar
+						</AlertDialogCancel>
+						<AlertDialogAction onClick={recoverDraft}>
+							Recuperar borrador
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</section>
 	);
 }
