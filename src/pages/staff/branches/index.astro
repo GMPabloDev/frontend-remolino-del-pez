@@ -1,0 +1,11 @@
+---
+import { StaffBranchesApp } from "../../../features/staff-branches/StaffBranchesApp";
+import StaffPageLayout from "../../../layouts/StaffPageLayout.astro";
+---
+
+<StaffPageLayout
+	title="Sucursales · El Molino del Pez"
+	description="Gestión administrativa de las sucursales de El Molino del Pez."
+>
+	<StaffBranchesApp client:load />
+</StaffPageLayout>
