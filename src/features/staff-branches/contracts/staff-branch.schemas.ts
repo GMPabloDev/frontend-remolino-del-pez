@@ -105,7 +105,14 @@ export const updateBranchStatusRequestSchema = z.object({
 });
 
 export const branchStatusFilterSchema = z.enum(["active", "inactive"]);
+export const branchDraftSectionSchema = z.enum([
+	"new",
+	"details",
+	"rules",
+	"schedule",
+]);
 
+export type BranchDraftSection = z.infer<typeof branchDraftSectionSchema>;
 export type BranchStatus = z.infer<typeof branchStatusSchema>;
 export type BranchRules = z.infer<typeof branchRulesSchema>;
 export type BranchScheduleInterval = z.infer<
