@@ -8,8 +8,10 @@ import {
 	useStaffAuth,
 } from "@/features/staff-auth/components/StaffAuthProvider";
 import { StaffQueryProvider } from "@/features/staff-auth/query/staff-query-client";
+import type { StaffSessionAccess } from "@/features/staff-auth/session/staff-session";
 import { StaffLayout } from "@/features/staff-shell/components/StaffLayout";
 import { ApiClientError } from "@/lib/api/api-error";
+import { StaffBranchDetailsForm } from "./components/StaffBranchDetailsForm";
 import type { StaffBranch } from "./contracts/staff-branch.schemas";
 import { useStaffBranchQuery } from "./query/staff-branches-query";
 
@@ -28,7 +30,7 @@ export function StaffBranchDetailApp({ branchId }: StaffBranchDetailAppProps) {
 }
 
 function StaffBranchDetailScreen({ branchId }: StaffBranchDetailAppProps) {
-	const { session } = useStaffAuth();
+	const { session, snapshot } = useStaffAuth();
 	const branchQuery = useStaffBranchQuery(session, branchId);
 
 	return (
@@ -43,13 +45,27 @@ function StaffBranchDetailScreen({ branchId }: StaffBranchDetailAppProps) {
 						onRetry={() => void branchQuery.refetch()}
 					/>
 				) : null}
-				{branchQuery.data ? <BranchOverview branch={branchQuery.data} /> : null}
+				{branchQuery.data && snapshot.user ? (
+					<BranchOverview
+						branch={branchQuery.data}
+						session={session}
+						userId={snapshot.user.id}
+					/>
+				) : null}
 			</StaffLayout>
 		</ProtectedStaffRoute>
 	);
 }
 
-function BranchOverview({ branch }: { branch: StaffBranch }) {
+function BranchOverview({
+	branch,
+	session,
+	userId,
+}: {
+	branch: StaffBranch;
+	session: StaffSessionAccess;
+	userId: string;
+}) {
 	return (
 		<div className="space-y-6">
 			<section className="rounded-3xl border border-[#12324a]/10 bg-white/90 p-6 shadow-[0_20px_60px_rgba(18,50,74,0.08)] sm:p-8">
@@ -85,6 +101,12 @@ function BranchOverview({ branch }: { branch: StaffBranch }) {
 					/>
 				</div>
 			</section>
+
+			<StaffBranchDetailsForm
+				branch={branch}
+				session={session}
+				userId={userId}
+			/>
 
 			<div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
 				<section className="rounded-3xl border border-[#12324a]/10 bg-white/80 p-6 shadow-[0_20px_60px_rgba(18,50,74,0.05)]">
