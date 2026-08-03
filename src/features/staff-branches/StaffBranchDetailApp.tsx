@@ -39,29 +39,30 @@ function StaffBranchDetailScreen({ branchId }: StaffBranchDetailAppProps) {
 
 	return (
 		<StaffUnsavedChangesProvider>
-			<ProtectedStaffRoute>
-				<StaffLayout
-					eyebrow="Gestión de sucursales"
-					title="Administrar sucursal"
-				>
-					{branchQuery.isPending ? (
-						<DetailStatus busy message="Cargando la sucursal…" />
-					) : null}
-					{branchQuery.isError ? (
-						<DetailErrorState
-							error={branchQuery.error}
-							onRetry={() => void branchQuery.refetch()}
-						/>
-					) : null}
-					{branchQuery.data && snapshot.user ? (
-						<BranchOverview
-							branch={branchQuery.data}
-							session={session}
-							userId={snapshot.user.id}
-						/>
-					) : null}
-				</StaffLayout>
-			</ProtectedStaffRoute>
+			<StaffLayout eyebrow="Gestión de sucursales" title="Administrar sucursal">
+				{snapshot.status === "checking" ? (
+					<DetailStatus busy message="Cargando la sucursal…" />
+				) : (
+					<ProtectedStaffRoute>
+						{branchQuery.isPending ? (
+							<DetailStatus busy message="Cargando la sucursal…" />
+						) : null}
+						{branchQuery.isError ? (
+							<DetailErrorState
+								error={branchQuery.error}
+								onRetry={() => void branchQuery.refetch()}
+							/>
+						) : null}
+						{branchQuery.data && snapshot.user ? (
+							<BranchOverview
+								branch={branchQuery.data}
+								session={session}
+								userId={snapshot.user.id}
+							/>
+						) : null}
+					</ProtectedStaffRoute>
+				)}
+			</StaffLayout>
 		</StaffUnsavedChangesProvider>
 	);
 }

@@ -22,9 +22,13 @@ interface StaffAuthContextValue {
 }
 
 const StaffAuthContext = createContext<StaffAuthContextValue | null>(null);
+let sharedStaffSession: StaffSessionController | null = null;
 
 export function StaffAuthProvider({ children }: PropsWithChildren) {
-	const [session] = useState(createStaffSession);
+	const [session] = useState(() => {
+		sharedStaffSession ??= createStaffSession();
+		return sharedStaffSession;
+	});
 	const queryClient = useQueryClient();
 	const previousStatus = useRef<StaffSessionSnapshot["status"]>("checking");
 	const snapshot = useSyncExternalStore(
@@ -34,8 +38,9 @@ export function StaffAuthProvider({ children }: PropsWithChildren) {
 	);
 
 	useEffect(() => {
-		void session.bootstrap();
-		return () => session.destroy();
+		if (session.getSnapshot().status !== "authenticated") {
+			void session.bootstrap();
+		}
 	}, [session]);
 
 	useEffect(() => {

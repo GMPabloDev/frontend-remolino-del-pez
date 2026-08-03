@@ -1,5 +1,5 @@
 import { MapPin, Plus, RefreshCw } from "lucide-react";
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ApiClientError } from "@/lib/api/api-error";
@@ -53,6 +53,7 @@ export function StaffBranchList({
 										aria-current={filter === option.value ? "page" : undefined}
 										className={getFilterClassName(filter === option.value)}
 										href={getFilterHref(option.value)}
+										onClick={(event) => handleFilterClick(event, option.value)}
 									>
 										{option.label}
 									</a>
@@ -280,6 +281,26 @@ function formatSchedule(branch: StaffBranch): string {
 		.sort(([firstDay], [secondDay]) => firstDay - secondDay)
 		.map(([day, times]) => `${DAY_LABELS[day]} ${times.join(", ")}`)
 		.join(" · ");
+}
+
+function handleFilterClick(
+	event: MouseEvent<HTMLAnchorElement>,
+	filter: BranchStatusFilter,
+): void {
+	if (
+		event.defaultPrevented ||
+		event.button !== 0 ||
+		event.metaKey ||
+		event.ctrlKey ||
+		event.shiftKey ||
+		event.altKey
+	) {
+		return;
+	}
+
+	event.preventDefault();
+	window.history.pushState({}, "", getFilterHref(filter));
+	window.dispatchEvent(new window.Event("popstate"));
 }
 
 function getFilterHref(filter: BranchStatusFilter): string {

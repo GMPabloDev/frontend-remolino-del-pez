@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
@@ -31,6 +31,10 @@ const branch = {
 	intervals: [{ dayOfWeek: 1, startTime: "09:00", endTime: "17:00" }],
 };
 
+afterEach(() => {
+	window.history.pushState({}, "", "/staff/branches");
+});
+
 const defaultProps = {
 	branches: [branch],
 	filter: "all" as const,
@@ -56,6 +60,17 @@ describe("StaffBranchList", () => {
 				.getByRole("button", { name: "Nueva sucursal" })
 				.getAttribute("href"),
 		).toBe("/staff/branches/new");
+	});
+
+	test("changes filters without a full document navigation", async () => {
+		const user = userEvent.setup();
+		window.history.pushState({}, "", "/staff/branches");
+		render(<StaffBranchList {...defaultProps} />);
+
+		await user.click(screen.getByRole("link", { name: "Activas" }));
+
+		expect(window.location.pathname).toBe("/staff/branches");
+		expect(window.location.search).toBe("?status=active");
 	});
 
 	test("marks the selected filter and hides creation for restricted users", () => {

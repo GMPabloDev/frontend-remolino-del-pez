@@ -44,20 +44,32 @@ function StaffBranchesScreen() {
 	}, []);
 
 	return (
-		<ProtectedStaffRoute>
-			<StaffLayout title="Sucursales">
-				{snapshot.user ? (
-					<StaffBranchList
-						branches={branchesQuery.data ?? []}
-						canCreate={canCreateStaffBranch(snapshot.user.role)}
-						error={branchesQuery.error}
-						filter={filter}
-						isError={branchesQuery.isError}
-						isLoading={branchesQuery.isPending}
-						onRetry={() => void branchesQuery.refetch()}
-					/>
-				) : null}
-			</StaffLayout>
-		</ProtectedStaffRoute>
+		<StaffLayout title="Sucursales">
+			{snapshot.status === "checking" ? (
+				<StaffBranchList
+					branches={[]}
+					canCreate={false}
+					error={null}
+					filter={filter}
+					isError={false}
+					isLoading
+					onRetry={() => undefined}
+				/>
+			) : (
+				<ProtectedStaffRoute>
+					{snapshot.user ? (
+						<StaffBranchList
+							branches={branchesQuery.data ?? []}
+							canCreate={canCreateStaffBranch(snapshot.user.role)}
+							error={branchesQuery.error}
+							filter={filter}
+							isError={branchesQuery.isError}
+							isLoading={branchesQuery.isPending}
+							onRetry={() => void branchesQuery.refetch()}
+						/>
+					) : null}
+				</ProtectedStaffRoute>
+			)}
+		</StaffLayout>
 	);
 }
