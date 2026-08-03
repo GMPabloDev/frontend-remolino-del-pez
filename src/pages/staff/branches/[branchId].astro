@@ -1,0 +1,15 @@
+---
+export const prerender = false;
+
+import { StaffBranchDetailApp } from "../../../features/staff-branches/StaffBranchDetailApp";
+import StaffPageLayout from "../../../layouts/StaffPageLayout.astro";
+
+const { branchId } = Astro.params;
+---
+
+<StaffPageLayout
+	title="Administrar sucursal · El Molino del Pez"
+	description="Administra la configuración de una sucursal de El Molino del Pez."
+>
+	<StaffBranchDetailApp branchId={branchId ?? ""} client:load />
+</StaffPageLayout>
