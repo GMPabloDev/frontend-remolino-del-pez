@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 
 import type { StaffBranchesClient } from "../src/features/staff-branches/api/staff-branches-client";
 import { StaffBranchCreateForm } from "../src/features/staff-branches/components/StaffBranchCreateForm";
-import { StaffUnsavedChangesProvider } from "../src/features/staff-branches/components/StaffUnsavedChangesProvider";
+import { StaffUnsavedChangesProvider } from "../src/features/staff-shell/components/StaffUnsavedChangesProvider";
 import { ApiClientError } from "../src/lib/api/api-error";
 
 function renderCreateForm(client: StaffBranchesClient) {

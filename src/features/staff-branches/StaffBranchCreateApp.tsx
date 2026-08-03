@@ -8,9 +8,9 @@ import {
 } from "@/features/staff-auth/components/StaffAuthProvider";
 import { StaffQueryProvider } from "@/features/staff-auth/query/staff-query-client";
 import { StaffLayout } from "@/features/staff-shell/components/StaffLayout";
+import { StaffUnsavedChangesProvider } from "@/features/staff-shell/components/StaffUnsavedChangesProvider";
 import { createStaffBranchesClient } from "./api/staff-branches-client";
 import { StaffBranchCreateForm } from "./components/StaffBranchCreateForm";
-import { StaffUnsavedChangesProvider } from "./components/StaffUnsavedChangesProvider";
 import { canCreateStaffBranch } from "./lib/staff-branch-permissions";
 
 export function StaffBranchCreateApp() {

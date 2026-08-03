@@ -5,12 +5,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
+import { Toaster } from "../src/components/ui/sonner";
 import type { StaffSessionAccess } from "../src/features/staff-auth/session/staff-session";
 import { StaffBranchDetailsForm } from "../src/features/staff-branches/components/StaffBranchDetailsForm";
 import { StaffBranchRulesForm } from "../src/features/staff-branches/components/StaffBranchRulesForm";
 import { StaffBranchScheduleForm } from "../src/features/staff-branches/components/StaffBranchScheduleForm";
-import { StaffUnsavedChangesProvider } from "../src/features/staff-branches/components/StaffUnsavedChangesProvider";
 import type { StaffBranch } from "../src/features/staff-branches/contracts/staff-branch.schemas";
+import { StaffUnsavedChangesProvider } from "../src/features/staff-shell/components/StaffUnsavedChangesProvider";
 
 const originalFetch = globalThis.fetch;
 
@@ -52,7 +53,10 @@ const session: StaffSessionAccess = {
 function renderForm(form: ReactNode) {
 	render(
 		<QueryClientProvider client={new QueryClient()}>
-			<StaffUnsavedChangesProvider>{form}</StaffUnsavedChangesProvider>
+			<StaffUnsavedChangesProvider>
+				{form}
+				<Toaster />
+			</StaffUnsavedChangesProvider>
 		</QueryClientProvider>,
 	);
 }
@@ -80,9 +84,9 @@ describe("staff branch detail forms", () => {
 		await user.click(screen.getByRole("button", { name: "Guardar datos" }));
 
 		await waitFor(() =>
-			expect(screen.getByRole("status").textContent).toContain(
-				"Los datos generales fueron guardados.",
-			),
+			expect(
+				screen.getByText("Los datos generales fueron guardados."),
+			).toBeTruthy(),
 		);
 		expect(request.method).toBe("PATCH");
 		expect(JSON.parse(request.body ?? "{}")).toMatchObject({
@@ -109,9 +113,11 @@ describe("staff branch detail forms", () => {
 		await user.click(screen.getByRole("button", { name: "Guardar datos" }));
 
 		await waitFor(() =>
-			expect(screen.getByRole("alert").textContent).toContain(
-				"No se pudo conectar con el servidor.",
-			),
+			expect(
+				screen.getByText("No se pudo conectar con el servidor.", {
+					exact: false,
+				}),
+			).toBeTruthy(),
 		);
 		expect((name as HTMLInputElement).value).toBe("Sucursal Offline");
 	});

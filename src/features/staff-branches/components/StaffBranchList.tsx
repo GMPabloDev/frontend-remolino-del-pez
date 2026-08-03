@@ -2,6 +2,15 @@ import { MapPin, Plus, RefreshCw } from "lucide-react";
 import type { MouseEvent, ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+	Table,
+	TableBody,
+	TableCaption,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
 import { ApiClientError } from "@/lib/api/api-error";
 import type { StaffBranch } from "../contracts/staff-branch.schemas";
 import {
@@ -101,52 +110,54 @@ export function StaffBranchList({
 function DesktopBranchTable({ branches }: { branches: StaffBranch[] }) {
 	return (
 		<div className="hidden overflow-hidden rounded-3xl border border-[#12324a]/10 bg-white/90 shadow-[0_20px_60px_rgba(18,50,74,0.06)] md:block">
-			<table className="w-full border-collapse text-left">
-				<caption className="sr-only">Sucursales del restaurante</caption>
-				<thead className="bg-[#12324a] text-xs uppercase tracking-[0.16em] text-white/75">
-					<tr>
-						<th className="px-6 py-4 font-semibold" scope="col">
+			<Table className="border-collapse text-left">
+				<TableCaption className="sr-only">
+					Sucursales del restaurante
+				</TableCaption>
+				<TableHeader className="bg-[#12324a] text-xs uppercase tracking-[0.16em] text-white/75">
+					<TableRow className="border-0 hover:bg-transparent">
+						<TableHead className="px-6 py-4 font-semibold text-white/75">
 							Sucursal
-						</th>
-						<th className="px-6 py-4 font-semibold" scope="col">
+						</TableHead>
+						<TableHead className="px-6 py-4 font-semibold text-white/75">
 							Ubicación
-						</th>
-						<th className="px-6 py-4 font-semibold" scope="col">
+						</TableHead>
+						<TableHead className="px-6 py-4 font-semibold text-white/75">
 							Estado
-						</th>
-						<th className="px-6 py-4 font-semibold" scope="col">
+						</TableHead>
+						<TableHead className="px-6 py-4 font-semibold text-white/75">
 							Horario
-						</th>
-						<th className="px-6 py-4 text-right font-semibold" scope="col">
+						</TableHead>
+						<TableHead className="px-6 py-4 text-right font-semibold text-white/75">
 							Acción
-						</th>
-					</tr>
-				</thead>
-				<tbody className="divide-y divide-[#12324a]/10">
+						</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody className="divide-y divide-[#12324a]/10">
 					{branches.map((branch) => (
-						<tr key={branch.id} className="align-top">
-							<td className="px-6 py-5">
+						<TableRow key={branch.id} className="align-top">
+							<TableCell className="px-6 py-5 whitespace-normal">
 								<p className="font-semibold">{branch.name}</p>
 								<p className="mt-1 text-xs text-[#12324a]/55">
 									Código {branch.code}
 								</p>
-							</td>
-							<td className="max-w-56 px-6 py-5 text-sm text-[#12324a]/65">
+							</TableCell>
+							<TableCell className="max-w-56 px-6 py-5 text-sm text-[#12324a]/65 whitespace-normal">
 								{formatLocation(branch)}
-							</td>
-							<td className="px-6 py-5">
+							</TableCell>
+							<TableCell className="px-6 py-5">
 								<BranchStatusBadge status={branch.status} />
-							</td>
-							<td className="max-w-72 px-6 py-5 text-sm leading-6 text-[#12324a]/65">
+							</TableCell>
+							<TableCell className="max-w-72 px-6 py-5 text-sm leading-6 text-[#12324a]/65 whitespace-normal">
 								{formatSchedule(branch)}
-							</td>
-							<td className="px-6 py-5 text-right">
+							</TableCell>
+							<TableCell className="px-6 py-5 text-right">
 								<ManageBranchLink branchId={branch.id} />
-							</td>
-						</tr>
+							</TableCell>
+						</TableRow>
 					))}
-				</tbody>
-			</table>
+				</TableBody>
+			</Table>
 		</div>
 	);
 }

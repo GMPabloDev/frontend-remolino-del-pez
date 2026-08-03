@@ -23,7 +23,7 @@ import {
 	attachUnsavedChangesBeforeUnload,
 	createUnsavedChangesGuard,
 	type UnsavedChangesGuard,
-} from "../lib/staff-branch-unsaved-changes";
+} from "../lib/staff-unsaved-changes";
 
 interface StaffUnsavedChangesContextValue {
 	registerDirty(section: string, isDirty: boolean): void;

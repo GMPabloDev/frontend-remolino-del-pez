@@ -1,6 +1,7 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import type { ReactNode } from "react";
-
+import { useEffect } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ProtectedStaffRoute } from "@/features/staff-auth/components/ProtectedStaffRoute";
 import {
@@ -10,12 +11,12 @@ import {
 import { StaffQueryProvider } from "@/features/staff-auth/query/staff-query-client";
 import type { StaffSessionAccess } from "@/features/staff-auth/session/staff-session";
 import { StaffLayout } from "@/features/staff-shell/components/StaffLayout";
+import { StaffUnsavedChangesProvider } from "@/features/staff-shell/components/StaffUnsavedChangesProvider";
 import { ApiClientError } from "@/lib/api/api-error";
 import { StaffBranchDetailsForm } from "./components/StaffBranchDetailsForm";
 import { StaffBranchRulesForm } from "./components/StaffBranchRulesForm";
 import { StaffBranchScheduleForm } from "./components/StaffBranchScheduleForm";
 import { StaffBranchStatusControl } from "./components/StaffBranchStatusControl";
-import { StaffUnsavedChangesProvider } from "./components/StaffUnsavedChangesProvider";
 import type { StaffBranch } from "./contracts/staff-branch.schemas";
 import { useStaffBranchQuery } from "./query/staff-branches-query";
 
@@ -36,6 +37,19 @@ export function StaffBranchDetailApp({ branchId }: StaffBranchDetailAppProps) {
 function StaffBranchDetailScreen({ branchId }: StaffBranchDetailAppProps) {
 	const { session, snapshot } = useStaffAuth();
 	const branchQuery = useStaffBranchQuery(session, branchId);
+
+	useEffect(() => {
+		const url = new URL(window.location.href);
+		if (url.searchParams.get("created") !== "1") return;
+
+		toast.success("La sucursal fue creada correctamente.");
+		url.searchParams.delete("created");
+		window.history.replaceState(
+			{},
+			"",
+			`${url.pathname}${url.search}${url.hash}`,
+		);
+	}, []);
 
 	return (
 		<StaffUnsavedChangesProvider>

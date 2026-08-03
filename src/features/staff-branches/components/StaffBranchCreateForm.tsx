@@ -1,12 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	type FieldErrors,
 	type UseFormRegisterReturn,
 	useForm,
 	useWatch,
 } from "react-hook-form";
-
+import { toast } from "sonner";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -28,6 +28,7 @@ import {
 	FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useStaffUnsavedChanges } from "@/features/staff-shell/components/StaffUnsavedChangesProvider";
 import { ApiClientError } from "@/lib/api/api-error";
 import type { StaffBranchesClient } from "../api/staff-branches-client";
 import {
@@ -42,7 +43,6 @@ import {
 	type StoredBranchDraft,
 	saveBranchDraft,
 } from "../lib/staff-branch-drafts";
-import { useStaffUnsavedChanges } from "./StaffUnsavedChangesProvider";
 
 interface StaffBranchCreateFormProps {
 	userId: string;
@@ -65,13 +65,11 @@ export function StaffBranchCreateForm({
 	userId,
 	client,
 }: StaffBranchCreateFormProps) {
-	const errorReference = useRef<HTMLParagraphElement>(null);
 	const [draft, setDraft] =
 		useState<StoredBranchDraft<CreateBranchFormValues> | null>(null);
 	const {
 		control,
 		formState: { errors, isDirty, isSubmitting },
-		clearErrors,
 		handleSubmit,
 		register,
 		reset,
@@ -84,7 +82,6 @@ export function StaffBranchCreateForm({
 		shouldFocusError: false,
 	});
 	const values = useWatch({ control }) as CreateBranchFormValues;
-	const rootError = errors.root?.server?.message;
 	useStaffUnsavedChanges("new", isDirty);
 
 	useEffect(() => {
@@ -110,21 +107,15 @@ export function StaffBranchCreateForm({
 		});
 	}, [isDirty, userId, values]);
 
-	useEffect(() => {
-		if (rootError) errorReference.current?.focus();
-	}, [rootError]);
-
 	async function handleValidSubmit(
 		formValues: CreateBranchFormValues,
 	): Promise<void> {
-		clearErrors("root");
-
 		try {
 			const branch = await client.createBranch(
 				toCreateBranchRequest(formValues),
 			);
 			removeBranchDraft(userId, null, "new");
-			window.location.replace(`/staff/branches/${branch.id}`);
+			window.location.replace(`/staff/branches/${branch.id}?created=1`);
 		} catch (error) {
 			if (
 				error instanceof ApiClientError &&
@@ -138,18 +129,13 @@ export function StaffBranchCreateForm({
 				return;
 			}
 
-			setError("root.server", {
-				message: getCreateBranchErrorMessage(error),
-				type: "server",
-			});
+			toast.error(getCreateBranchErrorMessage(error));
 		}
 	}
 
 	function handleInvalidSubmit(
 		formErrors: FieldErrors<CreateBranchFormValues>,
 	) {
-		clearErrors("root");
-
 		const firstField = getFirstInvalidField(formErrors);
 		if (firstField) setFocus(firstField);
 	}
@@ -174,17 +160,6 @@ export function StaffBranchCreateForm({
 					void handleSubmit(handleValidSubmit, handleInvalidSubmit)(event);
 				}}
 			>
-				{rootError ? (
-					<p
-						ref={errorReference}
-						className="rounded-xl border border-[#b34b25]/25 bg-[#b34b25]/10 px-4 py-3 text-sm leading-6 text-[#8f3d20] outline-none"
-						role="alert"
-						tabIndex={-1}
-					>
-						{rootError}
-					</p>
-				) : null}
-
 				<FieldSet>
 					<FieldLegend>Datos de la sucursal</FieldLegend>
 					<FieldDescription>

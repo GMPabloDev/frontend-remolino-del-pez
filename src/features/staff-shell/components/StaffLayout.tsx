@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/sonner";
 import { useStaffAuth } from "@/features/staff-auth/components/StaffAuthProvider";
 import type { StaffUser } from "@/features/staff-auth/contracts/staff-auth.schemas";
 import { removeAllBranchDrafts } from "@/features/staff-branches/lib/staff-branch-drafts";
@@ -38,6 +38,7 @@ export function StaffLayout({
 
 	return (
 		<div className="min-h-screen bg-[#f4f0e8] text-[#12324a]">
+			<Toaster position="top-right" />
 			<header className="border-b border-[#12324a]/10 bg-white/85">
 				<div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-12">
 					<a

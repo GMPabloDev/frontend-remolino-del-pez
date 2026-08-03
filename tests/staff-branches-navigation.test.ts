@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	attachUnsavedChangesBeforeUnload,
 	createUnsavedChangesGuard,
-} from "../src/features/staff-branches/lib/staff-branch-unsaved-changes";
+} from "../src/features/staff-shell/lib/staff-unsaved-changes";
 
 describe("unsaved branch changes guard", () => {
 	test("confirms navigation only while changes are pending", async () => {

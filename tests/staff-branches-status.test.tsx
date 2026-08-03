@@ -4,6 +4,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Toaster } from "../src/components/ui/sonner";
 import type { StaffSessionAccess } from "../src/features/staff-auth/session/staff-session";
 import { StaffBranchStatusControl } from "../src/features/staff-branches/components/StaffBranchStatusControl";
 import type { StaffBranch } from "../src/features/staff-branches/contracts/staff-branch.schemas";
@@ -49,6 +50,7 @@ function renderControl(value: StaffBranch) {
 	render(
 		<QueryClientProvider client={new QueryClient()}>
 			<StaffBranchStatusControl branch={value} session={session} />
+			<Toaster />
 		</QueryClientProvider>,
 	);
 }
@@ -110,9 +112,7 @@ describe("StaffBranchStatusControl", () => {
 		await user.click(screen.getByRole("button", { name: "Confirmar" }));
 
 		await waitFor(() =>
-			expect(screen.getByRole("status").textContent).toContain(
-				"La sucursal fue desactivada.",
-			),
+			expect(screen.getByText("La sucursal fue desactivada.")).toBeTruthy(),
 		);
 		expect(request.method).toBe("PATCH");
 		expect(JSON.parse(request.body ?? "{}")).toEqual({ status: "inactive" });

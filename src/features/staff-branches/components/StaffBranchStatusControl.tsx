@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { toast } from "sonner";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -29,15 +29,12 @@ export function StaffBranchStatusControl({
 	session,
 }: StaffBranchStatusControlProps) {
 	const [targetStatus, setTargetStatus] = useState<BranchStatus | null>(null);
-	const [errorMessage, setErrorMessage] = useState<string | null>(null);
-	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
 	const updateMutation = useUpdateStaffBranchStatusMutation(session);
 	const hasSchedule = branch.intervals.length > 0;
 	const isActivating = targetStatus === "active";
 
 	function openStatusDialog(status: BranchStatus): void {
-		setErrorMessage(null);
-		setSuccessMessage(null);
 		setTargetStatus(status);
 	}
 
@@ -50,13 +47,13 @@ export function StaffBranchStatusControl({
 				status: targetStatus,
 			});
 			setTargetStatus(null);
-			setSuccessMessage(
+			toast.success(
 				targetStatus === "active"
 					? "La sucursal fue activada."
 					: "La sucursal fue desactivada.",
 			);
 		} catch (error) {
-			setErrorMessage(getStatusErrorMessage(error));
+			toast.error(getStatusErrorMessage(error));
 		}
 	}
 
@@ -93,23 +90,6 @@ export function StaffBranchStatusControl({
 					</Button>
 				)}
 			</div>
-			{errorMessage ? (
-				<p
-					className="mt-4 rounded-xl border border-[#b34b25]/25 bg-[#b34b25]/10 px-4 py-3 text-sm leading-6 text-[#8f3d20]"
-					role="alert"
-				>
-					{errorMessage}
-				</p>
-			) : null}
-			{successMessage ? (
-				<p
-					className="mt-4 rounded-xl border border-[#338faa]/25 bg-[#dcecef] px-4 py-3 text-sm leading-6 text-[#12324a]"
-					role="status"
-				>
-					{successMessage}
-				</p>
-			) : null}
-
 			<AlertDialog
 				open={targetStatus !== null}
 				onOpenChange={(open) => {

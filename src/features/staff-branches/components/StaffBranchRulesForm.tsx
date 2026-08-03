@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	type FieldErrors,
 	type UseFormRegisterReturn,
 	useForm,
 	useWatch,
 } from "react-hook-form";
+import { toast } from "sonner";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { StaffSessionAccess } from "@/features/staff-auth/session/staff-session";
+import { useStaffUnsavedChanges } from "@/features/staff-shell/components/StaffUnsavedChangesProvider";
 import { ApiClientError } from "@/lib/api/api-error";
 import type { StaffBranch } from "../contracts/staff-branch.schemas";
 import {
@@ -42,7 +44,6 @@ import {
 	saveBranchDraft,
 } from "../lib/staff-branch-drafts";
 import { useUpdateStaffBranchRulesMutation } from "../query/staff-branches-query";
-import { useStaffUnsavedChanges } from "./StaffUnsavedChangesProvider";
 
 interface StaffBranchRulesFormProps {
 	branch: StaffBranch;
@@ -55,15 +56,12 @@ export function StaffBranchRulesForm({
 	session,
 	userId,
 }: StaffBranchRulesFormProps) {
-	const errorReference = useRef<HTMLParagraphElement>(null);
-	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 	const [draft, setDraft] =
 		useState<StoredBranchDraft<BranchRulesFormValues> | null>(null);
 	const updateMutation = useUpdateStaffBranchRulesMutation(session);
 	const {
 		control,
 		formState: { errors, isDirty, isSubmitting },
-		clearErrors,
 		handleSubmit,
 		register,
 		reset,
@@ -76,7 +74,6 @@ export function StaffBranchRulesForm({
 		shouldFocusError: false,
 	});
 	const values = useWatch({ control }) as BranchRulesFormValues;
-	const rootError = errors.root?.server?.message;
 	const hasDraftConflict = draft
 		? hasBranchDraftConflict(draft, branch.updatedAt)
 		: false;
@@ -109,14 +106,7 @@ export function StaffBranchRulesForm({
 		});
 	}, [branch.id, branch.updatedAt, isDirty, userId, values]);
 
-	useEffect(() => {
-		if (rootError) errorReference.current?.focus();
-	}, [rootError]);
-
 	async function handleValidSubmit(values: BranchRulesFormValues) {
-		clearErrors("root");
-		setSuccessMessage(null);
-
 		try {
 			const updatedBranch = await updateMutation.mutateAsync({
 				branchId: branch.id,
@@ -125,16 +115,13 @@ export function StaffBranchRulesForm({
 			removeBranchDraft(userId, branch.id, "rules");
 			setDraft(null);
 			reset(updatedBranch.rules);
-			setSuccessMessage("Las reglas de reserva fueron guardadas.");
+			toast.success("Las reglas de reserva fueron guardadas.");
 		} catch (error) {
 			setBranchError(error);
 		}
 	}
 
 	function handleInvalidSubmit(formErrors: FieldErrors<BranchRulesFormValues>) {
-		clearErrors("root");
-		setSuccessMessage(null);
-
 		const firstField = getFirstInvalidField(formErrors);
 		if (firstField) setFocus(firstField);
 	}
@@ -164,22 +151,17 @@ export function StaffBranchRulesForm({
 			}
 
 			if (error.code === "FORBIDDEN") {
-				setError("root.server", {
-					message: "No tienes permisos para editar estas reglas.",
-					type: "server",
-				});
+				toast.error("No tienes permisos para editar estas reglas.");
 				return;
 			}
 		}
 
-		setError("root.server", {
-			message:
-				error instanceof ApiClientError &&
+		toast.error(
+			error instanceof ApiClientError &&
 				(error.code === "NETWORK_ERROR" || error.status === 0)
-					? "No se pudo conectar con el servidor. Inténtalo nuevamente."
-					: "No se pudieron guardar las reglas. Inténtalo nuevamente.",
-			type: "server",
-		});
+				? "No se pudo conectar con el servidor. Inténtalo nuevamente."
+				: "No se pudieron guardar las reglas. Inténtalo nuevamente.",
+		);
 	}
 
 	return (
@@ -195,25 +177,6 @@ export function StaffBranchRulesForm({
 					Estos valores se aplican a las reservas de esta sucursal.
 				</FieldDescription>
 			</div>
-
-			{rootError ? (
-				<p
-					ref={errorReference}
-					className="mb-6 rounded-xl border border-[#b34b25]/25 bg-[#b34b25]/10 px-4 py-3 text-sm leading-6 text-[#8f3d20] outline-none"
-					role="alert"
-					tabIndex={-1}
-				>
-					{rootError}
-				</p>
-			) : null}
-			{successMessage ? (
-				<p
-					className="mb-6 rounded-xl border border-[#338faa]/25 bg-[#dcecef] px-4 py-3 text-sm leading-6 text-[#12324a]"
-					role="status"
-				>
-					{successMessage}
-				</p>
-			) : null}
 
 			<form
 				className="space-y-7"

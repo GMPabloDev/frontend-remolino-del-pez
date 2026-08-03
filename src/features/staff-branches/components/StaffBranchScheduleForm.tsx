@@ -9,7 +9,7 @@ import {
 	useForm,
 	useWatch,
 } from "react-hook-form";
-
+import { toast } from "sonner";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { StaffSessionAccess } from "@/features/staff-auth/session/staff-session";
+import { useStaffUnsavedChanges } from "@/features/staff-shell/components/StaffUnsavedChangesProvider";
 import { ApiClientError } from "@/lib/api/api-error";
 import type {
 	BranchScheduleInterval,
@@ -49,7 +50,6 @@ import {
 	saveBranchDraft,
 } from "../lib/staff-branch-drafts";
 import { useReplaceStaffBranchScheduleMutation } from "../query/staff-branches-query";
-import { useStaffUnsavedChanges } from "./StaffUnsavedChangesProvider";
 
 interface StaffBranchScheduleFormProps {
 	branch: StaffBranch;
@@ -73,7 +73,7 @@ export function StaffBranchScheduleForm({
 	userId,
 }: StaffBranchScheduleFormProps) {
 	const errorReference = useRef<HTMLParagraphElement>(null);
-	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
 	const [draft, setDraft] =
 		useState<StoredBranchDraft<BranchScheduleFormValues> | null>(null);
 	const replaceMutation = useReplaceStaffBranchScheduleMutation(session);
@@ -136,7 +136,6 @@ export function StaffBranchScheduleForm({
 
 	async function handleValidSubmit(values: BranchScheduleFormValues) {
 		clearErrors("root");
-		setSuccessMessage(null);
 
 		if (branch.status === "active" && values.intervals.length === 0) {
 			setError("root.server", {
@@ -155,7 +154,7 @@ export function StaffBranchScheduleForm({
 			removeBranchDraft(userId, branch.id, "schedule");
 			setDraft(null);
 			reset(getDefaultValues(updatedBranch));
-			setSuccessMessage("El horario semanal fue guardado.");
+			toast.success("El horario semanal fue guardado.");
 		} catch (error) {
 			setScheduleError(error);
 		}
@@ -165,7 +164,6 @@ export function StaffBranchScheduleForm({
 		formErrors: FieldErrors<BranchScheduleFormValues>,
 	) {
 		clearErrors("root");
-		setSuccessMessage(null);
 
 		const firstField = getFirstInvalidField(formErrors);
 		if (firstField) setFocus(firstField);
@@ -206,14 +204,12 @@ export function StaffBranchScheduleForm({
 			return;
 		}
 
-		setError("root.server", {
-			message:
-				error instanceof ApiClientError &&
+		toast.error(
+			error instanceof ApiClientError &&
 				(error.code === "NETWORK_ERROR" || error.status === 0)
-					? "No se pudo conectar con el servidor. Inténtalo nuevamente."
-					: "No se pudo guardar el horario. Inténtalo nuevamente.",
-			type: "server",
-		});
+				? "No se pudo conectar con el servidor. Inténtalo nuevamente."
+				: "No se pudo guardar el horario. Inténtalo nuevamente.",
+		);
 	}
 
 	return (
@@ -241,15 +237,6 @@ export function StaffBranchScheduleForm({
 					{rootError}
 				</p>
 			) : null}
-			{successMessage ? (
-				<p
-					className="mb-6 rounded-xl border border-[#338faa]/25 bg-[#dcecef] px-4 py-3 text-sm leading-6 text-[#12324a]"
-					role="status"
-				>
-					{successMessage}
-				</p>
-			) : null}
-
 			<form
 				className="space-y-6"
 				noValidate
