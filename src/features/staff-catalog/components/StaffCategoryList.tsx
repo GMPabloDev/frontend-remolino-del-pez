@@ -1,4 +1,17 @@
 import { Plus, RefreshCw } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	Table,
@@ -9,19 +22,42 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import type { StaffSessionAccess } from "@/features/staff-auth/session/staff-session";
+import { useStaffUnsavedChanges } from "@/features/staff-shell/components/StaffUnsavedChangesProvider";
 import { ApiClientError } from "@/lib/api/api-error";
 import type { MenuCategory } from "../contracts/staff-catalog.schemas";
+import {
+	type CatalogOrderItem,
+	createCatalogOrderDraft,
+	getChangedCatalogOrder,
+	normalizeCatalogOrder,
+} from "../lib/catalog-order";
 import type { CatalogStatusFilter } from "../lib/catalog-status-filter";
+import {
+	hasCatalogDraftOrderConflict,
+	readStaffCatalogDraft,
+	removeStaffCatalogDraft,
+	saveStaffCatalogDraft,
+} from "../lib/staff-catalog-drafts";
+import { useUpdateMenuCategoryOrderMutation } from "../query/staff-catalog-query";
 import { CatalogListStatus } from "./CatalogListStatus";
 import { CatalogSectionNav } from "./CatalogSectionNav";
 import { CatalogStatusBadge } from "./CatalogStatusBadge";
 import { CatalogStatusFilterNav } from "./CatalogStatusFilterNav";
+import { SortableCategoryList } from "./SortableCategoryList";
+
+const catalogOrderValuesSchema = z.array(z.uuid());
+const catalogOrderBaseSchema = z.array(
+	z.object({ id: z.uuid(), position: z.number().int().positive() }),
+);
 
 interface StaffCategoryListProps {
 	categories: MenuCategory[];
 	filter: CatalogStatusFilter;
 	canCreate: boolean;
 	canManage: boolean;
+	session: StaffSessionAccess;
+	userId: string;
 	isLoading: boolean;
 	isError: boolean;
 	error: unknown;
@@ -33,11 +69,116 @@ export function StaffCategoryList({
 	filter,
 	canCreate,
 	canManage,
+	session,
+	userId,
 	isLoading,
 	isError,
 	error,
 	onRetry,
 }: StaffCategoryListProps) {
+	const orderMutation = useUpdateMenuCategoryOrderMutation(session);
+	const serverOrder = useMemo(
+		() => createCatalogOrderDraft(categories),
+		[categories],
+	);
+	const [baseOrder, setBaseOrder] = useState<CatalogOrderItem[]>(
+		serverOrder.baseOrder,
+	);
+	const [orderedIds, setOrderedIds] = useState(serverOrder.orderedIds);
+	const [draft, setDraft] = useState<{
+		base: CatalogOrderItem[];
+		values: string[];
+	} | null>(null);
+	const isOrderingEnabled = canManage && filter === "all";
+	const isOrderDirty =
+		isOrderingEnabled &&
+		getChangedCatalogOrder(baseOrder, orderedIds).length > 0;
+	const hasDraftConflict = draft
+		? hasCatalogDraftOrderConflict(draft.base, serverOrder.baseOrder)
+		: false;
+
+	useStaffUnsavedChanges("category-order", isOrderDirty);
+
+	useEffect(() => {
+		if (isOrderDirty) return;
+
+		setBaseOrder(serverOrder.baseOrder);
+		setOrderedIds(serverOrder.orderedIds);
+	}, [isOrderDirty, serverOrder]);
+
+	useEffect(() => {
+		if (!isOrderingEnabled) {
+			setDraft(null);
+			return;
+		}
+
+		const storedDraft = readStaffCatalogDraft({
+			userId,
+			section: "category-order",
+			valuesSchema: catalogOrderValuesSchema,
+			baseSchema: catalogOrderBaseSchema,
+		});
+		setDraft(storedDraft);
+	}, [isOrderingEnabled, userId]);
+
+	useEffect(() => {
+		if (!isOrderDirty) return;
+
+		saveStaffCatalogDraft({
+			userId,
+			section: "category-order",
+			base: baseOrder,
+			values: orderedIds,
+			valuesSchema: catalogOrderValuesSchema,
+			baseSchema: catalogOrderBaseSchema,
+		});
+	}, [baseOrder, isOrderDirty, orderedIds, userId]);
+
+	function handleOrderChange(nextOrder: string[]): void {
+		if (!isOrderDirty) setBaseOrder(serverOrder.baseOrder);
+		setOrderedIds(nextOrder);
+	}
+
+	async function handleSaveOrder(): Promise<void> {
+		try {
+			await orderMutation.mutateAsync({
+				baseOrder,
+				categories,
+				orderedIds,
+			});
+			const savedOrder = normalizeCatalogOrder(orderedIds);
+			setBaseOrder(savedOrder);
+			setOrderedIds(savedOrder.map((item) => item.id));
+			removeStaffCatalogDraft(userId, "category-order");
+			setDraft(null);
+			toast.success("El orden de las categorías fue guardado.");
+		} catch (error) {
+			setBaseOrder(serverOrder.baseOrder);
+			setOrderedIds(serverOrder.orderedIds);
+			toast.error(getOrderErrorMessage(error));
+		}
+	}
+
+	function recoverDraft(): void {
+		if (!draft) return;
+
+		const currentIds = new Set(serverOrder.orderedIds);
+		const recoveredIds = draft.values.filter((id) => currentIds.has(id));
+		const missingIds = serverOrder.orderedIds.filter(
+			(id) => !recoveredIds.includes(id),
+		);
+		setBaseOrder(draft.base);
+		setOrderedIds([...recoveredIds, ...missingIds]);
+		setDraft(null);
+	}
+
+	function discardDraft(): void {
+		removeStaffCatalogDraft(userId, "category-order");
+		setDraft(null);
+		setBaseOrder(serverOrder.baseOrder);
+		setOrderedIds(serverOrder.orderedIds);
+	}
+
 	return (
 		<div className="space-y-6">
 			<CatalogSectionNav activeSection="categories" />
@@ -84,11 +225,65 @@ export function StaffCategoryList({
 				<EmptyCategoryState canCreate={canCreate} />
 			) : null}
 			{!isLoading && !isError && categories.length > 0 ? (
-				<>
-					<DesktopCategoryTable categories={categories} canManage={canManage} />
-					<MobileCategoryCards categories={categories} canManage={canManage} />
-				</>
+				isOrderingEnabled ? (
+					<section className="space-y-5">
+						<SortableCategoryList
+							categories={categories}
+							onOrderChange={handleOrderChange}
+							orderedIds={orderedIds}
+						/>
+						<div className="flex flex-col gap-3 border-t border-[#12324a]/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+							<p className="text-sm text-[#12324a]/65">
+								{isOrderDirty
+									? "Tienes cambios de orden pendientes de guardar."
+									: "El orden actual está sincronizado con el servidor."}
+							</p>
+							<Button
+								disabled={!isOrderDirty || orderMutation.isPending}
+								onClick={() => void handleSaveOrder()}
+							>
+								{orderMutation.isPending ? "Guardando orden…" : "Guardar orden"}
+							</Button>
+						</div>
+					</section>
+				) : (
+					<>
+						<DesktopCategoryTable
+							categories={categories}
+							canManage={canManage}
+						/>
+						<MobileCategoryCards
+							categories={categories}
+							canManage={canManage}
+						/>
+					</>
+				)
 			) : null}
+
+			<AlertDialog open={draft !== null} onOpenChange={() => undefined}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>
+							{hasDraftConflict
+								? "El orden tiene un borrador desactualizado"
+								: "Encontramos un borrador de orden"}
+						</AlertDialogTitle>
+						<AlertDialogDescription>
+							{hasDraftConflict
+								? "Las categorías cambiaron en el servidor desde que guardaste este orden. ¿Quieres recuperar tu versión?"
+								: "Hay un orden de categorías que no terminaste de guardar. Puedes recuperarlo o descartarlo."}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel onClick={discardDraft}>
+							Descartar
+						</AlertDialogCancel>
+						<AlertDialogAction onClick={recoverDraft}>
+							Recuperar borrador
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }
@@ -219,6 +414,20 @@ function CategoryLink({
 			{canManage ? "Administrar" : "Ver categoría"}
 		</a>
 	);
+}
+
+function getOrderErrorMessage(error: unknown): string {
+	if (error instanceof ApiClientError) {
+		if (error.code === "FORBIDDEN") {
+			return "No tienes permisos para reordenar las categorías.";
+		}
+
+		if (error.code === "NETWORK_ERROR" || error.status === 0) {
+			return "No se pudo guardar el orden. Se recargará el orden del servidor.";
+		}
+	}
+
+	return "No se pudo guardar todo el orden. Se recargará el orden del servidor.";
 }
 
 function getCategoryErrorMessage(error: unknown): string {

@@ -16,10 +16,15 @@ import type {
 	CatalogStatus,
 	CreateDishRequest,
 	CreateMenuCategoryRequest,
+	MenuCategory,
 	ReplaceBranchDishConfigurationRequest,
 	UpdateDishRequest,
 	UpdateMenuCategoryRequest,
 } from "../contracts/staff-catalog.schemas";
+import {
+	type CatalogOrderItem,
+	getChangedCatalogOrder,
+} from "../lib/catalog-order";
 
 export const staffCatalogQueryKeys = {
 	all: ["staff", "catalog"] as const,
@@ -161,6 +166,68 @@ export function useUpdateMenuCategoryMutation(session: StaffSessionAccess) {
 			input: UpdateMenuCategoryRequest;
 		}) => client.updateCategory(categoryId, input),
 		onSuccess: (category) => updateCategoryQueries(queryClient, category),
+	});
+}
+
+export function useUpdateMenuCategoryOrderMutation(
+	session: StaffSessionAccess,
+) {
+	const client = useStaffCatalogClient(session);
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({
+			baseOrder,
+			categories,
+			orderedIds,
+		}: {
+			baseOrder: CatalogOrderItem[];
+			categories: MenuCategory[];
+			orderedIds: string[];
+		}) => {
+			const changes = getChangedCatalogOrder(baseOrder, orderedIds);
+			const categoriesById = new Map(
+				categories.map((category) => [category.id, category]),
+			);
+			const updatedCategories: MenuCategory[] = [];
+
+			for (const change of changes) {
+				const category = categoriesById.get(change.id);
+				if (!category) continue;
+
+				updatedCategories.push(
+					await client.updateCategory(category.id, {
+						name: category.name,
+						position: change.position,
+					}),
+				);
+			}
+
+			return updatedCategories;
+		},
+		onSuccess: (categories) => {
+			const { restaurantId } = getStaffRuntimeConfig();
+			for (const category of categories) {
+				queryClient.setQueryData(
+					staffCatalogQueryKeys.categoryDetail(restaurantId, category.id),
+					category,
+				);
+			}
+			void queryClient.invalidateQueries({
+				queryKey: staffCatalogQueryKeys.categories,
+			});
+			void queryClient.invalidateQueries({
+				queryKey: staffCatalogQueryKeys.dishes,
+			});
+			void queryClient.invalidateQueries({
+				queryKey: staffCatalogQueryKeys.branchDishes,
+			});
+		},
+		onError: () => {
+			void queryClient.invalidateQueries({
+				queryKey: staffCatalogQueryKeys.categories,
+			});
+		},
 	});
 }
 
