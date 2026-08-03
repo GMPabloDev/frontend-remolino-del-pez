@@ -115,6 +115,17 @@ function BranchOverview({
 						>
 							Gestionar mesas
 						</Button>
+						<Button
+							nativeButton={false}
+							render={
+								<a
+									href={`/staff/branches/${encodeURIComponent(branch.id)}/menu`}
+								/>
+							}
+							variant="outline"
+						>
+							Configurar menú
+						</Button>
 					</div>
 				</div>
 

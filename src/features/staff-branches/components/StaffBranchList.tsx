@@ -155,6 +155,7 @@ function DesktopBranchTable({ branches }: { branches: StaffBranch[] }) {
 								<div className="flex flex-wrap justify-end gap-2">
 									<ManageBranchLink branchId={branch.id} />
 									<ManageTablesLink branchId={branch.id} />
+									<ManageMenuLink branchId={branch.id} />
 								</div>
 							</TableCell>
 						</TableRow>
@@ -204,6 +205,7 @@ function MobileBranchCards({ branches }: { branches: StaffBranch[] }) {
 					<div className="flex flex-wrap gap-2">
 						<ManageBranchLink branchId={branch.id} />
 						<ManageTablesLink branchId={branch.id} />
+						<ManageMenuLink branchId={branch.id} />
 					</div>
 				</article>
 			))}
@@ -287,6 +289,17 @@ function ManageTablesLink({ branchId }: { branchId: string }) {
 			href={`/staff/branches/${encodeURIComponent(branchId)}/tables`}
 		>
 			Gestionar mesas
+		</a>
+	);
+}
+
+function ManageMenuLink({ branchId }: { branchId: string }) {
+	return (
+		<a
+			className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#e76832]/30 px-4 text-sm font-semibold text-[#8f3d20] transition hover:border-[#e76832]/55 hover:bg-[#e76832]/8 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/35"
+			href={`/staff/branches/${encodeURIComponent(branchId)}/menu`}
+		>
+			Configurar menú
 		</a>
 	);
 }
