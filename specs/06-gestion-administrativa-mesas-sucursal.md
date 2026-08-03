@@ -1,6 +1,6 @@
 # SPEC 06 — Gestión administrativa de mesas por sucursal
 
-> **Estado:** Borrador
+> **Estado:** Aprobado
 > **Depende de:** SPEC 03, SPEC 04, SPEC 05
 > **Fecha:** 2026-08-03
 > **Objetivo:** Implementar la gestión staff de mesas por sucursal con permisos por rol, formularios recuperables, filtrado y control de estado.
