@@ -12,6 +12,7 @@ import type { StaffSessionAccess } from "@/features/staff-auth/session/staff-ses
 import { StaffLayout } from "@/features/staff-shell/components/StaffLayout";
 import { ApiClientError } from "@/lib/api/api-error";
 import { StaffBranchDetailsForm } from "./components/StaffBranchDetailsForm";
+import { StaffBranchRulesForm } from "./components/StaffBranchRulesForm";
 import type { StaffBranch } from "./contracts/staff-branch.schemas";
 import { useStaffBranchQuery } from "./query/staff-branches-query";
 
@@ -107,6 +108,7 @@ function BranchOverview({
 				session={session}
 				userId={userId}
 			/>
+			<StaffBranchRulesForm branch={branch} session={session} userId={userId} />
 
 			<div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
 				<section className="rounded-3xl border border-[#12324a]/10 bg-white/80 p-6 shadow-[0_20px_60px_rgba(18,50,74,0.05)]">
