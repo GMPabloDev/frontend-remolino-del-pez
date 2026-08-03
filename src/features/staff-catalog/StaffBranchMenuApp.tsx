@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ProtectedStaffRoute } from "@/features/staff-auth/components/ProtectedStaffRoute";
@@ -12,6 +12,7 @@ import { StaffLayout } from "@/features/staff-shell/components/StaffLayout";
 import { StaffUnsavedChangesProvider } from "@/features/staff-shell/components/StaffUnsavedChangesProvider";
 import { ApiClientError } from "@/lib/api/api-error";
 import { CatalogListStatus } from "./components/CatalogListStatus";
+import { StaffBranchDishConfigurationForm } from "./components/StaffBranchDishConfigurationForm";
 import { StaffBranchMenuList } from "./components/StaffBranchMenuList";
 import type { BranchDishFilter } from "./lib/branch-dish-filter";
 import { canConfigureBranchMenu } from "./lib/staff-catalog-permissions";
@@ -36,9 +37,24 @@ function StaffBranchMenuScreen({ branchId }: StaffBranchMenuAppProps) {
 	const branchQuery = useStaffBranchQuery(session, branchId);
 	const dishesQuery = useStaffBranchDishesQuery(session, branchId);
 	const [filter, setFilter] = useState<BranchDishFilter>("all");
+	const [selectedDishId, setSelectedDishId] = useState<string | null>(null);
 	const canConfigure = snapshot.user
 		? canConfigureBranchMenu(snapshot.user, branchId)
 		: false;
+	const selectedDish = (dishesQuery.data ?? []).find(
+		(dish) => dish.id === selectedDishId,
+	);
+
+	useEffect(() => {
+		const updateSelectedDish = () => {
+			const dishId = new URLSearchParams(window.location.search).get("dish");
+			setSelectedDishId(dishId);
+		};
+
+		updateSelectedDish();
+		window.addEventListener("popstate", updateSelectedDish);
+		return () => window.removeEventListener("popstate", updateSelectedDish);
+	}, []);
 
 	return (
 		<StaffUnsavedChangesProvider>
@@ -63,6 +79,17 @@ function StaffBranchMenuScreen({ branchId }: StaffBranchMenuAppProps) {
 									branchName={branchQuery.data.name}
 									canConfigure={canConfigure}
 								/>
+								{selectedDish && canConfigure ? (
+									<div className="mb-6">
+										<StaffBranchDishConfigurationForm
+											branchId={branchId}
+											branchStatus={branchQuery.data.status}
+											dish={selectedDish}
+											session={session}
+											userId={snapshot.user.id}
+										/>
+									</div>
+								) : null}
 								<StaffBranchMenuList
 									branchId={branchId}
 									canConfigure={canConfigure}

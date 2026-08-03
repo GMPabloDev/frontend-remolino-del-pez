@@ -85,6 +85,11 @@ export const branchDishConfigurationFormSchema = z.object({
 	status: branchDishStatusSchema,
 });
 
+export const branchDishConfigurationDraftSchema = z.object({
+	price: z.string(),
+	status: branchDishStatusSchema,
+});
+
 export type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 export type DishFormValues = z.infer<typeof dishFormSchema>;
 export type BranchDishConfigurationFormValues = z.infer<
