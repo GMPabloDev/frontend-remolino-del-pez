@@ -1,6 +1,6 @@
 # SPEC 02 — Descubrimiento público y menú por slug
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Amended by:** SPEC 03
 > **Depende de:** SPEC 01
 > **Supersedes:** SPEC 01 (identificación por UUID, endpoint del menú y ausencia de selector de sucursal)

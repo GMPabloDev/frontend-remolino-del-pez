@@ -1,6 +1,6 @@
 # SPEC 05 — Gestión administrativa de sucursales
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 03, SPEC 04
 > **Supersedes:** SPEC 03 (ausencia de restricciones frontend por rol para el módulo de sucursales)
 > **Fecha:** 2026-08-02
