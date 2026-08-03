@@ -75,7 +75,7 @@ function StaffTableDetailScreen({
 							<DetailError
 								error={branchQuery.error}
 								onRetry={() => void branchQuery.refetch()}
-								backHref={`/staff/branches/${encodeURIComponent(branchId)}/tables`}
+								backHref="/staff/branches"
 							/>
 						) : null}
 						{branchQuery.data && tableQuery.isPending ? (
@@ -208,19 +208,23 @@ function DetailError({
 	onRetry: () => void;
 	backHref: string;
 }) {
-	const isNotFound =
-		error instanceof ApiClientError &&
-		(error.code === "TABLE_NOT_FOUND" || error.code === "BRANCH_NOT_FOUND");
+	const isBranchNotFound =
+		error instanceof ApiClientError && error.code === "BRANCH_NOT_FOUND";
+	const isTableNotFound =
+		error instanceof ApiClientError && error.code === "TABLE_NOT_FOUND";
+	const isNotFound = isBranchNotFound || isTableNotFound;
 	const isForbidden =
 		error instanceof ApiClientError && error.code === "FORBIDDEN";
-	const message = isNotFound
-		? "La mesa o la sucursal ya no existe."
-		: isForbidden
-			? "No tienes permisos para consultar esta mesa."
-			: error instanceof ApiClientError &&
-					(error.code === "NETWORK_ERROR" || error.status === 0)
-				? "No se pudo conectar con el servidor."
-				: "No se pudo cargar la mesa.";
+	const message = isBranchNotFound
+		? "La sucursal no existe o no está disponible."
+		: isTableNotFound
+			? "La mesa no existe o no está disponible."
+			: isForbidden
+				? "No tienes permisos para consultar este recurso."
+				: error instanceof ApiClientError &&
+						(error.code === "NETWORK_ERROR" || error.status === 0)
+					? "No se pudo conectar con el servidor."
+					: "No se pudo cargar la mesa.";
 
 	return (
 		<section

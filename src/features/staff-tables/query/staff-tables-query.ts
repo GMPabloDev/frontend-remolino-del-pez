@@ -39,6 +39,7 @@ export function useStaffTablesQuery(
 	return useQuery({
 		queryKey: staffTableQueryKeys.list(restaurantId, branchId, status),
 		queryFn: () => client.listTables(branchId, status),
+		retry: false,
 		enabled: session.getAccessToken() !== null && branchId.length > 0,
 	});
 }
@@ -54,6 +55,7 @@ export function useStaffTableQuery(
 	return useQuery({
 		queryKey: staffTableQueryKeys.detail(restaurantId, branchId, tableId),
 		queryFn: () => client.getTable(branchId, tableId),
+		retry: false,
 		enabled:
 			session.getAccessToken() !== null &&
 			branchId.length > 0 &&

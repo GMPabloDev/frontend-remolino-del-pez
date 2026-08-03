@@ -33,6 +33,7 @@ export function useStaffBranchesQuery(
 	return useQuery({
 		queryKey: staffBranchQueryKeys.list(restaurantId, status),
 		queryFn: () => client.listBranches(status),
+		retry: false,
 		enabled: session.getAccessToken() !== null,
 	});
 }
@@ -47,6 +48,7 @@ export function useStaffBranchQuery(
 	return useQuery({
 		queryKey: staffBranchQueryKeys.detail(restaurantId, branchId),
 		queryFn: () => client.getBranch(branchId),
+		retry: false,
 		enabled: session.getAccessToken() !== null && branchId.length > 0,
 	});
 }
