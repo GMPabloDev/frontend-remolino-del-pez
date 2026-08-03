@@ -152,7 +152,10 @@ function DesktopBranchTable({ branches }: { branches: StaffBranch[] }) {
 								{formatSchedule(branch)}
 							</TableCell>
 							<TableCell className="px-6 py-5 text-right">
-								<ManageBranchLink branchId={branch.id} />
+								<div className="flex flex-wrap justify-end gap-2">
+									<ManageBranchLink branchId={branch.id} />
+									<ManageTablesLink branchId={branch.id} />
+								</div>
 							</TableCell>
 						</TableRow>
 					))}
@@ -198,7 +201,10 @@ function MobileBranchCards({ branches }: { branches: StaffBranch[] }) {
 							{formatSchedule(branch)}
 						</p>
 					</div>
-					<ManageBranchLink branchId={branch.id} />
+					<div className="flex flex-wrap gap-2">
+						<ManageBranchLink branchId={branch.id} />
+						<ManageTablesLink branchId={branch.id} />
+					</div>
 				</article>
 			))}
 		</div>
@@ -270,6 +276,17 @@ function ManageBranchLink({ branchId }: { branchId: string }) {
 			href={`/staff/branches/${encodeURIComponent(branchId)}`}
 		>
 			Administrar
+		</a>
+	);
+}
+
+function ManageTablesLink({ branchId }: { branchId: string }) {
+	return (
+		<a
+			className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#12324a]/15 px-4 text-sm font-semibold text-[#12324a] transition hover:border-[#12324a]/30 hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/35"
+			href={`/staff/branches/${encodeURIComponent(branchId)}/tables`}
+		>
+			Gestionar mesas
 		</a>
 	);
 }

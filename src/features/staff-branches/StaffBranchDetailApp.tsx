@@ -103,7 +103,19 @@ function BranchOverview({
 						</h2>
 						<p className="mt-2 text-sm text-[#12324a]/55">/{branch.slug}</p>
 					</div>
-					<StatusBadge status={branch.status} />
+					<div className="flex flex-wrap items-center gap-2">
+						<StatusBadge status={branch.status} />
+						<Button
+							nativeButton={false}
+							render={
+								<a
+									href={`/staff/branches/${encodeURIComponent(branch.id)}/tables`}
+								/>
+							}
+						>
+							Gestionar mesas
+						</Button>
+					</div>
 				</div>
 
 				<div className="mt-8 grid gap-4 border-t border-[#12324a]/10 pt-6 sm:grid-cols-2">
