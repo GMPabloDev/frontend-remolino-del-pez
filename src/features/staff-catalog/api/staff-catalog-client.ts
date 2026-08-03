@@ -10,6 +10,7 @@ import {
 	catalogStatusSchema,
 	createDishRequestSchema,
 	createMenuCategoryRequestSchema,
+	dishesSchema,
 	dishSchema,
 	type MenuCategory,
 	menuCategoriesSchema,

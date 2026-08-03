@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { useStaffAuth } from "@/features/staff-auth/components/StaffAuthProvider";
 import type { StaffUser } from "@/features/staff-auth/contracts/staff-auth.schemas";
 import { removeAllBranchDrafts } from "@/features/staff-branches/lib/staff-branch-drafts";
+import { removeAllStaffCatalogDrafts } from "@/features/staff-catalog/lib/staff-catalog-drafts";
 import { removeAllStaffTableDrafts } from "@/features/staff-tables/lib/staff-table-drafts";
 
 interface StaffLayoutProps {
@@ -34,6 +35,7 @@ export function StaffLayout({
 		setIsLoggingOut(true);
 		if (user) {
 			removeAllBranchDrafts(user.id);
+			removeAllStaffCatalogDrafts(user.id);
 			removeAllStaffTableDrafts(user.id);
 		}
 		await session.logout();
