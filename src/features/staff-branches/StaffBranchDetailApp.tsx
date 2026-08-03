@@ -14,6 +14,7 @@ import { ApiClientError } from "@/lib/api/api-error";
 import { StaffBranchDetailsForm } from "./components/StaffBranchDetailsForm";
 import { StaffBranchRulesForm } from "./components/StaffBranchRulesForm";
 import { StaffBranchScheduleForm } from "./components/StaffBranchScheduleForm";
+import { StaffBranchStatusControl } from "./components/StaffBranchStatusControl";
 import type { StaffBranch } from "./contracts/staff-branch.schemas";
 import { useStaffBranchQuery } from "./query/staff-branches-query";
 
@@ -102,6 +103,7 @@ function BranchOverview({
 						icon={<Mail />}
 					/>
 				</div>
+				<StaffBranchStatusControl branch={branch} session={session} />
 			</section>
 
 			<StaffBranchDetailsForm
