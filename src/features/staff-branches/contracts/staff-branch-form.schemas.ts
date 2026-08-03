@@ -3,8 +3,11 @@ import { z } from "zod";
 import {
 	type BranchRules,
 	branchRulesSchema,
+	branchScheduleIntervalSchema,
 	type CreateBranchRequest,
 	createBranchRequestSchema,
+	type ReplaceBranchScheduleRequest,
+	replaceBranchScheduleRequestSchema,
 	type UpdateBranchDetailsRequest,
 	updateBranchDetailsRequestSchema,
 	updateBranchRulesRequestSchema,
@@ -46,9 +49,49 @@ export const createBranchFormSchema = z.object({
 export const updateBranchDetailsFormSchema = branchDetailsFormSchema;
 export const updateBranchRulesFormSchema = branchRulesFormSchema;
 
+export const branchScheduleFormSchema = z
+	.object({
+		intervals: z.array(branchScheduleIntervalSchema),
+	})
+	.superRefine((schedule, context) => {
+		const intervalsByDay = new Map<
+			number,
+			Array<{ index: number; start: number; end: number }>
+		>();
+
+		for (const [index, interval] of schedule.intervals.entries()) {
+			const start = timeToMinutes(interval.startTime);
+			const end = timeToMinutes(interval.endTime);
+			if (!Number.isFinite(start) || !Number.isFinite(end)) continue;
+
+			const dayIntervals = intervalsByDay.get(interval.dayOfWeek) ?? [];
+			dayIntervals.push({ index, start, end });
+			intervalsByDay.set(interval.dayOfWeek, dayIntervals);
+		}
+
+		for (const dayIntervals of intervalsByDay.values()) {
+			const sortedIntervals = [...dayIntervals].sort(
+				(first, second) => first.start - second.start,
+			);
+
+			for (let index = 1; index < sortedIntervals.length; index += 1) {
+				const previous = sortedIntervals[index - 1];
+				const current = sortedIntervals[index];
+				if (current.start < previous.end) {
+					context.addIssue({
+						code: "custom",
+						path: ["intervals", current.index, "startTime"],
+						message: "Este intervalo se solapa con otro del mismo día.",
+					});
+				}
+			}
+		}
+	});
+
 export type BranchDetailsFormValues = z.infer<typeof branchDetailsFormSchema>;
 export type BranchRulesFormValues = z.infer<typeof branchRulesFormSchema>;
 export type CreateBranchFormValues = z.infer<typeof createBranchFormSchema>;
+export type BranchScheduleFormValues = z.infer<typeof branchScheduleFormSchema>;
 
 export function toCreateBranchRequest(
 	values: CreateBranchFormValues,
@@ -75,6 +118,14 @@ export function toUpdateBranchRulesRequest(
 	return payload.rules;
 }
 
+export function toReplaceBranchScheduleRequest(
+	values: BranchScheduleFormValues,
+): ReplaceBranchScheduleRequest {
+	return replaceBranchScheduleRequestSchema.parse({
+		intervals: [...values.intervals].sort(compareIntervals),
+	});
+}
+
 function normalizeCreateEmail(email: string): string | undefined {
 	const normalizedEmail = email.trim();
 	return normalizedEmail === "" ? undefined : normalizedEmail;
@@ -83,4 +134,20 @@ function normalizeCreateEmail(email: string): string | undefined {
 function normalizeUpdateEmail(email: string): string | null {
 	const normalizedEmail = email.trim();
 	return normalizedEmail === "" ? null : normalizedEmail;
+}
+
+function compareIntervals(
+	first: BranchScheduleFormValues["intervals"][number],
+	second: BranchScheduleFormValues["intervals"][number],
+): number {
+	return (
+		first.dayOfWeek - second.dayOfWeek ||
+		first.startTime.localeCompare(second.startTime) ||
+		first.endTime.localeCompare(second.endTime)
+	);
+}
+
+function timeToMinutes(value: string): number {
+	const [hours, minutes] = value.split(":").map(Number);
+	return hours * 60 + minutes;
 }
