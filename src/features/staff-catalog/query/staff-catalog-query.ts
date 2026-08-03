@@ -275,6 +275,68 @@ export function useUpdateDishMutation(session: StaffSessionAccess) {
 	});
 }
 
+export function useUpdateDishOrderMutation(session: StaffSessionAccess) {
+	const client = useStaffCatalogClient(session);
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({
+			baseOrder,
+			dishes,
+			orderedIds,
+		}: {
+			baseOrder: CatalogOrderItem[];
+			dishes: Awaited<ReturnType<StaffCatalogClient["listDishes"]>>;
+			orderedIds: string[];
+		}) => {
+			const changes = getChangedCatalogOrder(baseOrder, orderedIds);
+			const dishesById = new Map(dishes.map((dish) => [dish.id, dish]));
+			const updatedDishes: Awaited<
+				ReturnType<StaffCatalogClient["getDish"]>
+			>[] = [];
+
+			for (const change of changes) {
+				const dish = dishesById.get(change.id);
+				if (!dish) continue;
+
+				updatedDishes.push(
+					await client.updateDish(dish.id, {
+						name: dish.name,
+						description: dish.description,
+						imageUrl: dish.imageUrl,
+						ingredients: dish.ingredients,
+						allergens: dish.allergens,
+						categoryId: dish.categoryId,
+						position: change.position,
+					}),
+				);
+			}
+
+			return updatedDishes;
+		},
+		onSuccess: (dishes) => {
+			const { restaurantId } = getStaffRuntimeConfig();
+			for (const dish of dishes) {
+				queryClient.setQueryData(
+					staffCatalogQueryKeys.dishDetail(restaurantId, dish.id),
+					dish,
+				);
+			}
+			void queryClient.invalidateQueries({
+				queryKey: staffCatalogQueryKeys.dishes,
+			});
+			void queryClient.invalidateQueries({
+				queryKey: staffCatalogQueryKeys.branchDishes,
+			});
+		},
+		onError: () => {
+			void queryClient.invalidateQueries({
+				queryKey: staffCatalogQueryKeys.dishes,
+			});
+		},
+	});
+}
+
 export function useUpdateDishStatusMutation(session: StaffSessionAccess) {
 	const client = useStaffCatalogClient(session);
 	const queryClient = useQueryClient();

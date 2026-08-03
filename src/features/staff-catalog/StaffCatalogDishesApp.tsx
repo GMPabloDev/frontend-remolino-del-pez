@@ -62,11 +62,13 @@ function StaffCatalogDishesScreen() {
 								canCreate={canCreateStaffCatalog(snapshot.user.role)}
 								canManage={canManageStaffCatalog(snapshot.user.role)}
 								dishes={dishesQuery.data ?? []}
+								session={session}
 								error={dishesQuery.error}
 								filter={filter}
 								isError={dishesQuery.isError}
 								isLoading={dishesQuery.isPending}
 								onRetry={() => void dishesQuery.refetch()}
+								userId={snapshot.user.id}
 							/>
 						) : null}
 					</ProtectedStaffRoute>

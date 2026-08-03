@@ -10,6 +10,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import type { StaffSessionAccess } from "@/features/staff-auth/session/staff-session";
 import { ApiClientError } from "@/lib/api/api-error";
 import type { StaffDish } from "../contracts/staff-catalog.schemas";
 import type { CatalogStatusFilter } from "../lib/catalog-status-filter";
@@ -17,12 +18,15 @@ import { CatalogListStatus } from "./CatalogListStatus";
 import { CatalogSectionNav } from "./CatalogSectionNav";
 import { CatalogStatusBadge } from "./CatalogStatusBadge";
 import { CatalogStatusFilterNav } from "./CatalogStatusFilterNav";
+import { SortableDishList } from "./SortableDishList";
 
 interface StaffDishListProps {
 	dishes: StaffDish[];
 	filter: CatalogStatusFilter;
 	canCreate: boolean;
 	canManage: boolean;
+	session: StaffSessionAccess;
+	userId: string;
 	isLoading: boolean;
 	isError: boolean;
 	error: unknown;
@@ -34,6 +38,8 @@ export function StaffDishList({
 	filter,
 	canCreate,
 	canManage,
+	session,
+	userId,
 	isLoading,
 	isError,
 	error,
@@ -89,9 +95,12 @@ export function StaffDishList({
 					{groups.map((group) => (
 						<CategoryDishGroup
 							canManage={canManage}
+							canOrder={canManage && filter === "all"}
 							dishes={group.dishes}
 							key={group.categoryId}
 							name={group.categoryName}
+							session={session}
+							userId={userId}
 						/>
 					))}
 				</div>
@@ -130,10 +139,16 @@ function CategoryDishGroup({
 	name,
 	dishes,
 	canManage,
+	canOrder,
+	session,
+	userId,
 }: {
 	name: string;
 	dishes: StaffDish[];
 	canManage: boolean;
+	canOrder: boolean;
+	session: StaffSessionAccess;
+	userId: string;
 }) {
 	return (
 		<section aria-labelledby={`dish-group-${dishes[0]?.categoryId}`}>
@@ -153,14 +168,20 @@ function CategoryDishGroup({
 					{dishes.length} {dishes.length === 1 ? "plato" : "platos"}
 				</p>
 			</div>
-			<div className="hidden overflow-hidden rounded-3xl border border-[#12324a]/10 bg-white/90 shadow-[0_20px_60px_rgba(18,50,74,0.06)] md:block">
-				<DishTable canManage={canManage} dishes={dishes} />
-			</div>
-			<div className="grid gap-4 md:hidden">
-				{dishes.map((dish) => (
-					<DishCard canManage={canManage} dish={dish} key={dish.id} />
-				))}
-			</div>
+			{canOrder ? (
+				<SortableDishList dishes={dishes} session={session} userId={userId} />
+			) : (
+				<>
+					<div className="hidden overflow-hidden rounded-3xl border border-[#12324a]/10 bg-white/90 shadow-[0_20px_60px_rgba(18,50,74,0.06)] md:block">
+						<DishTable canManage={canManage} dishes={dishes} />
+					</div>
+					<div className="grid gap-4 md:hidden">
+						{dishes.map((dish) => (
+							<DishCard canManage={canManage} dish={dish} key={dish.id} />
+						))}
+					</div>
+				</>
+			)}
 		</section>
 	);
 }
