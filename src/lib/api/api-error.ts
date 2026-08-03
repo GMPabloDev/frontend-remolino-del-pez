@@ -6,6 +6,8 @@ const apiErrorDetailSchema = z.object({
 	message: z.string(),
 });
 
+export type ApiErrorDetail = z.infer<typeof apiErrorDetailSchema>;
+
 export const apiErrorResponseSchema = z.object({
 	error: z.object({
 		code: z.string(),
@@ -21,6 +23,7 @@ export class ApiClientError extends Error {
 		public readonly status: number,
 		public readonly code: string,
 		message: string,
+		public readonly details: ApiErrorDetail[] = [],
 	) {
 		super(message);
 		this.name = "ApiClientError";
@@ -38,6 +41,7 @@ export function parseApiErrorResponse(
 			status,
 			result.data.error.code,
 			result.data.error.message,
+			result.data.error.details ?? [],
 		);
 	}
 
