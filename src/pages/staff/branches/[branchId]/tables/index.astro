@@ -1,0 +1,15 @@
+---
+export const prerender = false;
+
+import { StaffTablesApp } from "../../../../../features/staff-tables/StaffTablesApp";
+import StaffPageLayout from "../../../../../layouts/StaffPageLayout.astro";
+
+const { branchId } = Astro.params;
+---
+
+<StaffPageLayout
+	title="Mesas de sucursal · El Molino del Pez"
+	description="Administra las mesas de una sucursal de El Molino del Pez."
+>
+	<StaffTablesApp branchId={branchId ?? ""} client:load />
+</StaffPageLayout>

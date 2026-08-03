@@ -1,0 +1,15 @@
+---
+export const prerender = false;
+
+import { StaffTableCreateApp } from "../../../../../features/staff-tables/StaffTableCreateApp";
+import StaffPageLayout from "../../../../../layouts/StaffPageLayout.astro";
+
+const { branchId } = Astro.params;
+---
+
+<StaffPageLayout
+	title="Nueva mesa · El Molino del Pez"
+	description="Registra una mesa para una sucursal de El Molino del Pez."
+>
+	<StaffTableCreateApp branchId={branchId ?? ""} client:load />
+</StaffPageLayout>
