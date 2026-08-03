@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+
+import { StaffCatalogCategoriesApp } from "../../../../features/staff-catalog/StaffCatalogCategoriesApp";
+import StaffPageLayout from "../../../../layouts/StaffPageLayout.astro";
+---
+
+<StaffPageLayout
+	title="Categorías del catálogo · El Molino del Pez"
+	description="Gestiona las categorías del catálogo de El Molino del Pez."
+>
+	<StaffCatalogCategoriesApp client:load />
+</StaffPageLayout>
