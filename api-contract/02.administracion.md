@@ -222,6 +222,8 @@ Crea el restaurante (**singleton**: solo puede existir uno).
 
 `Branch` = `{ id, restaurantId, slug, name, code, address, district, province, department, phone, email, status: "active"|"inactive", createdAt, updatedAt, rules: BranchRules | null, intervals: BranchScheduleInterval[] }`. **`status` siempre en minúsculas.**
 
+`BranchScheduleInterval` = `{ dayOfWeek: 1-7 (1=lunes), startTime: "HH:mm", endTime: "HH:mm" }`. En las respuestas, `intervals` viaja con `startTime`/`endTime` en formato `HH:mm` — mismo formato que acepta `PUT /schedule` y que usa la API pública.
+
 `BranchRules` = `{ defaultReservationDurationMinutes, minimumAdvanceMinutes, maximumAdvanceDays, arrivalToleranceMinutes, maxPartySize }`.
 
 ### POST /restaurants/:restaurantId/branches
