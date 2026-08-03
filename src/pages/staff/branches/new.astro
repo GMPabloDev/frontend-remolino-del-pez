@@ -1,0 +1,11 @@
+---
+import { StaffBranchCreateApp } from "../../../features/staff-branches/StaffBranchCreateApp";
+import StaffPageLayout from "../../../layouts/StaffPageLayout.astro";
+---
+
+<StaffPageLayout
+	title="Nueva sucursal · El Molino del Pez"
+	description="Registra una nueva sucursal de El Molino del Pez."
+>
+	<StaffBranchCreateApp client:load />
+</StaffPageLayout>
