@@ -31,7 +31,7 @@ export function createPublicCheckout(
 
 	return requestPublicJson(
 		baseUrl,
-		getPaymentPath(request),
+		getPaymentPath(request, "checkout"),
 		publicCheckoutResponseSchema,
 		"No se pudo iniciar el checkout.",
 		{
@@ -51,7 +51,7 @@ export function fetchPublicPaymentStatus(
 
 	return requestPublicJson(
 		baseUrl,
-		getPaymentPath(request),
+		getPaymentPath(request, "payment"),
 		publicPaymentStatusSchema,
 		"No se pudo consultar el estado del pago.",
 		{
@@ -73,10 +73,13 @@ function parsePaymentQuery(
 	};
 }
 
-function getPaymentPath({
-	restaurantSlug,
-	branchSlug,
-	reservationId,
-}: PublicPaymentBranchQuery & { reservationId: string }): string {
-	return `public/restaurants/${encodeURIComponent(restaurantSlug)}/branches/${encodeURIComponent(branchSlug)}/reservations/${encodeURIComponent(reservationId)}`;
+function getPaymentPath(
+	{
+		restaurantSlug,
+		branchSlug,
+		reservationId,
+	}: PublicPaymentBranchQuery & { reservationId: string },
+	action: "checkout" | "payment",
+): string {
+	return `public/restaurants/${encodeURIComponent(restaurantSlug)}/branches/${encodeURIComponent(branchSlug)}/reservations/${encodeURIComponent(reservationId)}/${action}`;
 }

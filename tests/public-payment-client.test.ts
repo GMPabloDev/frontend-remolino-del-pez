@@ -49,7 +49,7 @@ describe("public payment client", () => {
 		await createPublicCheckout(baseUrl, query);
 
 		expect(request?.url).toBe(
-			"https://api.example.test/public/restaurants/restaurante%20olimpico/branches/miraflores/reservations/123e4567-e89b-12d3-a456-426614174000",
+			"https://api.example.test/public/restaurants/restaurante%20olimpico/branches/miraflores/reservations/123e4567-e89b-12d3-a456-426614174000/checkout",
 		);
 		expect(request?.method).toBe("POST");
 		expect(request?.headers.get("Authorization")).toBe(
@@ -77,6 +77,9 @@ describe("public payment client", () => {
 		await fetchPublicPaymentStatus(baseUrl, query);
 
 		expect(request?.method).toBe("GET");
+		expect(request?.url).toContain(
+			"/reservations/123e4567-e89b-12d3-a456-426614174000/payment",
+		);
 		expect(request?.headers.get("Authorization")).toBe(
 			"Bearer sensitive-checkout-token",
 		);
