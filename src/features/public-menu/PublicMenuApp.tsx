@@ -4,7 +4,9 @@ import { PublicMenu } from "./components/PublicMenu";
 export function PublicMenuApp() {
 	return (
 		<PublicQueryProvider>
-			<PublicMenu />
+			<div className="relative">
+				<PublicMenu />
+			</div>
 		</PublicQueryProvider>
 	);
 }

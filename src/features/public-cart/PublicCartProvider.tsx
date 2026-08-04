@@ -197,7 +197,9 @@ export function PublicCartProvider({
 			}));
 			const currentStoredItems = toStoredItems(items);
 
-			setItems(nextItems);
+			if (!areCartItemsEqual(items, nextItems)) {
+				setItems(nextItems);
+			}
 			if (!areStoredItemsEqual(currentStoredItems, toStoredItems(nextItems))) {
 				persistItems(nextItems);
 			}
@@ -273,6 +275,13 @@ function toStoredItems(
 		unitPrice: item.unitPrice,
 		quantity: item.quantity,
 	}));
+}
+
+function areCartItemsEqual(
+	firstItems: ReadonlyArray<PublicCartItem>,
+	secondItems: ReadonlyArray<PublicCartItem>,
+): boolean {
+	return JSON.stringify(firstItems) === JSON.stringify(secondItems);
 }
 
 function areStoredItemsEqual(

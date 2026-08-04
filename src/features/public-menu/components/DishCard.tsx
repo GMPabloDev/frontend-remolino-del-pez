@@ -1,6 +1,9 @@
-import { CircleAlert } from "lucide-react";
+import { CircleAlert, Plus } from "lucide-react";
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import { PublicCartQuantityControl } from "../../public-cart/components/PublicCartQuantityControl";
+import { usePublicCart } from "../../public-cart/PublicCartProvider";
 import type { PublicDish } from "../contracts/public-menu";
 import { formatMenuPrice } from "../lib/format-menu-price";
 import { DishImageFallback } from "./MenuState";
@@ -11,7 +14,9 @@ interface DishCardProps {
 
 export function DishCard({ dish }: DishCardProps) {
 	const [imageFailed, setImageFailed] = useState(false);
+	const { addItem, decrementItem, incrementItem, items } = usePublicCart();
 	const isSoldOut = dish.status === "sold_out";
+	const cartItem = items.find((item) => item.dishId === dish.id);
 
 	return (
 		<article
@@ -91,6 +96,36 @@ export function DishCard({ dish }: DishCardProps) {
 						</span>
 					</p>
 				) : null}
+
+				<div className="mt-6 flex items-center justify-between gap-3 border-t border-[#12324a]/10 pt-5">
+					{isSoldOut ? (
+						<p className="text-xs font-semibold text-[#b34b25]">
+							No disponible para selección
+						</p>
+					) : cartItem ? (
+						<PublicCartQuantityControl
+							itemName={dish.name}
+							quantity={cartItem.quantity}
+							onDecrease={() => decrementItem(dish.id)}
+							onIncrease={() => incrementItem(dish.id)}
+						/>
+					) : (
+						<Button
+							aria-label={`Añadir ${dish.name} al carrito`}
+							className="rounded-full bg-[#12324a] px-5 text-white hover:bg-[#1d4b68]"
+							onClick={() => addItem(dish)}
+							variant="default"
+						>
+							<Plus data-icon="inline-start" />
+							Añadir
+						</Button>
+					)}
+					{cartItem && !isSoldOut ? (
+						<span className="text-xs font-semibold text-[#22624e]">
+							En tu selección
+						</span>
+					) : null}
+				</div>
 			</div>
 		</article>
 	);
