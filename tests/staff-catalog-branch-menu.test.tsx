@@ -67,6 +67,7 @@ describe("StaffBranchDishConfigurationForm", () => {
 			<StaffBranchDishConfigurationForm
 				branchId={branchId}
 				branchStatus="active"
+				categoryStatus="active"
 				dish={dish}
 				session={session}
 				userId="staff-user"
@@ -102,6 +103,7 @@ describe("StaffBranchDishConfigurationForm", () => {
 			<StaffBranchDishConfigurationForm
 				branchId={branchId}
 				branchStatus="active"
+				categoryStatus="active"
 				dish={{ ...dish, branchConfiguration: null }}
 				session={session}
 				userId="staff-user"
@@ -129,6 +131,7 @@ describe("StaffBranchDishConfigurationForm", () => {
 			<StaffBranchDishConfigurationForm
 				branchId={branchId}
 				branchStatus="inactive"
+				categoryStatus="active"
 				dish={dish}
 				session={session}
 				userId="staff-user"

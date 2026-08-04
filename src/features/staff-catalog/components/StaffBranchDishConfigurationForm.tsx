@@ -49,6 +49,7 @@ import { CatalogStatusBadge } from "./CatalogStatusBadge";
 interface StaffBranchDishConfigurationFormProps {
 	branchId: string;
 	branchStatus: "active" | "inactive";
+	categoryStatus: "active" | "inactive";
 	dish: StaffBranchDish;
 	session: StaffSessionAccess;
 	userId: string;
@@ -57,6 +58,7 @@ interface StaffBranchDishConfigurationFormProps {
 export function StaffBranchDishConfigurationForm({
 	branchId,
 	branchStatus,
+	categoryStatus,
 	dish,
 	session,
 	userId,
@@ -180,6 +182,9 @@ export function StaffBranchDishConfigurationForm({
 			) : null}
 			{branchStatus === "inactive" ? (
 				<StateWarning message="La sucursal está inactiva. Puedes preparar la configuración, pero no se publicará hasta activar la sucursal." />
+			) : null}
+			{categoryStatus === "inactive" ? (
+				<StateWarning message="La categoría está inactiva. Puedes preparar la configuración, pero no se publicará hasta activarla." />
 			) : null}
 			<div className="mt-6">
 				<form

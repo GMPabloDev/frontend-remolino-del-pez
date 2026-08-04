@@ -36,12 +36,18 @@ function StaffDishCreateScreen() {
 		: false;
 	const categories = categoriesQuery.data ?? [];
 	const initialCategoryId = categories[0]?.id;
-	const initialPosition = initialCategoryId
-		? getNextCatalogPosition(
+	const positionsByCategory = Object.fromEntries(
+		categories.map((category) => [
+			category.id,
+			getNextCatalogPosition(
 				(dishesQuery.data ?? []).filter(
-					(dish) => dish.categoryId === initialCategoryId,
+					(dish) => dish.categoryId === category.id,
 				),
-			)
+			),
+		]),
+	);
+	const initialPosition = initialCategoryId
+		? (positionsByCategory[initialCategoryId] ?? 1)
 		: 1;
 
 	return (
@@ -71,6 +77,7 @@ function StaffDishCreateScreen() {
 								<StaffDishCreateForm
 									categories={categories}
 									initialPosition={initialPosition}
+									positionsByCategory={positionsByCategory}
 									session={session}
 									userId={snapshot.user.id}
 								/>

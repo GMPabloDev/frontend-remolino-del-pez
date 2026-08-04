@@ -16,7 +16,10 @@ import { StaffBranchDishConfigurationForm } from "./components/StaffBranchDishCo
 import { StaffBranchMenuList } from "./components/StaffBranchMenuList";
 import type { BranchDishFilter } from "./lib/branch-dish-filter";
 import { canConfigureBranchMenu } from "./lib/staff-catalog-permissions";
-import { useStaffBranchDishesQuery } from "./query/staff-catalog-query";
+import {
+	useStaffBranchDishesQuery,
+	useStaffCategoriesQuery,
+} from "./query/staff-catalog-query";
 
 interface StaffBranchMenuAppProps {
 	branchId: string;
@@ -35,12 +38,19 @@ export function StaffBranchMenuApp({ branchId }: StaffBranchMenuAppProps) {
 function StaffBranchMenuScreen({ branchId }: StaffBranchMenuAppProps) {
 	const { session, snapshot } = useStaffAuth();
 	const branchQuery = useStaffBranchQuery(session, branchId);
+	const categoriesQuery = useStaffCategoriesQuery(session);
 	const dishesQuery = useStaffBranchDishesQuery(session, branchId);
 	const [filter, setFilter] = useState<BranchDishFilter>("all");
 	const [selectedDishId, setSelectedDishId] = useState<string | null>(null);
 	const canConfigure = snapshot.user
 		? canConfigureBranchMenu(snapshot.user, branchId)
 		: false;
+	const categoryStatuses = Object.fromEntries(
+		(categoriesQuery.data ?? []).map((category) => [
+			category.id,
+			category.status,
+		]),
+	);
 	const selectedDish = (dishesQuery.data ?? []).find(
 		(dish) => dish.id === selectedDishId,
 	);
@@ -63,16 +73,21 @@ function StaffBranchMenuScreen({ branchId }: StaffBranchMenuAppProps) {
 					<CatalogListStatus busy message="Comprobando tu sesión…" />
 				) : (
 					<ProtectedStaffRoute>
-						{branchQuery.isPending || dishesQuery.isPending ? (
+						{branchQuery.isPending ||
+						categoriesQuery.isPending ||
+						dishesQuery.isPending ? (
 							<CatalogListStatus busy message="Cargando menú…" />
 						) : null}
 						{branchQuery.isError ? (
 							<MenuError error={branchQuery.error} />
 						) : null}
+						{categoriesQuery.isError ? (
+							<MenuError error={categoriesQuery.error} />
+						) : null}
 						{dishesQuery.isError ? (
 							<MenuError error={dishesQuery.error} />
 						) : null}
-						{branchQuery.data && snapshot.user ? (
+						{branchQuery.data && categoriesQuery.data && snapshot.user ? (
 							<>
 								<BranchHeader
 									branchId={branchId}
@@ -84,6 +99,9 @@ function StaffBranchMenuScreen({ branchId }: StaffBranchMenuAppProps) {
 										<StaffBranchDishConfigurationForm
 											branchId={branchId}
 											branchStatus={branchQuery.data.status}
+											categoryStatus={
+												categoryStatuses[selectedDish.categoryId] ?? "active"
+											}
 											dish={selectedDish}
 											session={session}
 											userId={snapshot.user.id}
@@ -93,6 +111,7 @@ function StaffBranchMenuScreen({ branchId }: StaffBranchMenuAppProps) {
 								<StaffBranchMenuList
 									branchId={branchId}
 									canConfigure={canConfigure}
+									categoryStatuses={categoryStatuses}
 									dishes={dishesQuery.data ?? []}
 									error={dishesQuery.error}
 									filter={filter}
@@ -152,7 +171,18 @@ function MenuError({ error }: { error: unknown }) {
 	const message =
 		error instanceof ApiClientError && error.code === "FORBIDDEN"
 			? "No tienes permisos para consultar esta sucursal."
-			: "No se pudo cargar la información de la sucursal.";
+			: error instanceof ApiClientError && error.code === "BRANCH_NOT_FOUND"
+				? "La sucursal no existe o no está disponible."
+				: error instanceof ApiClientError &&
+						error.code === "RESTAURANT_NOT_FOUND"
+					? "El restaurante no existe o no está disponible."
+					: error instanceof ApiClientError &&
+							(error.code === "NETWORK_ERROR" || error.status === 0)
+						? "No se pudo conectar con el servidor."
+						: error instanceof ApiClientError &&
+								error.code === "INVALID_API_RESPONSE"
+							? "El servidor devolvió una respuesta inválida."
+							: "No se pudo cargar la información de la sucursal.";
 
 	return (
 		<section

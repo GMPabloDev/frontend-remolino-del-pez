@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	Controller,
 	type FieldErrors,
@@ -51,6 +51,7 @@ import { DynamicStringListField } from "./DynamicStringListField";
 interface StaffDishCreateFormProps {
 	categories: MenuCategory[];
 	initialPosition: number;
+	positionsByCategory: Record<string, number>;
 	session: StaffSessionAccess;
 	userId: string;
 }
@@ -58,6 +59,7 @@ interface StaffDishCreateFormProps {
 export function StaffDishCreateForm({
 	categories,
 	initialPosition,
+	positionsByCategory,
 	session,
 	userId,
 }: StaffDishCreateFormProps) {
@@ -74,6 +76,7 @@ export function StaffDishCreateForm({
 		reset,
 		setError,
 		setFocus,
+		setValue,
 	} = useForm<DishFormValues>({
 		defaultValues: getDefaultValues(categories, initialPosition),
 		mode: "onSubmit",
@@ -81,7 +84,24 @@ export function StaffDishCreateForm({
 		shouldFocusError: false,
 	});
 	const values = useWatch({ control }) as DishFormValues;
+	const selectedCategoryId = useWatch({ control, name: "categoryId" });
+	const previousCategoryId = useRef(selectedCategoryId);
+	const positionWasEdited = useRef(false);
+	const skipNextPositionSync = useRef(false);
 	useStaffUnsavedChanges("dish-new", isDirty);
+
+	useEffect(() => {
+		if (previousCategoryId.current === selectedCategoryId) return;
+		previousCategoryId.current = selectedCategoryId;
+		if (skipNextPositionSync.current) {
+			skipNextPositionSync.current = false;
+			return;
+		}
+		if (positionWasEdited.current || !selectedCategoryId) return;
+		setValue("position", positionsByCategory[selectedCategoryId] ?? 1, {
+			shouldDirty: true,
+		});
+	}, [positionsByCategory, selectedCategoryId, setValue]);
 
 	useEffect(() => {
 		setDraft(
@@ -142,6 +162,7 @@ export function StaffDishCreateForm({
 
 	function recoverDraft(): void {
 		if (!draft) return;
+		skipNextPositionSync.current = true;
 		reset(draft.values, { keepDefaultValues: true });
 		setDraft(null);
 	}
@@ -183,7 +204,12 @@ export function StaffDishCreateForm({
 								id="dish-position"
 								min={1}
 								type="number"
-								{...register("position", { valueAsNumber: true })}
+								{...register("position", {
+									valueAsNumber: true,
+									onChange: () => {
+										positionWasEdited.current = true;
+									},
+								})}
 							/>
 							<FieldError errors={[errors.position]} />
 						</Field>

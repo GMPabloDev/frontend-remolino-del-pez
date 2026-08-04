@@ -47,6 +47,9 @@ const dishes: StaffBranchDish[] = [
 const defaultProps = {
 	branchId: "00000000-0000-4000-8000-000000000002",
 	canConfigure: true,
+	categoryStatuses: {
+		"00000000-0000-4000-8000-000000000004": "active" as const,
+	},
 	dishes,
 	filter: "all" as const,
 	isLoading: false,

@@ -11,7 +11,10 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { ApiClientError } from "@/lib/api/api-error";
-import type { StaffBranchDish } from "../contracts/staff-catalog.schemas";
+import type {
+	CatalogStatus,
+	StaffBranchDish,
+} from "../contracts/staff-catalog.schemas";
 import {
 	type BranchDishFilter,
 	filterBranchDishes,
@@ -30,6 +33,7 @@ const FILTERS: Array<{ label: string; value: BranchDishFilter }> = [
 interface StaffBranchMenuListProps {
 	branchId: string;
 	dishes: StaffBranchDish[];
+	categoryStatuses: Record<string, CatalogStatus>;
 	filter: BranchDishFilter;
 	canConfigure: boolean;
 	isLoading: boolean;
@@ -42,6 +46,7 @@ interface StaffBranchMenuListProps {
 export function StaffBranchMenuList({
 	branchId,
 	dishes,
+	categoryStatuses,
 	filter,
 	canConfigure,
 	isLoading,
@@ -106,6 +111,7 @@ export function StaffBranchMenuList({
 						<BranchDishGroup
 							branchId={branchId}
 							canConfigure={canConfigure}
+							categoryStatus={categoryStatuses[group.categoryId] ?? "active"}
 							dishes={group.dishes}
 							key={group.categoryId}
 							name={group.categoryName}
@@ -121,11 +127,13 @@ function BranchDishGroup({
 	branchId,
 	dishes,
 	name,
+	categoryStatus,
 	canConfigure,
 }: {
 	branchId: string;
 	dishes: StaffBranchDish[];
 	name: string;
+	categoryStatus: CatalogStatus;
 	canConfigure: boolean;
 }) {
 	return (
@@ -150,6 +158,7 @@ function BranchDishGroup({
 				<BranchDishTable
 					branchId={branchId}
 					canConfigure={canConfigure}
+					categoryStatus={categoryStatus}
 					dishes={dishes}
 				/>
 			</div>
@@ -158,6 +167,7 @@ function BranchDishGroup({
 					<BranchDishCard
 						branchId={branchId}
 						canConfigure={canConfigure}
+						categoryStatus={categoryStatus}
 						dish={dish}
 						key={dish.id}
 					/>
@@ -170,10 +180,12 @@ function BranchDishGroup({
 function BranchDishTable({
 	branchId,
 	dishes,
+	categoryStatus,
 	canConfigure,
 }: {
 	branchId: string;
 	dishes: StaffBranchDish[];
+	categoryStatus: CatalogStatus;
 	canConfigure: boolean;
 }) {
 	return (
@@ -207,7 +219,7 @@ function BranchDishTable({
 							</p>
 						</TableCell>
 						<TableCell className="px-6 py-5">
-							<GlobalState dish={dish} />
+							<GlobalState categoryStatus={categoryStatus} dish={dish} />
 						</TableCell>
 						<TableCell className="px-6 py-5">
 							<ConfigurationSummary dish={dish} />
@@ -229,10 +241,12 @@ function BranchDishTable({
 function BranchDishCard({
 	branchId,
 	dish,
+	categoryStatus,
 	canConfigure,
 }: {
 	branchId: string;
 	dish: StaffBranchDish;
+	categoryStatus: CatalogStatus;
 	canConfigure: boolean;
 }) {
 	return (
@@ -249,7 +263,7 @@ function BranchDishCard({
 				<CatalogStatusBadge status={dish.status} />
 			</div>
 			<div className="mt-5 space-y-3 border-y border-[#12324a]/10 py-4">
-				<GlobalState dish={dish} />
+				<GlobalState categoryStatus={categoryStatus} dish={dish} />
 				<ConfigurationSummary dish={dish} />
 			</div>
 			<ConfigureLink
@@ -261,14 +275,30 @@ function BranchDishCard({
 	);
 }
 
-function GlobalState({ dish }: { dish: StaffBranchDish }) {
+function GlobalState({
+	categoryStatus,
+	dish,
+}: {
+	categoryStatus: CatalogStatus;
+	dish: StaffBranchDish;
+}) {
 	return (
-		<div className="text-sm text-[#12324a]/65">
-			<span className="font-semibold text-[#12324a]">Estado global:</span>{" "}
-			{dish.status === "active" ? "Activo" : "Inactivo"}
-			{dish.status === "inactive" || dish.categoryName.length === 0
-				? null
-				: null}
+		<div className="space-y-1 text-sm text-[#12324a]/65">
+			<p>
+				<span className="font-semibold text-[#12324a]">Estado del plato:</span>{" "}
+				{dish.status === "active" ? "Activo" : "Inactivo"}
+			</p>
+			<p>
+				<span className="font-semibold text-[#12324a]">
+					Estado de categoría:
+				</span>{" "}
+				{categoryStatus === "active" ? "Activa" : "Inactiva"}
+			</p>
+			{categoryStatus === "inactive" || dish.status === "inactive" ? (
+				<p className="font-semibold text-[#8f3d20]">
+					La publicación está condicionada por un estado global inactivo.
+				</p>
+			) : null}
 		</div>
 	);
 }
