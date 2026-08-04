@@ -1,0 +1,38 @@
+- generic [active] [ref=f2e1]:
+  - link "Saltar al contenido principal" [ref=f2e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f2e3]:
+    - banner [ref=f2e4]:
+      - generic [ref=f2e5]:
+        - link "El Molino del Pez Sabor que viene del mar Ir al inicio del menú" [ref=f2e6] [cursor=pointer]:
+          - /url: /menu
+          - generic [ref=f2e8]:
+            - generic [ref=f2e9]: El Molino del Pez
+            - generic [ref=f2e10]: Sabor que viene del mar
+          - generic [ref=f2e11]: Ir al inicio del menú
+        - generic [ref=f2e12]: Carta pública
+      - generic [ref=f2e15]:
+        - generic [ref=f2e16]:
+          - paragraph [ref=f2e17]: Menú de la casa
+          - heading [level=1] [ref=f2e19]:
+            - text: Sabor que
+            - emphasis [ref=f2e20]: viene
+            - text: del mar.
+          - paragraph [ref=f2e21]: Descubre una carta pensada para compartir, celebrar y volver a la mesa.
+        - generic [ref=f2e22]:
+          - generic [ref=f2e23]: Desdeel mar
+          - img "El Molino del Pez, identidad visual" [ref=f2e27]
+    - generic [ref=f2e29]:
+      - status [ref=f2e31]:
+        - paragraph [ref=f2e34]: Un momento
+        - heading "Estamos preparando la carta." [level=2] [ref=f2e35]
+        - paragraph [ref=f2e36]: Los sabores de la casa están a punto de llegar.
+      - paragraph [ref=f2e37]
+      - button "Abrir carrito. 0 unidades. Subtotal S/ 0.00." [ref=f2e38]:
+        - generic [ref=f2e41]:
+          - strong [ref=f2e42]: Tu carrito
+          - generic [ref=f2e43]: 0 unidades · S/ 0.00
+        - generic [ref=f2e44]: →
+    - contentinfo [ref=f2e45]:
+      - paragraph [ref=f2e46]: El Molino del Pez
+      - paragraph [ref=f2e47]: Sabor que viene del mar

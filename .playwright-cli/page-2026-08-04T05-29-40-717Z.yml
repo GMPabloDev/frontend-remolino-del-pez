@@ -1,0 +1,102 @@
+- generic [active] [ref=e1]:
+  - link "Saltar al contenido principal" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "El Molino del Pez Sabor que viene del mar Ir al inicio del menú" [ref=e6] [cursor=pointer]:
+          - /url: /menu
+          - generic [ref=e8]:
+            - generic [ref=e9]: El Molino del Pez
+            - generic [ref=e10]: Sabor que viene del mar
+          - generic [ref=e11]: Ir al inicio del menú
+        - generic [ref=e12]: Carta pública
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - paragraph [ref=e17]: Menú de la casa
+          - heading [level=1] [ref=e19]:
+            - text: Sabor que
+            - emphasis [ref=e20]: viene
+            - text: del mar.
+          - paragraph [ref=e21]: Descubre una carta pensada para compartir, celebrar y volver a la mesa.
+        - generic [ref=e22]:
+          - generic [ref=e23]: Desdeel mar
+          - img "El Molino del Pez, identidad visual" [ref=e27]
+    - generic [ref=e29]:
+      - main [ref=e39]:
+        - navigation "Categorías del menú" [ref=e40]:
+          - paragraph [ref=e41]: Explora la carta
+          - list [ref=e42]:
+            - listitem [ref=e43]:
+              - link "FondosTest" [ref=e44] [cursor=pointer]:
+                - /url: "#category-19108db7-8417-41fb-9e2b-44ad42b0b677"
+        - region [ref=e46]:
+          - generic [ref=e47]:
+            - paragraph [ref=e48]: "01"
+            - heading "FondosTest" [level=2] [ref=e49]
+          - list [ref=e50]:
+            - listitem [ref=e51]:
+              - article [ref=e52]:
+                - generic [ref=e53]:
+                  - img "Fotografía de Lomo saltado" [ref=e54]
+                  - generic [ref=e55]: Disponible
+                - generic [ref=e56]:
+                  - generic [ref=e57]:
+                    - heading "Lomo saltado" [level=3] [ref=e58]
+                    - paragraph [ref=e59]: S/ 50.00
+                  - paragraph [ref=e60]: It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+                  - generic [ref=e61]:
+                    - paragraph [ref=e62]: Lleva
+                    - list "Ingredientes de Lomo saltado" [ref=e63]:
+                      - listitem [ref=e64]: Lomo
+                      - listitem [ref=e65]: Aji amarillo
+                      - listitem [ref=e66]: arroz
+                      - listitem [ref=e67]: papas fritas
+                      - listitem [ref=e68]: cebolla
+                      - listitem [ref=e69]: tomate
+                  - paragraph [ref=e70]:
+                    - generic [ref=e73]:
+                      - strong [ref=e74]: "Alérgenos:"
+                      - text: Alerjano 1
+                  - generic [ref=e75]:
+                    - group "Cantidad de Lomo saltado" [ref=e135]:
+                      - button "Reducir cantidad de Lomo saltado" [disabled]
+                      - generic [ref=e137]: "1"
+                      - button "Aumentar cantidad de Lomo saltado" [ref=e138]
+                    - generic [ref=e139]: En tu selección
+            - listitem [ref=e77]:
+              - article [ref=e78]:
+                - generic [ref=e79]:
+                  - img "Fotografía de Causa Limeña" [ref=e80]
+                  - generic [ref=e81]: Disponible
+                - generic [ref=e82]:
+                  - generic [ref=e83]:
+                    - heading "Causa Limeña" [level=3] [ref=e84]
+                    - paragraph [ref=e85]: S/ 20.00
+                  - paragraph [ref=e86]: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London,
+                  - generic [ref=e87]:
+                    - paragraph [ref=e88]: Lleva
+                    - list "Ingredientes de Causa Limeña" [ref=e89]:
+                      - listitem [ref=e90]: Arroz
+                      - listitem [ref=e91]: Azucar
+                      - listitem [ref=e92]: Wasabi
+                      - listitem [ref=e93]: Papa Amarrilla
+                  - paragraph [ref=e94]:
+                    - generic [ref=e97]:
+                      - strong [ref=e98]: "Alérgenos:"
+                      - text: Sushi
+                  - button "Añadir Causa Limeña al carrito" [ref=e100]: Añadir
+      - paragraph [ref=e101]: Añadido Lomo saltado al carrito.
+      - button "Abrir carrito. 1 unidades. Subtotal S/ 50.00." [ref=e140]:
+        - generic [ref=e105]:
+          - strong [ref=e106]: Tu carrito
+          - generic [ref=e107]: 1 unidades · S/ 50.00
+        - generic [ref=e108]: →
+    - contentinfo [ref=e36]:
+      - paragraph [ref=e37]: El Molino del Pez
+      - paragraph [ref=e38]: Sabor que viene del mar
+  - generic [ref=e111]:
+    - button [ref=e112]
+    - button [ref=e118]
+    - button [ref=e122]
+    - button [ref=e130]

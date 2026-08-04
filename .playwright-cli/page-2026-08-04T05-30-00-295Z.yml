@@ -1,0 +1,300 @@
+- generic [ref=f1e1]:
+  - link "Saltar al contenido principal" [ref=f1e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f1e3]:
+    - banner [ref=f1e4]:
+      - link "El Molino del Pez Sabor que viene del mar Ir al inicio" [ref=f1e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=f1e7]:
+          - generic [ref=f1e8]: El Molino del Pez
+          - generic [ref=f1e9]: Sabor que viene del mar
+        - generic [ref=f1e10]: Ir al inicio
+      - link "Cambiar sucursal" [ref=f1e11] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f1e12]:
+      - paragraph [ref=f1e13]: Reserva temporal
+      - heading [level=1] [ref=f1e15]:
+        - text: Encuentra tu
+        - emphasis [ref=f1e16]: momento
+        - text: en la mesa.
+      - paragraph [ref=f1e17]: Consulta un horario, confirma tus datos y mantén tu selección bloqueada temporalmente.
+    - main [ref=f1e51]:
+      - generic [ref=f1e52]:
+        - region [ref=f1e53]:
+          - generic [ref=f1e54]:
+            - heading "1. Fecha y personas" [level=2] [ref=f1e55]
+            - paragraph [ref=f1e56]: Indica cuándo nos visitarás y cuántas personas asistirán.
+          - generic [ref=f1e57]:
+            - group [ref=f1e58]:
+              - generic [ref=f1e59]: Fecha
+              - button "Fecha" [expanded] [ref=f1e60]:
+                - generic [ref=f1e61]: 4 de agosto de 2026
+              - dialog [ref=f1e94]:
+                - generic [ref=f1e96]:
+                  - navigation "Navigation bar" [ref=f1e97]:
+                    - button "Go to the Previous Month" [active] [ref=f1e98]
+                    - button "Go to the Next Month" [ref=f1e99]
+                  - generic [ref=f1e100]:
+                    - generic [ref=f1e102]:
+                      - generic [ref=f1e103]:
+                        - combobox "Choose the Month" [ref=f1e104]:
+                          - option "Ene."
+                          - option "Feb."
+                          - option "Mar."
+                          - option "Abr."
+                          - option "May."
+                          - option "Jun."
+                          - option "Jul."
+                          - option "Ago." [selected]
+                          - option "Set."
+                          - option "Oct."
+                          - option "Nov."
+                          - option "Dic."
+                        - generic [ref=f1e105]: Ago.
+                      - generic [ref=f1e108]:
+                        - combobox "Choose the Year" [ref=f1e109]:
+                          - option "1926"
+                          - option "1927"
+                          - option "1928"
+                          - option "1929"
+                          - option "1930"
+                          - option "1931"
+                          - option "1932"
+                          - option "1933"
+                          - option "1934"
+                          - option "1935"
+                          - option "1936"
+                          - option "1937"
+                          - option "1938"
+                          - option "1939"
+                          - option "1940"
+                          - option "1941"
+                          - option "1942"
+                          - option "1943"
+                          - option "1944"
+                          - option "1945"
+                          - option "1946"
+                          - option "1947"
+                          - option "1948"
+                          - option "1949"
+                          - option "1950"
+                          - option "1951"
+                          - option "1952"
+                          - option "1953"
+                          - option "1954"
+                          - option "1955"
+                          - option "1956"
+                          - option "1957"
+                          - option "1958"
+                          - option "1959"
+                          - option "1960"
+                          - option "1961"
+                          - option "1962"
+                          - option "1963"
+                          - option "1964"
+                          - option "1965"
+                          - option "1966"
+                          - option "1967"
+                          - option "1968"
+                          - option "1969"
+                          - option "1970"
+                          - option "1971"
+                          - option "1972"
+                          - option "1973"
+                          - option "1974"
+                          - option "1975"
+                          - option "1976"
+                          - option "1977"
+                          - option "1978"
+                          - option "1979"
+                          - option "1980"
+                          - option "1981"
+                          - option "1982"
+                          - option "1983"
+                          - option "1984"
+                          - option "1985"
+                          - option "1986"
+                          - option "1987"
+                          - option "1988"
+                          - option "1989"
+                          - option "1990"
+                          - option "1991"
+                          - option "1992"
+                          - option "1993"
+                          - option "1994"
+                          - option "1995"
+                          - option "1996"
+                          - option "1997"
+                          - option "1998"
+                          - option "1999"
+                          - option "2000"
+                          - option "2001"
+                          - option "2002"
+                          - option "2003"
+                          - option "2004"
+                          - option "2005"
+                          - option "2006"
+                          - option "2007"
+                          - option "2008"
+                          - option "2009"
+                          - option "2010"
+                          - option "2011"
+                          - option "2012"
+                          - option "2013"
+                          - option "2014"
+                          - option "2015"
+                          - option "2016"
+                          - option "2017"
+                          - option "2018"
+                          - option "2019"
+                          - option "2020"
+                          - option "2021"
+                          - option "2022"
+                          - option "2023"
+                          - option "2024"
+                          - option "2025"
+                          - option "2026" [selected]
+                        - generic [ref=f1e110]: "2026"
+                      - status [ref=f1e113]: August 2026
+                    - grid "August 2026" [ref=f1e114]:
+                      - rowgroup [ref=f1e115]:
+                        - row [ref=f1e116]:
+                          - columnheader [ref=f1e117]: Su
+                          - columnheader [ref=f1e118]: Mo
+                          - columnheader [ref=f1e119]: Tu
+                          - columnheader [ref=f1e120]: We
+                          - columnheader [ref=f1e121]: Th
+                          - columnheader [ref=f1e122]: Fr
+                          - columnheader [ref=f1e123]: Sa
+                      - rowgroup [ref=f1e124]:
+                        - row [ref=f1e125]:
+                          - gridcell "Sunday, July 26th, 2026" [ref=f1e126]:
+                            - button "Sunday, July 26th, 2026" [disabled]: "26"
+                          - gridcell "Monday, July 27th, 2026" [ref=f1e127]:
+                            - button "Monday, July 27th, 2026" [disabled]: "27"
+                          - gridcell "Tuesday, July 28th, 2026" [ref=f1e128]:
+                            - button "Tuesday, July 28th, 2026" [disabled]: "28"
+                          - gridcell "Wednesday, July 29th, 2026" [ref=f1e129]:
+                            - button "Wednesday, July 29th, 2026" [disabled]: "29"
+                          - gridcell "Thursday, July 30th, 2026" [ref=f1e130]:
+                            - button "Thursday, July 30th, 2026" [disabled]: "30"
+                          - gridcell "Friday, July 31st, 2026" [ref=f1e131]:
+                            - button "Friday, July 31st, 2026" [disabled]: "31"
+                          - gridcell "Saturday, August 1st, 2026" [ref=f1e132]:
+                            - button "Saturday, August 1st, 2026" [disabled]: "1"
+                        - row [ref=f1e133]:
+                          - gridcell "Sunday, August 2nd, 2026" [ref=f1e134]:
+                            - button "Sunday, August 2nd, 2026" [disabled]: "2"
+                          - gridcell "Monday, August 3rd, 2026" [ref=f1e135]:
+                            - button "Monday, August 3rd, 2026" [disabled]: "3"
+                          - gridcell [selected] [ref=f1e136]:
+                            - button "Today, Tuesday, August 4th, 2026, selected" [ref=f1e137]: "4"
+                          - gridcell [ref=f1e138]:
+                            - button "Wednesday, August 5th, 2026" [ref=f1e139]: "5"
+                          - gridcell [ref=f1e140]:
+                            - button "Thursday, August 6th, 2026" [ref=f1e141]: "6"
+                          - gridcell [ref=f1e142]:
+                            - button "Friday, August 7th, 2026" [ref=f1e143]: "7"
+                          - gridcell [ref=f1e144]:
+                            - button "Saturday, August 8th, 2026" [ref=f1e145]: "8"
+                        - row [ref=f1e146]:
+                          - gridcell [ref=f1e147]:
+                            - button "Sunday, August 9th, 2026" [ref=f1e148]: "9"
+                          - gridcell [ref=f1e149]:
+                            - button "Monday, August 10th, 2026" [ref=f1e150]: "10"
+                          - gridcell [ref=f1e151]:
+                            - button "Tuesday, August 11th, 2026" [ref=f1e152]: "11"
+                          - gridcell [ref=f1e153]:
+                            - button "Wednesday, August 12th, 2026" [ref=f1e154]: "12"
+                          - gridcell [ref=f1e155]:
+                            - button "Thursday, August 13th, 2026" [ref=f1e156]: "13"
+                          - gridcell [ref=f1e157]:
+                            - button "Friday, August 14th, 2026" [ref=f1e158]: "14"
+                          - gridcell [ref=f1e159]:
+                            - button "Saturday, August 15th, 2026" [ref=f1e160]: "15"
+                        - row [ref=f1e161]:
+                          - gridcell [ref=f1e162]:
+                            - button "Sunday, August 16th, 2026" [ref=f1e163]: "16"
+                          - gridcell [ref=f1e164]:
+                            - button "Monday, August 17th, 2026" [ref=f1e165]: "17"
+                          - gridcell [ref=f1e166]:
+                            - button "Tuesday, August 18th, 2026" [ref=f1e167]: "18"
+                          - gridcell [ref=f1e168]:
+                            - button "Wednesday, August 19th, 2026" [ref=f1e169]: "19"
+                          - gridcell [ref=f1e170]:
+                            - button "Thursday, August 20th, 2026" [ref=f1e171]: "20"
+                          - gridcell [ref=f1e172]:
+                            - button "Friday, August 21st, 2026" [ref=f1e173]: "21"
+                          - gridcell [ref=f1e174]:
+                            - button "Saturday, August 22nd, 2026" [ref=f1e175]: "22"
+                        - row [ref=f1e176]:
+                          - gridcell [ref=f1e177]:
+                            - button "Sunday, August 23rd, 2026" [ref=f1e178]: "23"
+                          - gridcell [ref=f1e179]:
+                            - button "Monday, August 24th, 2026" [ref=f1e180]: "24"
+                          - gridcell [ref=f1e181]:
+                            - button "Tuesday, August 25th, 2026" [ref=f1e182]: "25"
+                          - gridcell [ref=f1e183]:
+                            - button "Wednesday, August 26th, 2026" [ref=f1e184]: "26"
+                          - gridcell [ref=f1e185]:
+                            - button "Thursday, August 27th, 2026" [ref=f1e186]: "27"
+                          - gridcell [ref=f1e187]:
+                            - button "Friday, August 28th, 2026" [ref=f1e188]: "28"
+                          - gridcell [ref=f1e189]:
+                            - button "Saturday, August 29th, 2026" [ref=f1e190]: "29"
+                        - row [ref=f1e191]:
+                          - gridcell [ref=f1e192]:
+                            - button "Sunday, August 30th, 2026" [ref=f1e193]: "30"
+                          - gridcell [ref=f1e194]:
+                            - button "Monday, August 31st, 2026" [ref=f1e195]: "31"
+                          - gridcell [ref=f1e196]:
+                            - button "Tuesday, September 1st, 2026" [ref=f1e197]: "1"
+                          - gridcell [ref=f1e198]:
+                            - button "Wednesday, September 2nd, 2026" [ref=f1e199]: "2"
+                          - gridcell [ref=f1e200]:
+                            - button "Thursday, September 3rd, 2026" [ref=f1e201]: "3"
+                          - gridcell "Friday, September 4th, 2026" [ref=f1e202]:
+                            - button "Friday, September 4th, 2026" [disabled]: "4"
+                          - gridcell "Saturday, September 5th, 2026" [ref=f1e203]:
+                            - button "Saturday, September 5th, 2026" [disabled]: "5"
+              - paragraph [ref=f1e62]: Selecciona una fecha dentro del periodo permitido.
+            - group [ref=f1e63]:
+              - generic [ref=f1e64]: Cantidad de personas
+              - spinbutton "Cantidad de personas" [ref=f1e65]
+              - paragraph [ref=f1e66]: Puedes reservar para entre 1 y 12 personas.
+            - button "Ver horarios" [disabled]
+        - region [ref=f1e67]:
+          - generic [ref=f1e68]:
+            - heading "2. Elige un horario" [level=2] [ref=f1e69]
+            - paragraph [ref=f1e70]: Los horarios se muestran según la disponibilidad actual de la sucursal.
+          - alert [ref=f1e71]:
+            - generic [ref=f1e75]: Consulta primero la disponibilidad
+            - generic [ref=f1e76]: Completa la fecha y la cantidad de personas, y pulsa “Ver horarios”.
+        - region [ref=f1e77]:
+          - generic [ref=f1e78]:
+            - heading "3. Tus datos" [level=2] [ref=f1e79]
+            - paragraph [ref=f1e80]: Los necesitamos para preparar tu reserva. No se guardarán en el navegador.
+          - generic [ref=f1e81]:
+            - generic [ref=f1e82]:
+              - group [ref=f1e83]:
+                - generic [ref=f1e84]: Nombre completo
+                - textbox "Nombre completo" [disabled]:
+                  - /placeholder: Ana Torres
+              - group [ref=f1e85]:
+                - generic [ref=f1e86]: Email
+                - textbox "Email" [disabled]:
+                  - /placeholder: ana@ejemplo.com
+              - group [ref=f1e87]:
+                - generic [ref=f1e88]: Teléfono
+                - textbox "Teléfono" [disabled]:
+                  - /placeholder: "+51987654321"
+                - paragraph [ref=f1e89]: Usa el formato internacional, por ejemplo +51987654321. Puedes separar los dígitos con espacios o guiones.
+            - button "Revisar reserva" [disabled]
+    - contentinfo [ref=f1e22]:
+      - paragraph [ref=f1e23]: El Molino del Pez
+      - paragraph [ref=f1e24]: El pago se integrará en un siguiente paso.
+  - generic [ref=f1e27]:
+    - button [ref=f1e28]
+    - button [ref=f1e34]
+    - button [ref=f1e38]
+    - button [ref=f1e46]

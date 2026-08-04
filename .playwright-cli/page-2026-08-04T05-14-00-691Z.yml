@@ -1,0 +1,124 @@
+- generic [ref=f2e1]:
+  - link [ref=f2e116] [cursor=pointer]:
+    - /url: "#main-content"
+    - text: Saltar al contenido principal
+  - generic [ref=f2e3]:
+    - banner [ref=f2e4]:
+      - generic [ref=f2e5]:
+        - link [ref=f2e117] [cursor=pointer]:
+          - /url: /menu
+          - generic [ref=f2e8]:
+            - generic [ref=f2e9]: El Molino del Pez
+            - generic [ref=f2e10]: Sabor que viene del mar
+          - generic [ref=f2e11]: Ir al inicio del menú
+        - generic [ref=f2e12]: Carta pública
+      - generic [ref=f2e15]:
+        - generic [ref=f2e16]:
+          - paragraph [ref=f2e17]: Menú de la casa
+          - heading [level=1] [ref=f2e118]:
+            - text: Sabor que
+            - emphasis [ref=f2e20]: viene
+            - text: del mar.
+          - paragraph [ref=f2e21]: Descubre una carta pensada para compartir, celebrar y volver a la mesa.
+        - generic [ref=f2e22]: Desdeel mar
+    - generic [ref=f2e29]:
+      - main [ref=f2e48]:
+        - navigation [ref=f2e120]:
+          - paragraph [ref=f2e50]: Explora la carta
+          - list [ref=f2e51]:
+            - listitem [ref=f2e52]:
+              - link [ref=f2e121] [cursor=pointer]:
+                - /url: "#category-19108db7-8417-41fb-9e2b-44ad42b0b677"
+                - text: FondosTest
+        - region [ref=f2e122]:
+          - generic [ref=f2e56]:
+            - paragraph [ref=f2e57]: "01"
+            - heading [level=2] [ref=f2e123]: FondosTest
+          - list [ref=f2e59]:
+            - listitem [ref=f2e60]:
+              - article [ref=f2e61]:
+                - generic [ref=f2e62]: Disponible
+                - generic [ref=f2e65]:
+                  - generic [ref=f2e66]:
+                    - heading [level=3] [ref=f2e125]: Lomo saltado
+                    - paragraph [ref=f2e68]: S/ 50.00
+                  - paragraph [ref=f2e69]: It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+                  - generic [ref=f2e70]:
+                    - paragraph [ref=f2e71]: Lleva
+                    - list [ref=f2e126]:
+                      - listitem [ref=f2e73]: Lomo
+                      - listitem [ref=f2e74]: Aji amarillo
+                      - listitem [ref=f2e75]: arroz
+                      - listitem [ref=f2e76]: papas fritas
+                      - listitem [ref=f2e77]: cebolla
+                      - listitem [ref=f2e78]: tomate
+                  - paragraph [ref=f2e79]:
+                    - generic [ref=f2e82]:
+                      - strong [ref=f2e83]: "Alérgenos:"
+                      - text: Alerjano 1
+                  - generic [ref=f2e84]:
+                    - group [ref=f2e127]:
+                      - generic [ref=f2e111]: Cantidad de Lomo saltado
+                      - button [disabled]
+                      - generic [ref=f2e112]: "1"
+                      - button [ref=f2e128]
+                    - generic [ref=f2e114]: En tu selección
+            - listitem [ref=f2e86]:
+              - article [ref=f2e87]:
+                - generic [ref=f2e88]: Disponible
+                - generic [ref=f2e91]:
+                  - generic [ref=f2e92]:
+                    - heading [level=3] [ref=f2e130]: Causa Limeña
+                    - paragraph [ref=f2e94]: S/ 20.00
+                  - paragraph [ref=f2e95]: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London,
+                  - generic [ref=f2e96]:
+                    - paragraph [ref=f2e97]: Lleva
+                    - list [ref=f2e131]:
+                      - listitem [ref=f2e99]: Arroz
+                      - listitem [ref=f2e100]: Azucar
+                      - listitem [ref=f2e101]: Wasabi
+                      - listitem [ref=f2e102]: Papa Amarrilla
+                  - paragraph [ref=f2e103]:
+                    - generic [ref=f2e106]:
+                      - strong [ref=f2e107]: "Alérgenos:"
+                      - text: Sushi
+                  - button [ref=f2e132]: Añadir
+      - paragraph [ref=f2e37]: Añadido Lomo saltado al carrito.
+      - button [expanded] [ref=f2e133]:
+        - generic [ref=f2e41]:
+          - strong [ref=f2e42]: Tu carrito
+          - generic [ref=f2e43]: 1 unidades · S/ 50.00
+        - generic [ref=f2e44]: →
+    - contentinfo [ref=f2e45]:
+      - paragraph [ref=f2e46]: El Molino del Pez
+      - paragraph [ref=f2e47]: Sabor que viene del mar
+  - dialog [ref=f2e137]:
+    - generic [ref=f2e138]:
+      - heading "Tu selección" [level=2] [ref=f2e139]
+      - paragraph [ref=f2e140]: Revisa tus platos antes de continuar con la reserva.
+    - article "Lomo saltado, 1 unidades" [ref=f2e144]:
+      - generic [ref=f2e145]:
+        - img "Fotografía de Lomo saltado" [ref=f2e147]
+        - generic [ref=f2e148]:
+          - generic [ref=f2e149]:
+            - heading "Lomo saltado" [level=3] [ref=f2e150]
+            - paragraph [ref=f2e151]: S/ 50.00
+          - paragraph [ref=f2e152]: S/ 50.00 por unidad
+      - generic [ref=f2e153]:
+        - group "Cantidad de Lomo saltado" [ref=f2e154]:
+          - button "Reducir cantidad de Lomo saltado" [disabled]
+          - generic [ref=f2e156]: "1"
+          - button "Aumentar cantidad de Lomo saltado" [active] [ref=f2e157]
+        - button "Eliminar Lomo saltado del carrito" [ref=f2e158]: Eliminar
+      - generic [ref=f2e159]: Precio actualizado
+    - separator [ref=f2e160]
+    - generic [ref=f2e161]:
+      - generic [ref=f2e162]:
+        - generic [ref=f2e163]:
+          - paragraph [ref=f2e164]: Subtotal estimado
+          - paragraph [ref=f2e165]: 1 unidades disponibles · PEN
+        - strong [ref=f2e166]: S/ 50.00
+      - button "Continuar con la reserva" [ref=f2e167]
+      - paragraph [ref=f2e168]: Tu selección está lista para consultar disponibilidad.
+      - button "Vaciar carrito" [ref=f2e170]
+    - button "Close" [ref=f2e171]

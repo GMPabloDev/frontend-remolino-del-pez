@@ -1,0 +1,133 @@
+- generic [ref=e1]:
+  - link [ref=e143] [cursor=pointer]:
+    - /url: "#main-content"
+    - text: Saltar al contenido principal
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link [ref=e144] [cursor=pointer]:
+          - /url: /menu
+          - generic [ref=e8]:
+            - generic [ref=e9]: El Molino del Pez
+            - generic [ref=e10]: Sabor que viene del mar
+          - generic [ref=e11]: Ir al inicio del menú
+        - generic [ref=e12]: Carta pública
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - paragraph [ref=e17]: Menú de la casa
+          - heading [level=1] [ref=e145]:
+            - text: Sabor que
+            - emphasis [ref=e20]: viene
+            - text: del mar.
+          - paragraph [ref=e21]: Descubre una carta pensada para compartir, celebrar y volver a la mesa.
+        - generic [ref=e22]: Desdeel mar
+    - generic [ref=e29]:
+      - main [ref=e39]:
+        - navigation [ref=e147]:
+          - paragraph [ref=e41]: Explora la carta
+          - list [ref=e42]:
+            - listitem [ref=e43]:
+              - link [ref=e148] [cursor=pointer]:
+                - /url: "#category-19108db7-8417-41fb-9e2b-44ad42b0b677"
+                - text: FondosTest
+        - region [ref=e149]:
+          - generic [ref=e47]:
+            - paragraph [ref=e48]: "01"
+            - heading [level=2] [ref=e150]: FondosTest
+          - list [ref=e50]:
+            - listitem [ref=e51]:
+              - article [ref=e52]:
+                - generic [ref=e53]: Disponible
+                - generic [ref=e56]:
+                  - generic [ref=e57]:
+                    - heading [level=3] [ref=e152]: Lomo saltado
+                    - paragraph [ref=e59]: S/ 50.00
+                  - paragraph [ref=e60]: It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+                  - generic [ref=e61]:
+                    - paragraph [ref=e62]: Lleva
+                    - list [ref=e153]:
+                      - listitem [ref=e64]: Lomo
+                      - listitem [ref=e65]: Aji amarillo
+                      - listitem [ref=e66]: arroz
+                      - listitem [ref=e67]: papas fritas
+                      - listitem [ref=e68]: cebolla
+                      - listitem [ref=e69]: tomate
+                  - paragraph [ref=e70]:
+                    - generic [ref=e73]:
+                      - strong [ref=e74]: "Alérgenos:"
+                      - text: Alerjano 1
+                  - generic [ref=e75]:
+                    - group [ref=e154]:
+                      - generic [ref=e136]: Cantidad de Lomo saltado
+                      - button [disabled]
+                      - generic [ref=e137]: "1"
+                      - button [ref=e155]
+                    - generic [ref=e139]: En tu selección
+            - listitem [ref=e77]:
+              - article [ref=e78]:
+                - generic [ref=e79]: Disponible
+                - generic [ref=e82]:
+                  - generic [ref=e83]:
+                    - heading [level=3] [ref=e157]: Causa Limeña
+                    - paragraph [ref=e85]: S/ 20.00
+                  - paragraph [ref=e86]: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since 1966, when designers at Letraset and James Mosley, the librarian at St Bride Printing Library in London,
+                  - generic [ref=e87]:
+                    - paragraph [ref=e88]: Lleva
+                    - list [ref=e158]:
+                      - listitem [ref=e90]: Arroz
+                      - listitem [ref=e91]: Azucar
+                      - listitem [ref=e92]: Wasabi
+                      - listitem [ref=e93]: Papa Amarrilla
+                  - paragraph [ref=e94]:
+                    - generic [ref=e97]:
+                      - strong [ref=e98]: "Alérgenos:"
+                      - text: Sushi
+                  - button [ref=e159]: Añadir
+      - paragraph [ref=e101]: Añadido Lomo saltado al carrito.
+      - button [expanded] [ref=e160]:
+        - generic [ref=e105]:
+          - strong [ref=e106]: Tu carrito
+          - generic [ref=e107]: 1 unidades · S/ 50.00
+        - generic [ref=e108]: →
+    - contentinfo [ref=e36]:
+      - paragraph [ref=e37]: El Molino del Pez
+      - paragraph [ref=e38]: Sabor que viene del mar
+  - generic [ref=e111]:
+    - button [ref=e161]:
+      - generic: Menu
+    - button [ref=e162]:
+      - generic: Inspect
+    - button [ref=e163]:
+      - generic: Audit
+    - button [ref=e166]:
+      - generic: Settings
+  - dialog [ref=e170]:
+    - generic [ref=e171]:
+      - heading "Tu selección" [level=2] [ref=e172]
+      - paragraph [ref=e173]: Revisa tus platos antes de continuar con la reserva.
+    - article "Lomo saltado, 1 unidades" [ref=e177]:
+      - generic [ref=e178]:
+        - img "Fotografía de Lomo saltado" [ref=e180]
+        - generic [ref=e181]:
+          - generic [ref=e182]:
+            - heading "Lomo saltado" [level=3] [ref=e183]
+            - paragraph [ref=e184]: S/ 50.00
+          - paragraph [ref=e185]: S/ 50.00 por unidad
+      - generic [ref=e186]:
+        - group "Cantidad de Lomo saltado" [ref=e187]:
+          - button "Reducir cantidad de Lomo saltado" [disabled]
+          - generic [ref=e189]: "1"
+          - button "Aumentar cantidad de Lomo saltado" [active] [ref=e190]
+        - button "Eliminar Lomo saltado del carrito" [ref=e191]: Eliminar
+      - generic [ref=e192]: Precio actualizado
+    - separator [ref=e193]
+    - generic [ref=e194]:
+      - generic [ref=e195]:
+        - generic [ref=e196]:
+          - paragraph [ref=e197]: Subtotal estimado
+          - paragraph [ref=e198]: 1 unidades disponibles · PEN
+        - strong [ref=e199]: S/ 50.00
+      - button "Continuar con la reserva" [ref=e200]
+      - paragraph [ref=e201]: Tu selección está lista para consultar disponibilidad.
+      - button "Vaciar carrito" [ref=e203]
+    - button "Close" [ref=e204]

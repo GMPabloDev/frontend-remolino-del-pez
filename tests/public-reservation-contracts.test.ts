@@ -14,7 +14,7 @@ const validReservation = {
 	status: "pending_payment" as const,
 	date: "2026-08-04",
 	startTime: "19:30",
-	endTime: "21:00",
+	endTime: "14:50",
 	timezone: "America/Lima" as const,
 	durationMinutes: 90,
 	expiresAt: "2026-08-04T19:45:00-05:00",
@@ -77,8 +77,11 @@ describe("public reservation contracts", () => {
 		).toThrow();
 	});
 
-	test("validates response and removes customer from stored reservation", () => {
-		const response = temporaryReservationResponseSchema.parse(validReservation);
+	test("accepts nullable checkout token and removes customer from stored reservation", () => {
+		const response = temporaryReservationResponseSchema.parse({
+			...validReservation,
+			checkoutToken: null,
+		});
 		const stored = storedPublicReservationSchema.parse({
 			...response,
 			version: 1,
@@ -87,6 +90,6 @@ describe("public reservation contracts", () => {
 		});
 
 		expect(stored).not.toHaveProperty("customer");
-		expect(stored).toHaveProperty("checkoutToken", "sensitive-token");
+		expect(stored).toHaveProperty("checkoutToken", null);
 	});
 });

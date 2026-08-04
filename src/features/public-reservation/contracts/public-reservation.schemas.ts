@@ -6,6 +6,7 @@ export const RESERVATION_TIMEZONE = "America/Lima" as const;
 
 const CALENDAR_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const RESERVATION_TIME_REGEX = /^(?:[01]\d|2[0-3]):(?:00|15|30|45)$/;
+const RESERVATION_END_TIME_REGEX = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const E164_PHONE_REGEX = /^\+\d{8,15}$/;
 const RESERVATION_MONEY_REGEX = /^\d{1,8}\.\d{2}$/;
 
@@ -30,6 +31,10 @@ export const reservationDateSchema = z
 export const reservationTimeSchema = z
 	.string()
 	.regex(RESERVATION_TIME_REGEX, "La hora debe usar minutos 00, 15, 30 o 45.");
+
+export const reservationEndTimeSchema = z
+	.string()
+	.regex(RESERVATION_END_TIME_REGEX, "La hora de término no es válida.");
 
 export const reservationMoneySchema = z
 	.string()
@@ -110,7 +115,7 @@ export const temporaryReservationResponseSchema = z.object({
 	status: z.literal("pending_payment"),
 	date: reservationDateSchema,
 	startTime: reservationTimeSchema,
-	endTime: reservationTimeSchema,
+	endTime: reservationEndTimeSchema,
 	timezone: z.literal(RESERVATION_TIMEZONE),
 	durationMinutes: z.number().int().positive(),
 	expiresAt: z.iso.datetime({ offset: true }),
@@ -119,7 +124,7 @@ export const temporaryReservationResponseSchema = z.object({
 	items: z.array(temporaryReservationItemSchema).min(1).max(50),
 	currency: z.literal("PEN"),
 	total: reservationMoneySchema,
-	checkoutToken: z.string().min(1),
+	checkoutToken: z.string().min(1).nullable(),
 	createdAt: z.iso.datetime({ offset: true }),
 });
 

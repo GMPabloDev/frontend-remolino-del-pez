@@ -2,6 +2,8 @@ import type { z } from "zod";
 
 import { ApiClientError, parseApiErrorResponse } from "@/lib/api/api-error";
 
+const PUBLIC_REQUEST_TIMEOUT_MS = 15_000;
+
 export interface PublicJsonRequestOptions {
 	method?: RequestInit["method"];
 	body?: RequestInit["body"];
@@ -21,13 +23,22 @@ export async function requestPublicJson<T>(
 	const headers = new Headers(options.headers);
 	headers.set("Accept", "application/json");
 
+	const controller = new AbortController();
+	const timeoutId = globalThis.setTimeout(
+		() => controller.abort(),
+		PUBLIC_REQUEST_TIMEOUT_MS,
+	);
+
 	try {
 		response = await fetch(endpoint, {
 			...options,
 			headers,
+			signal: controller.signal,
 		});
 	} catch {
 		throw new ApiClientError(0, "NETWORK_ERROR", networkMessage);
+	} finally {
+		globalThis.clearTimeout(timeoutId);
 	}
 
 	let payload: unknown;

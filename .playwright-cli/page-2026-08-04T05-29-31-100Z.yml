@@ -1,0 +1,31 @@
+- generic [active] [ref=e1]:
+  - link "Saltar al contenido principal" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "El Molino del Pez Sabor que viene del mar Ir al inicio del menú" [ref=e6] [cursor=pointer]:
+          - /url: /menu
+          - generic [ref=e8]:
+            - generic [ref=e9]: El Molino del Pez
+            - generic [ref=e10]: Sabor que viene del mar
+          - generic [ref=e11]: Ir al inicio del menú
+        - generic [ref=e12]: Carta pública
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - paragraph [ref=e17]: Menú de la casa
+          - heading [level=1] [ref=e19]:
+            - text: Sabor que
+            - emphasis [ref=e20]: viene
+            - text: del mar.
+          - paragraph [ref=e21]: Descubre una carta pensada para compartir, celebrar y volver a la mesa.
+        - generic [ref=e22]:
+          - generic [ref=e23]: Desdeel mar
+          - img "El Molino del Pez, identidad visual" [ref=e27]
+    - status [ref=e30]:
+      - paragraph [ref=e33]: Un momento
+      - heading "Estamos preparando la carta." [level=2] [ref=e34]
+      - paragraph [ref=e35]: Los sabores de la casa están a punto de llegar.
+    - contentinfo [ref=e36]:
+      - paragraph [ref=e37]: El Molino del Pez
+      - paragraph [ref=e38]: Sabor que viene del mar

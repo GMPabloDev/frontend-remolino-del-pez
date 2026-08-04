@@ -97,6 +97,8 @@ export function PublicReservationFlow({
 		[localError, mutationError],
 	);
 	const availabilityData = availabilityQuery.data;
+	const availabilityLoading =
+		availabilityRequest !== null && availabilityQuery.isFetching;
 	const customerReady = Boolean(selectedTime && customer);
 
 	useEffect(() => {
@@ -307,7 +309,7 @@ export function PublicReservationFlow({
 				date={date}
 				dateError={localError && !availabilityRequest ? localError : undefined}
 				disabled={reservationMutation.isPending}
-				isLoading={availabilityQuery.isPending}
+				isLoading={availabilityLoading}
 				maxDate={maxDate}
 				maxPartySize={maxPartySize}
 				minDate={minDate}
@@ -328,7 +330,7 @@ export function PublicReservationFlow({
 				durationMinutes={availabilityData?.durationMinutes}
 				error={availabilityRemoteMessage}
 				hasSearched={hasSearched}
-				isLoading={availabilityQuery.isPending}
+				isLoading={availabilityLoading}
 				onChangeSearch={() => {
 					setAvailabilityRequest(null);
 					setSelectedTime("");

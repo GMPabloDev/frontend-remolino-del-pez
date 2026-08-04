@@ -1,0 +1,136 @@
+- generic [active] [ref=f4e1]:
+  - link "Saltar al contenido principal" [ref=f4e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f4e3]:
+    - banner [ref=f4e4]:
+      - link "El Molino del Pez Sabor que viene del mar Ir al inicio" [ref=f4e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=f4e7]:
+          - generic [ref=f4e8]: El Molino del Pez
+          - generic [ref=f4e9]: Sabor que viene del mar
+        - generic [ref=f4e10]: Ir al inicio
+      - link "Cambiar sucursal" [ref=f4e11] [cursor=pointer]:
+        - /url: /
+    - generic [ref=f4e12]:
+      - paragraph [ref=f4e13]: Reserva temporal
+      - heading [level=1] [ref=f4e15]:
+        - text: Encuentra tu
+        - emphasis [ref=f4e16]: momento
+        - text: en la mesa.
+      - paragraph [ref=f4e17]: Consulta un horario, confirma tus datos y mantén tu selección bloqueada temporalmente.
+    - main [ref=f4e25]:
+      - generic [ref=f4e26]:
+        - region [ref=f4e27]:
+          - generic [ref=f4e28]:
+            - heading "1. Fecha y personas" [level=2] [ref=f4e29]
+            - paragraph [ref=f4e30]: Indica cuándo nos visitarás y cuántas personas asistirán.
+          - generic [ref=f4e31]:
+            - group [ref=f4e32]:
+              - generic [ref=f4e33]: Fecha
+              - button "Fecha" [ref=f4e34]:
+                - generic [ref=f4e35]: 4 de agosto de 2026
+              - paragraph [ref=f4e36]: Selecciona una fecha dentro del periodo permitido.
+            - group [ref=f4e37]:
+              - generic [ref=f4e38]: Cantidad de personas
+              - spinbutton "Cantidad de personas" [ref=f4e39]: "4"
+              - paragraph [ref=f4e40]: Puedes reservar para entre 1 y 12 personas.
+            - button "Ver horarios" [ref=f4e64]
+        - region [ref=f4e41]:
+          - generic [ref=f4e42]:
+            - heading "2. Elige un horario" [level=2] [ref=f4e43]
+            - paragraph [ref=f4e44]: Los horarios se muestran según la disponibilidad actual de la sucursal.
+          - group "Horarios disponibles" [ref=f4e65]:
+            - paragraph [ref=f4e67]: Cada reserva dura 80 minutos.
+            - radiogroup [ref=f4e68]:
+              - group [ref=f4e69]:
+                - radio "Reservar a las 09:00" [ref=f4e70]
+                - generic [ref=f4e71] [cursor=pointer]: 09:00
+              - group [ref=f4e72]:
+                - radio "Reservar a las 09:15" [ref=f4e73]
+                - generic [ref=f4e74] [cursor=pointer]: 09:15
+              - group [ref=f4e75]:
+                - radio "Reservar a las 09:30" [ref=f4e76]
+                - generic [ref=f4e77] [cursor=pointer]: 09:30
+              - group [ref=f4e78]:
+                - radio "Reservar a las 09:45" [ref=f4e79]
+                - generic [ref=f4e80] [cursor=pointer]: 09:45
+              - group [ref=f4e81]:
+                - radio "Reservar a las 10:00" [ref=f4e82]
+                - generic [ref=f4e83] [cursor=pointer]: 10:00
+              - group [ref=f4e84]:
+                - radio "Reservar a las 10:15" [ref=f4e85]
+                - generic [ref=f4e86] [cursor=pointer]: 10:15
+              - group [ref=f4e87]:
+                - radio "Reservar a las 10:30" [ref=f4e88]
+                - generic [ref=f4e89] [cursor=pointer]: 10:30
+              - group [ref=f4e90]:
+                - radio "Reservar a las 10:45" [ref=f4e91]
+                - generic [ref=f4e92] [cursor=pointer]: 10:45
+              - group [ref=f4e93]:
+                - radio "Reservar a las 11:00" [ref=f4e94]
+                - generic [ref=f4e95] [cursor=pointer]: 11:00
+              - group [ref=f4e96]:
+                - radio "Reservar a las 11:15" [ref=f4e97]
+                - generic [ref=f4e98] [cursor=pointer]: 11:15
+              - group [ref=f4e99]:
+                - radio "Reservar a las 11:30" [ref=f4e100]
+                - generic [ref=f4e101] [cursor=pointer]: 11:30
+              - group [ref=f4e102]:
+                - radio "Reservar a las 11:45" [ref=f4e103]
+                - generic [ref=f4e104] [cursor=pointer]: 11:45
+              - group [ref=f4e105]:
+                - radio "Reservar a las 12:00" [ref=f4e106]
+                - generic [ref=f4e107] [cursor=pointer]: 12:00
+              - group [ref=f4e108]:
+                - radio "Reservar a las 12:15" [ref=f4e109]
+                - generic [ref=f4e110] [cursor=pointer]: 12:15
+              - group [ref=f4e111]:
+                - radio "Reservar a las 12:30" [ref=f4e112]
+                - generic [ref=f4e113] [cursor=pointer]: 12:30
+              - group [ref=f4e114]:
+                - radio "Reservar a las 12:45" [ref=f4e115]
+                - generic [ref=f4e116] [cursor=pointer]: 12:45
+              - group [ref=f4e117]:
+                - radio "Reservar a las 13:00" [ref=f4e118]
+                - generic [ref=f4e119] [cursor=pointer]: 13:00
+              - group [ref=f4e120]:
+                - radio "Reservar a las 13:15" [ref=f4e121]
+                - generic [ref=f4e122] [cursor=pointer]: 13:15
+              - group [ref=f4e123]:
+                - radio "Reservar a las 13:30" [ref=f4e124]
+                - generic [ref=f4e125] [cursor=pointer]: 13:30
+              - group [ref=f4e126]:
+                - radio "Reservar a las 13:45" [ref=f4e127]
+                - generic [ref=f4e128] [cursor=pointer]: 13:45
+              - group [ref=f4e129]:
+                - radio "Reservar a las 14:00" [ref=f4e130]
+                - generic [ref=f4e131] [cursor=pointer]: 14:00
+              - group [ref=f4e132]:
+                - radio "Reservar a las 14:15" [ref=f4e133]
+                - generic [ref=f4e134] [cursor=pointer]: 14:15
+              - group [ref=f4e135]:
+                - radio "Reservar a las 14:30" [ref=f4e136]
+                - generic [ref=f4e137] [cursor=pointer]: 14:30
+        - region [ref=f4e51]:
+          - generic [ref=f4e52]:
+            - heading "3. Tus datos" [level=2] [ref=f4e53]
+            - paragraph [ref=f4e54]: Los necesitamos para preparar tu reserva. No se guardarán en el navegador.
+          - generic [ref=f4e55]:
+            - generic [ref=f4e56]:
+              - group [ref=f4e57]:
+                - generic [ref=f4e58]: Nombre completo
+                - textbox "Nombre completo" [disabled]:
+                  - /placeholder: Ana Torres
+              - group [ref=f4e59]:
+                - generic [ref=f4e60]: Email
+                - textbox "Email" [disabled]:
+                  - /placeholder: ana@ejemplo.com
+              - group [ref=f4e61]:
+                - generic [ref=f4e62]: Teléfono
+                - textbox "Teléfono" [disabled]:
+                  - /placeholder: "+51987654321"
+                - paragraph [ref=f4e63]: Usa el formato internacional, por ejemplo +51987654321. Puedes separar los dígitos con espacios o guiones.
+            - button "Revisar reserva" [disabled]
+    - contentinfo [ref=f4e22]:
+      - paragraph [ref=f4e23]: El Molino del Pez
+      - paragraph [ref=f4e24]: El pago se integrará en un siguiente paso.
