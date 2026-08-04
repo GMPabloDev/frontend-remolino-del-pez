@@ -14,6 +14,8 @@ import type {
 } from "../public-menu/contracts/public-menu";
 import {
 	createPublicReservationCartHandoff,
+	readPublicReservationCartHandoff,
+	removePublicReservationCartHandoff,
 	writePublicReservationCartHandoff,
 } from "../public-reservation/lib/public-reservation-storage";
 import type {
@@ -60,6 +62,7 @@ interface PublicCartContextValue {
 	branchSlug: string;
 	reservationNavigationBlocked: boolean;
 	prepareReservationNavigation(): boolean;
+	restoreReservationCartHandoff(): boolean;
 	addItem(dish: PublicDish): CartMutationResult;
 	incrementItem(dishId: string): CartMutationResult;
 	decrementItem(dishId: string): CartMutationResult;
@@ -163,6 +166,18 @@ export function PublicCartProvider({
 			return false;
 		}
 	}, [branchSlug, items, persistence, restaurantSlug]);
+
+	const restoreReservationCartHandoff = useCallback((): boolean => {
+		const result = readPublicReservationCartHandoff(restaurantSlug, branchSlug);
+		if (!result.value) return false;
+
+		const nextItems = markPublicCartItemsUnverified(result.value.cart.items);
+		setItems(nextItems);
+		setPersistence(result.persistence);
+		removePublicReservationCartHandoff(restaurantSlug, branchSlug);
+		setAnnouncement("Tu selección se recuperó para iniciar la reserva.");
+		return true;
+	}, [branchSlug, restaurantSlug]);
 
 	const applyMutation = useCallback(
 		(
@@ -308,6 +323,7 @@ export function PublicCartProvider({
 			persistenceWarning: persistence === "memory",
 			reservationNavigationBlocked,
 			prepareReservationNavigation,
+			restoreReservationCartHandoff,
 			addItem,
 			incrementItem,
 			decrementItem,
@@ -330,6 +346,7 @@ export function PublicCartProvider({
 			prepareReservationNavigation,
 			reconcileMenu,
 			removeItem,
+			restoreReservationCartHandoff,
 			reservationNavigationBlocked,
 			restaurantSlug,
 			totals,

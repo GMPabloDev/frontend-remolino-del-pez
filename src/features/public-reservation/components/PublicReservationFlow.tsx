@@ -30,7 +30,9 @@ interface PublicReservationFlowProps {
 	maxDate: Date;
 	maxPartySize: number;
 	items: ReadonlyArray<PublicCartItem>;
+	onDishUnavailable?(): void;
 	onReservationCreated(reservation: TemporaryReservationResponse): void;
+	onReturnToMenu?(): void;
 }
 
 export function PublicReservationFlow({
@@ -41,7 +43,9 @@ export function PublicReservationFlow({
 	maxDate,
 	maxPartySize,
 	items,
+	onDishUnavailable,
 	onReservationCreated,
+	onReturnToMenu,
 }: PublicReservationFlowProps) {
 	const [date, setDate] = useState(initialDate);
 	const [partySize, setPartySize] = useState<number | "">("");
@@ -54,6 +58,7 @@ export function PublicReservationFlow({
 	const [customer, setCustomer] = useState<ReservationCustomer | null>(null);
 	const [attempt, setAttempt] = useState<ReservationAttempt | null>(null);
 	const [localError, setLocalError] = useState<string | null>(null);
+	const handledMutationErrorReference = useRef<string | null>(null);
 	const errorReference = useRef<HTMLDivElement>(null);
 	const availabilityQuery = usePublicAvailabilityQuery(
 		availabilityRequest
@@ -99,6 +104,35 @@ export function PublicReservationFlow({
 			errorReference.current?.focus();
 		}
 	}, [flowError]);
+
+	useEffect(() => {
+		const errorCode = mutationError?.code;
+		if (!errorCode) {
+			handledMutationErrorReference.current = null;
+			return;
+		}
+		if (handledMutationErrorReference.current === errorCode) return;
+
+		handledMutationErrorReference.current = errorCode;
+		if (errorCode === "RESERVATION_TIME_UNAVAILABLE") {
+			setSelectedTime("");
+			setAttempt(null);
+			void availabilityQuery.refetch();
+			return;
+		}
+
+		if (errorCode === "DISH_NOT_AVAILABLE") {
+			setSelectedTime("");
+			setAttempt(null);
+			onDishUnavailable?.();
+			return;
+		}
+
+		if (errorCode === "IDEMPOTENCY_KEY_REUSED") {
+			setAttempt(null);
+			setCustomer(null);
+		}
+	}, [availabilityQuery.refetch, mutationError?.code, onDishUnavailable]);
 
 	function handleDateChange(nextDate: string) {
 		setDate(nextDate);
@@ -201,6 +235,19 @@ export function PublicReservationFlow({
 		onReservationCreated(reservation);
 	}
 
+	function handleAvailabilityRecovery() {
+		setSelectedTime("");
+		setAttempt(null);
+		reservationMutation.reset();
+		void availabilityQuery.refetch();
+	}
+
+	function handleReviewRecovery() {
+		setAttempt(null);
+		setCustomer(null);
+		reservationMutation.reset();
+	}
+
 	const availabilityRemoteMessage = availabilityError?.message;
 	const hasSearched = availabilityRequest !== null;
 	const selectedTimeIsAvailable = Boolean(
@@ -227,6 +274,29 @@ export function PublicReservationFlow({
 								variant="outline"
 							>
 								Revisar y volver a intentar
+							</Button>
+						) : null}
+						{flowError.action === "availability" ? (
+							<Button
+								onClick={handleAvailabilityRecovery}
+								size="sm"
+								variant="outline"
+							>
+								Consultar otros horarios
+							</Button>
+						) : null}
+						{flowError.action === "review" ? (
+							<Button
+								onClick={handleReviewRecovery}
+								size="sm"
+								variant="outline"
+							>
+								Revisar datos nuevamente
+							</Button>
+						) : null}
+						{flowError.action === "menu" && onReturnToMenu ? (
+							<Button onClick={onReturnToMenu} size="sm" variant="outline">
+								Volver al menú
 							</Button>
 						) : null}
 					</AlertDescription>

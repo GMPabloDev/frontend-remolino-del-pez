@@ -8,7 +8,10 @@ import {
 	formatPublicCartPrice,
 	publicPriceToCents,
 } from "../../public-cart/lib/public-cart-money";
-import type { TemporaryReservationResponse } from "../contracts/public-reservation.schemas";
+import type {
+	StoredPublicReservation,
+	TemporaryReservationResponse,
+} from "../contracts/public-reservation.schemas";
 import {
 	formatReservationDateLabel,
 	reservationDateToCalendarDate,
@@ -16,7 +19,7 @@ import {
 import { PublicReservationCountdown } from "./PublicReservationCountdown";
 
 interface PublicReservationSummaryProps {
-	reservation: TemporaryReservationResponse;
+	reservation: TemporaryReservationResponse | StoredPublicReservation;
 	branchName?: string;
 	isPaymentAvailable?: boolean;
 	onExpired(): void;
