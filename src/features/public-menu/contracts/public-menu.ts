@@ -4,6 +4,8 @@ import { publicSlugSchema } from "../../public-discovery/contracts/public-discov
 
 export const dishAvailabilitySchema = z.enum(["available", "sold_out"]);
 
+export const publicPriceSchema = z.string().regex(/^\d{1,8}\.\d{2}$/);
+
 export const publicDishSchema = z.object({
 	id: z.string().min(1),
 	name: z.string(),
@@ -12,7 +14,7 @@ export const publicDishSchema = z.object({
 	ingredients: z.array(z.string()),
 	allergens: z.array(z.string()),
 	position: z.number().int().positive(),
-	price: z.string(),
+	price: publicPriceSchema,
 	status: dishAvailabilitySchema,
 });
 
