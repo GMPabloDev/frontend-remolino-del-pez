@@ -24,6 +24,17 @@ http://localhost:3000
 
 Todas las rutas de gestión requieren `Authorization: Bearer <accessToken>`. Las rutas públicas (`/public/**`) y los webhooks no requieren sesión interna. `GET /customer-auth/me` requiere un access token de cliente separado.
 
+**Rutas que NUNCA llevan `Authorization`:**
+`POST /auth/login` · `POST /auth/refresh` · `POST /auth/logout` · `POST /public/restaurants/:restaurantSlug/customer-auth/magic-links` · `POST /public/customer-auth/magic-links/exchange` · `POST /customer-auth/refresh` · `POST /customer-auth/logout` · `POST /webhooks/stripe` (este último se autentica con `Stripe-Signature`, no con Bearer). Si algún frontend envía un Bearer innecesario, la API lo ignora; no es un error.
+
+### CORS
+
+- La API valida el origen contra la variable `CORS_ORIGINS` del servidor (lista separada por comas). En desarrollo por defecto es `http://localhost:4321`; el frontend debe configurarla con su origen real.
+- Solo se permiten los orígenes listados. Un origen no listado no recibe cabeceras CORS y el navegador bloquea la respuesta.
+- Métodos permitidos: `GET`, `HEAD`, `PUT`, `POST`, `DELETE`, `PATCH`, `OPTIONS`.
+- Cabeceras permitidas: `Content-Type`, `Authorization`, `Idempotency-Key`.
+- La autenticación viaja en cabeceras (`Authorization`), **no en cookies**; no se necesita `credentials: include` en `fetch` salvo que el frontend use cookies por su cuenta.
+
 ---
 
 ## Formato de errores
@@ -68,6 +79,7 @@ Regla para el frontend: ante un `401 UNAUTHORIZED` intenta el flujo de refresh (
 | 404 | `PUBLIC_MENU_NOT_FOUND` | Restaurante o sucursal inexistente, no relacionados, o sucursal inactiva |
 | 404 | `PUBLIC_RESERVATION_NOT_FOUND` | Restaurante/sucursal no disponibles para reservas |
 | 404 | `PUBLIC_PAYMENT_NOT_FOUND` | Reserva no encontrada **o token de checkout inválido** (no distinguir ambos casos) |
+| 404 | `ROUTE_NOT_FOUND` | La URL no coincide con ninguna ruta registrada |
 | 409 | `RESTAURANT_ALREADY_EXISTS` | Ya existe un restaurante (singleton) |
 | 409 | `BRANCH_CODE_ALREADY_EXISTS` | Código de sucursal duplicado |
 | 409 | `BRANCH_SCHEDULE_CONFLICT` | Intervalos del mismo día solapados |
@@ -85,6 +97,7 @@ Regla para el frontend: ante un `401 UNAUTHORIZED` intenta el flujo de refresh (
 | 422 | `LAST_ADMIN_REQUIRED` | No se puede degradar/desactivar al último admin activo |
 | 422 | `INVALID_ROLE_BRANCH` | Rol-sucursal incompatible o sucursal inexistente |
 | 500 | `INTERNAL_SERVER_ERROR` | Error interno (no exponer detalles al usuario) |
+| 500 | `UNKNOWN_ERROR` | Error inesperado lanzado como `HTTPException` de Hono; usa el status que tenga la excepción (mantener la regla: no depender del `message`) |
 | 503 | `PAYMENT_PROVIDER_UNAVAILABLE` | Proveedor de pagos no disponible |
 
 ---

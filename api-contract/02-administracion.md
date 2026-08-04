@@ -287,19 +287,24 @@ Reemplaza todos los intervalos atómicamente.
 ```json
 {
   "intervals": [
-    { "dayOfWeek": "1-7 (1=lunes)", "startTime": "HH:mm", "endTime": "HH:mm" }
+    { "dayOfWeek": 1, "startTime": "12:00", "endTime": "15:00" },
+    { "dayOfWeek": 1, "startTime": "17:00", "endTime": "22:00" },
+    { "dayOfWeek": 2, "startTime": "12:00", "endTime": "22:00" }
   ]
 }
 ```
 
 **Constraints:** `startTime < endTime`, sin solapamientos en un mismo día.
 
-**Response 200:** `Branch`.
+**Response 200:** `Branch`. El reemplazo del horario también actualiza `Branch.updatedAt` (los cambios en `intervals` se reflejan en el `updatedAt` de la sucursal).
 **Errores:** `404 BRANCH_NOT_FOUND`, `409 BRANCH_SCHEDULE_CONFLICT`, `403 FORBIDDEN`
 
 ### PATCH /restaurants/:restaurantId/branches/:branchId/status
 
-**Request:** `{ "status": "active | inactive" }`
+**Request:**
+```json
+{ "status": "active" }
+```
 
 - `active` requiere al menos un intervalo (`422` si no).
 - `inactive` siempre se permite.
@@ -376,7 +381,10 @@ Todos los campos opcionales:
 
 ### PATCH /restaurants/:restaurantId/branches/:branchId/tables/:tableId/status
 
-**Request:** `{ "status": "active | inactive" }`
+**Request:**
+```json
+{ "status": "active" }
+```
 
 - Se permite activar mesas incluso si la sucursal está inactiva.
 

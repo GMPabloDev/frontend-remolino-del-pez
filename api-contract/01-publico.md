@@ -15,6 +15,7 @@
 
 Contenido:
 
+- [GET / (health)](#get--health)
 - [GET /public/restaurants/:restaurantSlug](#get-publicrestaurantsrestaurantslug)
 - [GET /public/restaurants/:restaurantSlug/branches](#get-publicrestaurantsrestaurantslugbranches)
 - [GET /public/restaurants/:restaurantSlug/branches/:branchSlug/menu](#get-publicrestaurantsrestaurantslugbranchesbranchslugmenu)
@@ -29,6 +30,14 @@ Contenido:
 - [GET /customer-auth/me](#get-customer-authme)
 - [POST /webhooks/stripe](#post-webhooksstripe)
 - [Gotchas de pago y expiración](#gotchas-de-pago-y-expiracion)
+
+---
+
+## GET / (health)
+
+Verifica que el servidor esté levantado. Sin autenticación.
+
+**Response 200:** texto plano `Hello Hono!` (no es JSON).
 
 ---
 
@@ -48,6 +57,8 @@ Devuelve únicamente la información pública del restaurante.
 ```
 
 No expone `legalName`, `taxId`, UUID ni timestamps.
+
+- `phone` y `email` pueden venir `null` si el restaurante no los tiene configurados. Trátalos como opcionales en el UI.
 
 **Errores:** `404 RESTAURANT_NOT_FOUND`
 
@@ -86,6 +97,7 @@ Lista las sucursales `active` del restaurante, ordenadas por `name ASC, slug ASC
 
 - `dayOfWeek`: `1-7` (`1` = lunes).
 - No expone UUID, `code`, `status` ni timestamps de sucursal.
+- `email` puede venir `null` si la sucursal no tiene uno configurado.
 
 **Errores:** `404 RESTAURANT_NOT_FOUND`
 
@@ -255,6 +267,8 @@ Validaciones y reglas:
 ```
 
 **Idempotencia:** repetir la misma `Idempotency-Key` con el **mismo payload** devuelve `200` con la reserva original (mismo `checkoutToken`), incluso si ya venció — es la forma segura de reintentar un envío ante una falla de red. Reutilizar la clave con otro restaurante, sucursal o payload devuelve `409 IDEMPOTENCY_KEY_REUSED`. La clave se puede regenerar para un intento de reserva distinto (por ejemplo, si el usuario cambia fecha/hora).
+
+- `checkoutToken` viene siempre presente en las respuestas 200 y 201. Es opaco: no intentes parsearlo ni derivar información de él; úsalo solo como Bearer en checkout/estado de pago.
 
 **Errores:**
 - `400 VALIDATION_ERROR`
