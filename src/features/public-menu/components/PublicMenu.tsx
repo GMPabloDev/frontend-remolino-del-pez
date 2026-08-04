@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { ApiClientError } from "@/lib/api/api-error";
 import { runtimeConfig } from "../../../config/runtime";
@@ -74,50 +74,25 @@ function PublicMenuContent({ menuQuery }: PublicMenuContentProps) {
 		}
 	}, [markItemsUnverified, menuQuery.data, menuQuery.isError, reconcileMenu]);
 
+	let content: ReactNode;
+
 	if (menuQuery.isPending) {
-		return (
-			<>
-				<MenuState kind="loading" />
-				<PublicCartSheet />
-			</>
+		content = renderResponsiveMenuState(<MenuState kind="loading" />);
+	} else if (menuQuery.isError) {
+		content = renderResponsiveMenuState(
+			<MenuState
+				kind="error"
+				errorCode={getErrorCode(menuQuery.error)}
+				onRetry={() => void menuQuery.refetch()}
+			/>,
 		);
-	}
-
-	if (menuQuery.isError) {
-		return (
-			<>
-				<MenuState
-					kind="error"
-					errorCode={getErrorCode(menuQuery.error)}
-					onRetry={() => void menuQuery.refetch()}
-				/>
-				<PublicCartSheet />
-			</>
-		);
-	}
-
-	if (!menuQuery.data) {
-		return (
-			<>
-				<MenuState kind="loading" />
-				<PublicCartSheet />
-			</>
-		);
-	}
-
-	const menu: PublicMenuData = menuQuery.data;
-
-	if (menu.categories.length === 0) {
-		return (
-			<>
-				<MenuState kind="empty" />
-				<PublicCartSheet />
-			</>
-		);
-	}
-
-	return (
-		<>
+	} else if (!menuQuery.data) {
+		content = renderResponsiveMenuState(<MenuState kind="loading" />);
+	} else if (menuQuery.data.categories.length === 0) {
+		content = renderResponsiveMenuState(<MenuState kind="empty" />);
+	} else {
+		const menu: PublicMenuData = menuQuery.data;
+		content = (
 			<main
 				id="main-content"
 				className="mx-auto w-full max-w-6xl px-5 pb-32 sm:px-8 sm:pb-36 lg:px-12"
@@ -133,7 +108,7 @@ function PublicMenuContent({ menuQuery }: PublicMenuContentProps) {
 						{menu.categories.map((category) => (
 							<li key={category.id}>
 								<a
-									className="underline decoration-[#e76832]/50 decoration-2 underline-offset-4 transition-colors hover:text-[#e76832] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25"
+									className="break-words underline decoration-[#e76832]/50 decoration-2 underline-offset-4 transition-colors hover:text-[#e76832] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25"
 									href={`#category-${category.id}`}
 								>
 									{category.name}
@@ -149,7 +124,17 @@ function PublicMenuContent({ menuQuery }: PublicMenuContentProps) {
 					))}
 				</div>
 			</main>
+		);
+	}
+
+	return (
+		<>
+			{content}
 			<PublicCartSheet />
 		</>
 	);
+}
+
+function renderResponsiveMenuState(content: ReactNode) {
+	return <div className="px-5 sm:px-8 lg:px-12">{content}</div>;
 }

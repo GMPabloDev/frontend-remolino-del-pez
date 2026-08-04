@@ -20,6 +20,7 @@ export function PublicCartQuantityControl({
 			<legend className="sr-only">Cantidad de {itemName}</legend>
 			<Button
 				aria-label={`Reducir cantidad de ${itemName}`}
+				className="size-10"
 				disabled={quantity <= 1}
 				onClick={onDecrease}
 				size="icon"
@@ -28,13 +29,14 @@ export function PublicCartQuantityControl({
 				<Minus aria-hidden="true" />
 			</Button>
 			<span
-				className="min-w-8 text-center text-sm font-semibold text-[#12324a]"
 				aria-live="polite"
+				className="min-w-10 text-center text-sm font-semibold text-[#12324a]"
 			>
 				{quantity}
 			</span>
 			<Button
 				aria-label={`Aumentar cantidad de ${itemName}`}
+				className="size-10"
 				disabled={quantity >= 99}
 				onClick={onIncrease}
 				size="icon"

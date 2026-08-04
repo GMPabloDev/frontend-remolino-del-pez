@@ -17,7 +17,7 @@ export const PublicCartTrigger = forwardRef<
 			ref={ref}
 			{...props}
 			aria-label={props["aria-label"] ?? label}
-			className={`fixed inset-x-4 bottom-4 z-40 mx-auto flex min-h-14 max-w-sm items-center justify-between rounded-full bg-[#12324a] px-5 text-white shadow-[0_18px_45px_rgba(18,50,74,0.28)] hover:bg-[#1d4b68] sm:inset-auto sm:bottom-6 sm:right-6 sm:left-auto sm:mx-0 sm:max-w-none ${className ?? ""}`}
+			className={`fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 mx-auto flex min-h-14 max-w-sm items-center justify-between rounded-full bg-[#12324a] px-5 text-white shadow-[0_18px_45px_rgba(18,50,74,0.28)] hover:bg-[#1d4b68] sm:inset-auto sm:bottom-6 sm:right-6 sm:left-auto sm:mx-0 sm:max-w-none ${className ?? ""}`}
 			variant="default"
 		>
 			<span className="flex items-center gap-3">

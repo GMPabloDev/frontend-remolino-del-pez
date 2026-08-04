@@ -14,13 +14,13 @@ export function CategorySection({ category }: CategorySectionProps) {
 			id={`category-${category.id}`}
 			aria-labelledby={headingId}
 		>
-			<div className="mb-7 flex items-end gap-4 sm:mb-9">
+			<div className="mb-7 flex min-w-0 items-end gap-4 sm:mb-9">
 				<p className="font-heading text-4xl font-semibold leading-none tracking-[-0.08em] text-[#e76832]/80 sm:text-5xl">
 					{String(category.position).padStart(2, "0")}
 				</p>
 				<h2
 					id={headingId}
-					className="font-heading text-3xl font-semibold tracking-[-0.055em] text-[#12324a] sm:text-4xl"
+					className="min-w-0 break-words font-heading text-3xl font-semibold tracking-[-0.055em] text-[#12324a] sm:text-4xl"
 				>
 					{category.name}
 				</h2>
