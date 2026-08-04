@@ -2,34 +2,57 @@ import { Clock3 } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
 	formatPublicCartPrice,
 	publicPriceToCents,
 } from "../../public-cart/lib/public-cart-money";
-import type {
-	StoredPublicReservation,
-	TemporaryReservationResponse,
-} from "../contracts/public-reservation.schemas";
+import { PublicCheckoutButton } from "../../public-payment/components/PublicCheckoutButton";
+import type { TemporaryReservationResponse } from "../contracts/public-reservation.schemas";
 import {
 	formatReservationDateLabel,
 	reservationDateToCalendarDate,
 } from "../lib/public-reservation-date";
 import { PublicReservationCountdown } from "./PublicReservationCountdown";
 
+export type PublicReservationSummaryData = Pick<
+	TemporaryReservationResponse,
+	| "id"
+	| "branchSlug"
+	| "status"
+	| "date"
+	| "startTime"
+	| "endTime"
+	| "timezone"
+	| "durationMinutes"
+	| "expiresAt"
+	| "partySize"
+	| "items"
+	| "currency"
+	| "total"
+	| "createdAt"
+>;
+
 interface PublicReservationSummaryProps {
-	reservation: TemporaryReservationResponse | StoredPublicReservation;
+	reservation: PublicReservationSummaryData;
 	branchName?: string;
+	checkoutError?: string;
+	isCheckoutPending?: boolean;
 	isPaymentAvailable?: boolean;
+	onCheckout?(): void;
 	onExpired(): void;
+	paymentDisabledReason?: string;
 }
 
 export function PublicReservationSummary({
 	reservation,
 	branchName,
+	checkoutError,
+	isCheckoutPending = false,
 	isPaymentAvailable = false,
+	onCheckout = () => {},
 	onExpired,
+	paymentDisabledReason,
 }: PublicReservationSummaryProps) {
 	const dateLabel = formatReservationDateLabel(
 		reservationDateToCalendarDate(reservation.date),
@@ -125,29 +148,49 @@ export function PublicReservationSummary({
 				</strong>
 			</div>
 
-			<Alert className="mt-6">
-				<Clock3 aria-hidden="true" />
-				<AlertTitle>El pago se habilitará después</AlertTitle>
-				<AlertDescription>
-					{isPaymentAvailable
-						? "El pago estará disponible cuando se habilite el siguiente paso."
-						: "Continuar al pago estará disponible en el siguiente paso del flujo."}
-				</AlertDescription>
-			</Alert>
+			{checkoutError ? (
+				<Alert className="mt-6" variant="destructive">
+					<Clock3 aria-hidden="true" />
+					<AlertTitle>No pudimos iniciar el pago</AlertTitle>
+					<AlertDescription>{checkoutError}</AlertDescription>
+				</Alert>
+			) : (
+				<Alert className="mt-6">
+					<Clock3 aria-hidden="true" />
+					<AlertTitle>
+						{isCheckoutPending
+							? "Preparando tu pago"
+							: isPaymentAvailable
+								? "Pago seguro con Stripe"
+								: "El pago no está disponible"}
+					</AlertTitle>
+					<AlertDescription>
+						{isCheckoutPending
+							? "Estamos preparando una sesión segura. No cierres esta página."
+							: isPaymentAvailable
+								? "Serás redirigido a Stripe para completar el pago."
+								: (paymentDisabledReason ??
+									"Necesitamos conservar el contexto de la reserva antes de continuar.")}
+					</AlertDescription>
+				</Alert>
+			)}
 
-			<Button
+			<PublicCheckoutButton
 				aria-describedby="reservation-payment-help"
-				className="mt-6 w-full"
 				disabled={!isPaymentAvailable}
-				type="button"
-			>
-				Continuar al pago
-			</Button>
+				isPending={isCheckoutPending}
+				onClick={onCheckout}
+			/>
 			<p
 				className="mt-2 text-center text-sm text-muted-foreground"
 				id="reservation-payment-help"
 			>
-				Esta opción se habilitará en la siguiente spec.
+				{isCheckoutPending
+					? "No cierres esta página mientras preparamos la redirección."
+					: isPaymentAvailable
+						? "El pago se procesa en Stripe; no introducimos datos de tarjeta aquí."
+						: (paymentDisabledReason ??
+							"El pago requiere una reserva vigente y guardada en esta pestaña.")}
 			</p>
 		</section>
 	);

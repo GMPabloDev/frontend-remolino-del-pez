@@ -16,8 +16,22 @@ import {
 import type { PublicBranch } from "../public-discovery/contracts/public-discovery.schemas";
 import { publicSlugSchema } from "../public-discovery/contracts/public-discovery.schemas";
 import { readMenuQuery } from "../public-menu/lib/menu-query";
+import {
+	PUBLIC_PAYMENT_VERSION,
+	publicCheckoutReturnSchema,
+} from "../public-payment/contracts/public-payment.schemas";
+import {
+	isAllowedPublicCheckoutUrl,
+	matchesPublicCheckoutReservation,
+} from "../public-payment/lib/public-payment-contracts";
+import { getPublicPaymentErrorPresentation } from "../public-payment/lib/public-payment-errors";
+import { writePublicCheckoutReturn } from "../public-payment/lib/public-payment-storage";
+import { useCreatePublicCheckoutMutation } from "../public-payment/query/public-payment-query";
 import { PublicReservationFlow } from "./components/PublicReservationFlow";
-import { PublicReservationSummary } from "./components/PublicReservationSummary";
+import {
+	PublicReservationSummary,
+	type PublicReservationSummaryData,
+} from "./components/PublicReservationSummary";
 import type {
 	StoredPublicReservation,
 	TemporaryReservationResponse,
@@ -146,8 +160,11 @@ function PublicReservationContent({ branch }: PublicReservationContentProps) {
 		TemporaryReservationResponse | StoredPublicReservation | null
 	>(null);
 	const [reservationChecked, setReservationChecked] = useState(false);
+	const [reservationPersisted, setReservationPersisted] = useState(false);
 	const [storageWarning, setStorageWarning] = useState(false);
 	const [expiredNotice, setExpiredNotice] = useState(false);
+	const [checkoutError, setCheckoutError] = useState<string | null>(null);
+	const checkoutMutation = useCreatePublicCheckoutMutation();
 	const handoffCheckedReference = useRef(false);
 	const bounds = useMemo(
 		() => getReservationDateBounds(branch.rules.maximumAdvanceDays),
@@ -168,9 +185,13 @@ function PublicReservationContent({ branch }: PublicReservationContentProps) {
 			branch.branchSlug,
 		);
 		setReservation(result.value);
+		setReservationPersisted(
+			result.persistence === "persistent" && result.value !== null,
+		);
 		setReservationChecked(true);
 		setStorageWarning(result.persistence === "memory");
 		setExpiredNotice(result.reason === "expired");
+		setCheckoutError(null);
 	}, [branch.branchSlug]);
 
 	useEffect(() => {
@@ -192,15 +213,100 @@ function PublicReservationContent({ branch }: PublicReservationContentProps) {
 			nextReservation,
 		);
 		const writeResult = writePublicReservation(storedReservation);
-		setReservation(nextReservation);
+		setReservation(writeResult.value ?? nextReservation);
+		setReservationPersisted(
+			writeResult.persistence === "persistent" && writeResult.value !== null,
+		);
 		setStorageWarning(writeResult.persistence === "memory");
 		setExpiredNotice(false);
+		setCheckoutError(null);
 	}
 
 	function handleReservationExpired() {
+		checkoutMutation.reset();
 		removePublicReservation(runtimeConfig.restaurantSlug, branch.branchSlug);
 		setReservation(null);
+		setReservationPersisted(false);
+		setCheckoutError(null);
 		setExpiredNotice(true);
+	}
+
+	function handleCheckout() {
+		if (
+			checkoutMutation.isPending ||
+			!reservationPersisted ||
+			!reservation ||
+			!isStoredPublicReservation(reservation)
+		) {
+			setCheckoutError(
+				"No pudimos conservar el contexto de la reserva para iniciar el pago.",
+			);
+			return;
+		}
+
+		if (Date.parse(reservation.expiresAt) <= Date.now()) {
+			handleReservationExpired();
+			return;
+		}
+
+		setCheckoutError(null);
+		checkoutMutation.mutate(
+			{
+				restaurantSlug: runtimeConfig.restaurantSlug,
+				branchSlug: branch.branchSlug,
+				reservationId: reservation.id,
+				checkoutToken: reservation.checkoutToken,
+			},
+			{
+				onError: (error) => {
+					setCheckoutError(getPublicPaymentErrorPresentation(error).message);
+				},
+				onSuccess: (checkout) => {
+					if (!matchesPublicCheckoutReservation(checkout, reservation)) {
+						setCheckoutError(
+							"La sesión de pago no coincide con tu reserva. No realizamos la redirección.",
+						);
+						return;
+					}
+
+					if (!isAllowedPublicCheckoutUrl(checkout.checkoutUrl)) {
+						setCheckoutError(
+							"El proveedor devolvió una dirección de pago no segura. No realizamos la redirección.",
+						);
+						return;
+					}
+
+					const checkoutReturnResult = publicCheckoutReturnSchema.safeParse({
+						version: PUBLIC_PAYMENT_VERSION,
+						restaurantSlug: runtimeConfig.restaurantSlug,
+						branchSlug: branch.branchSlug,
+						reservationId: reservation.id,
+						paymentAttemptId: checkout.paymentAttemptId,
+						initiatedAt: new Date().toISOString(),
+						reservationExpiresAt: reservation.expiresAt,
+					});
+
+					if (!checkoutReturnResult.success) {
+						setCheckoutError(
+							"No pudimos preparar el retorno seguro del pago. Conservamos tu reserva.",
+						);
+						return;
+					}
+
+					const writeResult = writePublicCheckoutReturn(
+						checkoutReturnResult.data,
+					);
+					if (writeResult.persistence !== "persistent") {
+						setCheckoutError(
+							"No pudimos conservar el contexto para volver desde Stripe. Conservamos tu reserva; inténtalo nuevamente.",
+						);
+						return;
+					}
+
+					window.location.assign(checkout.checkoutUrl);
+				},
+			},
+		);
 	}
 
 	function refreshMenuAfterDishConflict() {
@@ -223,8 +329,20 @@ function PublicReservationContent({ branch }: PublicReservationContentProps) {
 				{storageWarning ? <StorageWarning /> : null}
 				<PublicReservationSummary
 					branchName={branch.name}
+					checkoutError={checkoutError ?? undefined}
+					isCheckoutPending={checkoutMutation.isPending}
+					isPaymentAvailable={
+						reservationPersisted &&
+						Date.parse(reservation.expiresAt) > Date.now()
+					}
+					onCheckout={handleCheckout}
 					onExpired={handleReservationExpired}
-					reservation={reservation}
+					paymentDisabledReason={
+						!reservationPersisted
+							? "Guarda la reserva en esta pestaña antes de continuar al pago."
+							: undefined
+					}
+					reservation={toPublicReservationSummary(reservation)}
 				/>
 			</ReservationShell>
 		);
@@ -329,6 +447,33 @@ function PublicReservationContent({ branch }: PublicReservationContentProps) {
 			/>
 		</ReservationShell>
 	);
+}
+
+function isStoredPublicReservation(
+	reservation: TemporaryReservationResponse | StoredPublicReservation,
+): reservation is StoredPublicReservation {
+	return "restaurantSlug" in reservation && "version" in reservation;
+}
+
+function toPublicReservationSummary(
+	reservation: TemporaryReservationResponse | StoredPublicReservation,
+): PublicReservationSummaryData {
+	return {
+		id: reservation.id,
+		branchSlug: reservation.branchSlug,
+		status: reservation.status,
+		date: reservation.date,
+		startTime: reservation.startTime,
+		endTime: reservation.endTime,
+		timezone: reservation.timezone,
+		durationMinutes: reservation.durationMinutes,
+		expiresAt: reservation.expiresAt,
+		partySize: reservation.partySize,
+		items: reservation.items,
+		currency: reservation.currency,
+		total: reservation.total,
+		createdAt: reservation.createdAt,
+	};
 }
 
 interface PublicReservationFormContentProps {
