@@ -19,4 +19,16 @@ export const publicQueryKeys = {
 			date,
 			partySize,
 		] as const,
+	paymentStatus: (
+		restaurantSlug: string,
+		branchSlug: string,
+		reservationId: string,
+	) =>
+		[
+			"public",
+			"payment-status",
+			restaurantSlug,
+			branchSlug,
+			reservationId,
+		] as const,
 };
