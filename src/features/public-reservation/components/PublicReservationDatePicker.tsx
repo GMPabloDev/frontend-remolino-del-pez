@@ -17,6 +17,7 @@ import {
 import { isValidCalendarDate } from "../contracts/public-reservation.schemas";
 import {
 	calendarDateToReservationDate,
+	formatReservationDateLabel,
 	reservationDateToCalendarDate,
 } from "../lib/public-reservation-date";
 
@@ -75,7 +76,7 @@ export function PublicReservationDatePicker({
 					<CalendarDays data-icon="inline-start" />
 					<span className={selectedDate ? "" : "text-muted-foreground"}>
 						{selectedDate
-							? formatReservationDateForDisplay(selectedDate)
+							? formatReservationDateLabel(selectedDate)
 							: "Selecciona una fecha"}
 					</span>
 				</PopoverTrigger>
@@ -103,11 +104,4 @@ export function PublicReservationDatePicker({
 			{error ? <FieldError id={`${id}-error`}>{error}</FieldError> : null}
 		</Field>
 	);
-}
-
-function formatReservationDateForDisplay(value: Date): string {
-	return new Intl.DateTimeFormat("es-PE", {
-		dateStyle: "long",
-		timeZone: "America/Lima",
-	}).format(value);
 }

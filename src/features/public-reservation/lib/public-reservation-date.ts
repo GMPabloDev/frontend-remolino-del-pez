@@ -39,6 +39,13 @@ export function getCurrentReservationDate(now = new Date()): string {
 	return formatReservationDate(now);
 }
 
+export function formatReservationDateLabel(value: Date): string {
+	return new Intl.DateTimeFormat("es-PE", {
+		dateStyle: "long",
+		timeZone: RESERVATION_TIMEZONE,
+	}).format(value);
+}
+
 export function getReservationDateBounds(
 	maximumAdvanceDays: number,
 	now = new Date(),
