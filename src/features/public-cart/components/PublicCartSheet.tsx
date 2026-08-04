@@ -29,19 +29,40 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
+import { runtimeConfig } from "../../../config/runtime";
+import type { CartItemAvailability } from "../contracts/public-cart.schemas";
 import { formatPublicCartPrice } from "../lib/public-cart-money";
 import { usePublicCart } from "../PublicCartProvider";
 import { PublicCartItem } from "./PublicCartItem";
 import { PublicCartTrigger } from "./PublicCartTrigger";
 
 export function PublicCartSheet() {
-	const { announcement, clearCart, items, persistenceWarning, totals } =
-		usePublicCart();
+	const {
+		announcement,
+		branchSlug,
+		clearCart,
+		items,
+		persistenceWarning,
+		prepareReservationNavigation,
+		reservationNavigationBlocked,
+		totals,
+	} = usePublicCart();
 	const [open, setOpen] = useState(false);
 	const [clearDialogOpen, setClearDialogOpen] = useState(false);
-	const hasUnverifiedItems = items.some(
-		(item) => item.availability === "unverified",
+	const unavailableItems = items.filter(
+		(item) => item.availability !== "available",
 	);
+	const canContinueToReservation =
+		items.length > 0 &&
+		unavailableItems.length === 0 &&
+		!runtimeConfig.useMenuFixture;
+
+	function handleContinueToReservation() {
+		if (!canContinueToReservation) return;
+		if (!prepareReservationNavigation()) return;
+
+		window.location.assign(`/reserve?branch=${encodeURIComponent(branchSlug)}`);
+	}
 
 	return (
 		<>
@@ -78,13 +99,47 @@ export function PublicCartSheet() {
 								</AlertDescription>
 							</Alert>
 						) : null}
-						{hasUnverifiedItems ? (
+						{unavailableItems.length > 0 ? (
 							<Alert className="m-4 mb-0">
 								<CircleAlert aria-hidden="true" />
-								<AlertTitle>Disponibilidad por verificar</AlertTitle>
+								<AlertTitle>No puedes continuar todavía</AlertTitle>
 								<AlertDescription>
-									No pudimos confirmar estos platos. Se verificarán antes de
-									crear la reserva.
+									<p>Corrige estos platos antes de crear la reserva:</p>
+									<ul className="mt-2 list-disc pl-5">
+										{unavailableItems.map((item) => (
+											<li key={item.dishId}>
+												{item.name} ({getAvailabilityLabel(item.availability)})
+											</li>
+										))}
+									</ul>
+								</AlertDescription>
+							</Alert>
+						) : null}
+						{runtimeConfig.useMenuFixture && items.length > 0 ? (
+							<Alert className="m-4 mb-0">
+								<CircleAlert aria-hidden="true" />
+								<AlertTitle>
+									Reserva real no disponible en modo demostración
+								</AlertTitle>
+								<AlertDescription>
+									Desactiva el menú fixture para continuar con la API real.
+								</AlertDescription>
+							</Alert>
+						) : null}
+						{reservationNavigationBlocked && items.length > 0 ? (
+							<Alert className="m-4 mb-0" variant="destructive">
+								<CircleAlert aria-hidden="true" />
+								<AlertTitle>No pudimos abrir la reserva</AlertTitle>
+								<AlertDescription>
+									No pudimos conservar tu selección para abrir la reserva.
+									<Button
+										className="mt-3"
+										onClick={handleContinueToReservation}
+										size="sm"
+										variant="outline"
+									>
+										Intentar de nuevo
+									</Button>
 								</AlertDescription>
 							</Alert>
 						) : null}
@@ -136,8 +191,9 @@ export function PublicCartSheet() {
 								) : null}
 								<Button
 									aria-describedby="public-cart-continue-help"
-									disabled
 									className="w-full"
+									disabled={!canContinueToReservation}
+									onClick={handleContinueToReservation}
 									type="button"
 								>
 									Continuar con la reserva
@@ -146,7 +202,10 @@ export function PublicCartSheet() {
 									id="public-cart-continue-help"
 									className="text-center text-xs leading-5 text-[#12324a]/55"
 								>
-									Esta opción estará disponible en el siguiente paso.
+									{getContinueHelpText({
+										fixtureMode: runtimeConfig.useMenuFixture,
+										unavailableItemCount: unavailableItems.length,
+									})}
 								</p>
 								<div className="flex justify-between gap-3">
 									<AlertDialog
@@ -195,4 +254,35 @@ export function PublicCartSheet() {
 			</Sheet>
 		</>
 	);
+}
+
+function getAvailabilityLabel(availability: CartItemAvailability): string {
+	switch (availability) {
+		case "sold_out":
+			return "agotado";
+		case "removed":
+			return "retirado";
+		case "unverified":
+			return "sin verificar";
+		default:
+			return "no disponible";
+	}
+}
+
+function getContinueHelpText({
+	fixtureMode,
+	unavailableItemCount,
+}: {
+	fixtureMode: boolean;
+	unavailableItemCount: number;
+}): string {
+	if (unavailableItemCount > 0) {
+		return "Corrige los platos indicados para continuar.";
+	}
+
+	if (fixtureMode) {
+		return "La reserva se habilitará al usar el menú conectado a la API real.";
+	}
+
+	return "Tu selección está lista para consultar disponibilidad.";
 }

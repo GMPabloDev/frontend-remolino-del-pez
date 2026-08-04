@@ -57,7 +57,7 @@ describe("public cart UI", () => {
 			screen
 				.getByRole("button", { name: "Continuar con la reserva" })
 				.hasAttribute("disabled"),
-		).toBe(true);
+		).toBe(false);
 		const sheet = screen.getByRole("dialog");
 		expect(within(sheet).getByText("Causa de pollo")).toBeTruthy();
 

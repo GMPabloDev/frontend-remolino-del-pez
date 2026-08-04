@@ -12,6 +12,10 @@ import type {
 	PublicDish,
 	PublicMenu,
 } from "../public-menu/contracts/public-menu";
+import {
+	createPublicReservationCartHandoff,
+	writePublicReservationCartHandoff,
+} from "../public-reservation/lib/public-reservation-storage";
 import type {
 	CartReconciliationResult,
 	PublicCartItem,
@@ -52,6 +56,10 @@ interface PublicCartContextValue {
 	isRestoring: boolean;
 	persistence: PublicCartPersistence;
 	persistenceWarning: boolean;
+	restaurantSlug: string;
+	branchSlug: string;
+	reservationNavigationBlocked: boolean;
+	prepareReservationNavigation(): boolean;
 	addItem(dish: PublicDish): CartMutationResult;
 	incrementItem(dishId: string): CartMutationResult;
 	decrementItem(dishId: string): CartMutationResult;
@@ -73,6 +81,8 @@ export function PublicCartProvider({
 	const [isRestoring, setIsRestoring] = useState(true);
 	const [persistence, setPersistence] =
 		useState<PublicCartPersistence>("persistent");
+	const [reservationNavigationBlocked, setReservationNavigationBlocked] =
+		useState(false);
 	const cartKey = getPublicCartKey(restaurantSlug, branchSlug);
 
 	const persistItems = useCallback(
@@ -113,6 +123,47 @@ export function PublicCartProvider({
 		return () => window.removeEventListener("storage", handleStorage);
 	}, [branchSlug, cartKey, restaurantSlug]);
 
+	const prepareReservationNavigation = useCallback((): boolean => {
+		if (items.length === 0) {
+			setReservationNavigationBlocked(true);
+			return false;
+		}
+
+		if (persistence === "persistent") {
+			setReservationNavigationBlocked(false);
+			return true;
+		}
+
+		try {
+			const cart = createStoredPublicCart({
+				restaurantSlug,
+				branchSlug,
+				items: toStoredItems(items),
+			});
+			const handoff = createPublicReservationCartHandoff(
+				restaurantSlug,
+				branchSlug,
+				cart,
+			);
+			const result = writePublicReservationCartHandoff(handoff);
+			const ready = result.persistence === "persistent";
+
+			setReservationNavigationBlocked(!ready);
+			if (!ready) {
+				setAnnouncement(
+					"No pudimos conservar tu selección para abrir la reserva. Puedes volver a intentarlo.",
+				);
+			}
+			return ready;
+		} catch {
+			setReservationNavigationBlocked(true);
+			setAnnouncement(
+				"No pudimos conservar tu selección para abrir la reserva. Puedes volver a intentarlo.",
+			);
+			return false;
+		}
+	}, [branchSlug, items, persistence, restaurantSlug]);
+
 	const applyMutation = useCallback(
 		(
 			mutation: CartMutationResult,
@@ -149,6 +200,7 @@ export function PublicCartProvider({
 			});
 
 			setItems(nextItems);
+			setReservationNavigationBlocked(false);
 			persistItems(nextItems);
 			return mutation;
 		},
@@ -230,6 +282,7 @@ export function PublicCartProvider({
 	);
 
 	const markItemsUnverified = useCallback(() => {
+		setReservationNavigationBlocked(false);
 		setItems((currentItems) =>
 			currentItems.map((item) => ({
 				...item,
@@ -247,10 +300,14 @@ export function PublicCartProvider({
 			items,
 			totals,
 			announcement,
+			restaurantSlug,
+			branchSlug,
 
 			isRestoring,
 			persistence,
 			persistenceWarning: persistence === "memory",
+			reservationNavigationBlocked,
+			prepareReservationNavigation,
 			addItem,
 			incrementItem,
 			decrementItem,
@@ -262,6 +319,7 @@ export function PublicCartProvider({
 		[
 			addItem,
 			announcement,
+			branchSlug,
 			clearCart,
 			decrementItem,
 			incrementItem,
@@ -269,8 +327,11 @@ export function PublicCartProvider({
 			items,
 			markItemsUnverified,
 			persistence,
+			prepareReservationNavigation,
 			reconcileMenu,
 			removeItem,
+			reservationNavigationBlocked,
+			restaurantSlug,
 			totals,
 		],
 	);
