@@ -28,6 +28,7 @@ import {
 	isAllowedPublicCheckoutUrl,
 	matchesPublicCheckoutReservation,
 	matchesPublicCheckoutReturnReservation,
+	matchesPublicPaymentStatusReservation,
 } from "./lib/public-payment-contracts";
 import { getPublicPaymentErrorPresentation } from "./lib/public-payment-errors";
 import type { PublicPaymentState } from "./lib/public-payment-state";
@@ -286,6 +287,18 @@ function PublicPaymentResultContent() {
 				if (result.error || !result.data) {
 					handleRequestError(
 						result.error ?? new Error("Missing payment status response."),
+					);
+					return;
+				}
+
+				if (
+					!matchesPublicPaymentStatusReservation(
+						result.data,
+						pendingReservation,
+					)
+				) {
+					setPollingError(
+						"Recibimos un estado de pago que no coincide con tu reserva. Puedes consultar nuevamente de forma manual.",
 					);
 					return;
 				}

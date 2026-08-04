@@ -59,6 +59,14 @@ describe("public payment client", () => {
 		expect(request?.url).not.toContain(query.checkoutToken);
 	});
 
+	test("accepts a reused checkout session with HTTP 200", async () => {
+		globalThis.fetch = async () => Response.json(checkoutResponse);
+
+		await expect(createPublicCheckout(baseUrl, query)).resolves.toMatchObject({
+			status: "pending",
+		});
+	});
+
 	test("uses the same bearer contract for payment status without exposing the token", async () => {
 		let request: Request | undefined;
 		globalThis.fetch = async (input, init) => {
@@ -74,6 +82,33 @@ describe("public payment client", () => {
 		);
 		expect(request?.body).toBeNull();
 		expect(request?.url).not.toContain(query.checkoutToken);
+	});
+
+	test("rejects malformed checkout responses", async () => {
+		globalThis.fetch = async () =>
+			Response.json({ reservationId: query.reservationId }, { status: 201 });
+
+		await expect(createPublicCheckout(baseUrl, query)).rejects.toMatchObject({
+			code: "INVALID_API_RESPONSE",
+		});
+	});
+
+	test("maps a typed API error without exposing the token", async () => {
+		globalThis.fetch = async () =>
+			Response.json(
+				{
+					error: {
+						code: "PAYMENT_PROVIDER_UNAVAILABLE",
+						message: "Stripe no disponible",
+					},
+				},
+				{ status: 503 },
+			);
+
+		await expect(createPublicCheckout(baseUrl, query)).rejects.toMatchObject({
+			code: "PAYMENT_PROVIDER_UNAVAILABLE",
+			status: 503,
+		});
 	});
 
 	test("rejects an empty checkout token before making a request", async () => {
