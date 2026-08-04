@@ -4,8 +4,6 @@ import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
 	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
 	AlertDialogContent,
 	AlertDialogDescription,
 	AlertDialogFooter,
@@ -166,10 +164,21 @@ export function PublicCartSheet() {
 											</AlertDialogDescription>
 										</AlertDialogHeader>
 										<AlertDialogFooter>
-											<AlertDialogCancel>Conservar selección</AlertDialogCancel>
-											<AlertDialogAction onClick={() => clearCart()}>
+											<Button
+												onClick={() => setClearDialogOpen(false)}
+												variant="outline"
+											>
+												Conservar selección
+											</Button>
+											<Button
+												onClick={() => {
+													clearCart();
+													setClearDialogOpen(false);
+												}}
+												variant="destructive"
+											>
 												Vaciar carrito
-											</AlertDialogAction>
+											</Button>
 										</AlertDialogFooter>
 									</AlertDialogContent>
 								</AlertDialog>

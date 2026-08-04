@@ -26,6 +26,11 @@ Object.defineProperty(globalObject, "self", {
 	value: happyWindow,
 });
 
+Object.defineProperty(happyWindow.HTMLElement.prototype, "getAnimations", {
+	configurable: true,
+	value: () => [],
+});
+
 for (const property of [
 	"Element",
 	"HTMLElement",
