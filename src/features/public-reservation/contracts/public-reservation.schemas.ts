@@ -124,7 +124,7 @@ export const temporaryReservationResponseSchema = z.object({
 	items: z.array(temporaryReservationItemSchema).min(1).max(50),
 	currency: z.literal("PEN"),
 	total: reservationMoneySchema,
-	checkoutToken: z.string().min(1).nullable(),
+	checkoutToken: z.string().min(1),
 	createdAt: z.iso.datetime({ offset: true }),
 });
 

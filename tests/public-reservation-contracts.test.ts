@@ -77,11 +77,8 @@ describe("public reservation contracts", () => {
 		).toThrow();
 	});
 
-	test("accepts nullable checkout token and removes customer from stored reservation", () => {
-		const response = temporaryReservationResponseSchema.parse({
-			...validReservation,
-			checkoutToken: null,
-		});
+	test("requires a checkout token and removes customer from stored reservation", () => {
+		const response = temporaryReservationResponseSchema.parse(validReservation);
 		const stored = storedPublicReservationSchema.parse({
 			...response,
 			version: 1,
@@ -90,6 +87,17 @@ describe("public reservation contracts", () => {
 		});
 
 		expect(stored).not.toHaveProperty("customer");
-		expect(stored).toHaveProperty("checkoutToken", null);
+		expect(stored).toHaveProperty("checkoutToken", "sensitive-token");
+	});
+
+	test("rejects a missing, empty or nullable checkout token", () => {
+		for (const checkoutToken of [null, "", undefined]) {
+			expect(() =>
+				temporaryReservationResponseSchema.parse({
+					...validReservation,
+					checkoutToken,
+				}),
+			).toThrow();
+		}
 	});
 });
