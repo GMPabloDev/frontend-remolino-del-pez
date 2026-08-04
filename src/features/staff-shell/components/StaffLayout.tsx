@@ -92,6 +92,12 @@ export function StaffLayout({
 						>
 							Sucursales
 						</NavItem>
+						<NavItem
+							href="/staff/catalog/categories"
+							isActive={isPathActive(currentPath, "/staff/catalog")}
+						>
+							Catálogo
+						</NavItem>
 					</ul>
 				</nav>
 
