@@ -135,6 +135,10 @@ export function StaffBranchDishConfigurationForm({
 				branchId,
 			);
 			setDraft(null);
+			if (!configuration) {
+				toast.error("El servidor no devolvió la configuración guardada.");
+				return;
+			}
 			reset(configuration);
 			toast.success("La configuración del plato fue guardada.");
 		} catch (error) {

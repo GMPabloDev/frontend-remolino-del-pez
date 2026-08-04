@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import { StaffBranchMenuList } from "../src/features/staff-catalog/components/StaffBranchMenuList";
 import type { StaffBranchDish } from "../src/features/staff-catalog/contracts/staff-catalog.schemas";
+import type { BranchDishFilter } from "../src/features/staff-catalog/lib/branch-dish-filter";
 
 const dishes: StaffBranchDish[] = [
 	{
@@ -70,7 +71,7 @@ describe("StaffBranchMenuList", () => {
 	test("applies local filters without navigation", async () => {
 		const user = userEvent.setup();
 		function FilterHarness() {
-			const [filter, setFilter] = useState<typeof defaultProps.filter>("all");
+			const [filter, setFilter] = useState<BranchDishFilter>("all");
 			return (
 				<StaffBranchMenuList
 					{...defaultProps}

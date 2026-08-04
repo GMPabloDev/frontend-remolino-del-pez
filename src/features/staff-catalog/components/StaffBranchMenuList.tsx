@@ -346,7 +346,7 @@ function formatPrice(price: string): string {
 }
 
 function getBranchStatusLabel(
-	status: StaffBranchDish["branchConfiguration"]["status"],
+	status: NonNullable<StaffBranchDish["branchConfiguration"]>["status"],
 ): string {
 	return status === "available"
 		? "Disponible"
