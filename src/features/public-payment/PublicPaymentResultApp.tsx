@@ -1,28 +1,51 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { usePublicBranchesQuery } from "../public-api/query/public-queries";
 import { PublicQueryProvider } from "../public-api/query/public-query-client";
+import { removePublicCart } from "../public-cart/lib/public-cart-storage";
 import type { PublicBranch } from "../public-discovery/contracts/public-discovery.schemas";
 import type { StoredPublicReservation } from "../public-reservation/contracts/public-reservation.schemas";
-import { readPublicReservation } from "../public-reservation/lib/public-reservation-storage";
+import {
+	readPublicReservation,
+	removePublicReservation,
+} from "../public-reservation/lib/public-reservation-storage";
 import { PublicPaymentConfirmation } from "./components/PublicPaymentConfirmation";
 import { PublicPaymentResultState } from "./components/PublicPaymentResultState";
 import { PublicPaymentWaiting } from "./components/PublicPaymentWaiting";
 import type {
 	PublicCheckoutReturn,
+	PublicPaymentStatus,
 	StoredPublicPaymentConfirmation,
 } from "./contracts/public-payment.schemas";
-import { matchesPublicCheckoutReturnReservation } from "./lib/public-payment-contracts";
+import {
+	currentPublicPaymentConfirmationSchema,
+	PUBLIC_PAYMENT_VERSION,
+	publicCheckoutReturnSchema,
+	storedPublicPaymentConfirmationSchema,
+} from "./contracts/public-payment.schemas";
+import {
+	isAllowedPublicCheckoutUrl,
+	matchesPublicCheckoutReservation,
+	matchesPublicCheckoutReturnReservation,
+} from "./lib/public-payment-contracts";
 import { getPublicPaymentErrorPresentation } from "./lib/public-payment-errors";
 import type { PublicPaymentState } from "./lib/public-payment-state";
 import { classifyPublicPaymentStatus } from "./lib/public-payment-state";
 import {
+	getPublicPaymentConfirmationKey,
 	readCurrentPublicPaymentConfirmation,
 	readPublicCheckoutReturn,
 	readPublicPaymentConfirmation,
+	removePublicCheckoutReturn,
+	writeCurrentPublicPaymentConfirmation,
+	writePublicCheckoutReturn,
+	writePublicPaymentConfirmation,
 } from "./lib/public-payment-storage";
-import { usePublicPaymentStatusQuery } from "./query/public-payment-query";
+import {
+	useCreatePublicCheckoutMutation,
+	usePublicPaymentStatusQuery,
+} from "./query/public-payment-query";
 
 export function PublicPaymentResultApp() {
 	return (
@@ -54,6 +77,10 @@ function PublicPaymentResultContent() {
 		null,
 	);
 	const [pollingError, setPollingError] = useState<string | null>(null);
+	const [checkoutError, setCheckoutError] = useState<string | null>(null);
+	const [confirmationStorageWarning, setConfirmationStorageWarning] =
+		useState(false);
+	const checkoutMutation = useCreatePublicCheckoutMutation();
 	const paymentStatusQueryInput =
 		context.kind === "waiting"
 			? {
@@ -66,6 +93,84 @@ function PublicPaymentResultContent() {
 	const paymentStatusQuery = usePublicPaymentStatusQuery(
 		paymentStatusQueryInput,
 		false,
+	);
+
+	const completeConfirmation = useCallback(
+		(nextStatus: PublicPaymentStatus) => {
+			if (context.kind !== "waiting" || nextStatus.confirmedAt === null) {
+				return;
+			}
+
+			const savedAt = new Date().toISOString();
+			const confirmationResult =
+				storedPublicPaymentConfirmationSchema.safeParse({
+					...context.reservation,
+					version: PUBLIC_PAYMENT_VERSION,
+					status: "confirmed",
+					confirmedAt: nextStatus.confirmedAt,
+					savedAt,
+				});
+
+			const clearPendingContext = () => {
+				removePublicReservation(
+					context.reservation.restaurantSlug,
+					context.reservation.branchSlug,
+				);
+				removePublicCheckoutReturn();
+				removePublicCart(
+					context.reservation.restaurantSlug,
+					context.reservation.branchSlug,
+				);
+			};
+
+			if (!confirmationResult.success) {
+				clearPendingContext();
+				setConfirmationStorageWarning(true);
+				setContext({
+					kind: "invalid",
+					reason:
+						"El pago fue confirmado, pero no pudimos preparar su resumen local. Conservamos el resultado solo durante esta vista.",
+				});
+				return;
+			}
+
+			const currentConfirmationResult =
+				currentPublicPaymentConfirmationSchema.safeParse({
+					version: PUBLIC_PAYMENT_VERSION,
+					restaurantSlug: confirmationResult.data.restaurantSlug,
+					branchSlug: confirmationResult.data.branchSlug,
+					reservationId: confirmationResult.data.id,
+					confirmationKey: getPublicPaymentConfirmationKey(
+						confirmationResult.data.restaurantSlug,
+						confirmationResult.data.branchSlug,
+					),
+					savedAt,
+				});
+
+			const confirmationWrite = writePublicPaymentConfirmation(
+				confirmationResult.data,
+			);
+			const currentWrite = currentConfirmationResult.success
+				? writeCurrentPublicPaymentConfirmation(currentConfirmationResult.data)
+				: null;
+			const persisted =
+				confirmationWrite.persistence === "persistent" &&
+				currentWrite?.persistence === "persistent";
+
+			clearPendingContext();
+			setConfirmationStorageWarning(!persisted);
+			setPaymentState({
+				kind: "confirmed",
+				canRetryCheckout: false,
+				shouldContinuePolling: false,
+			});
+			setPollingError(null);
+			setContext({
+				kind: "confirmed",
+				confirmation: confirmationResult.data,
+			});
+		},
+		[context],
 	);
 
 	useEffect(() => {
@@ -120,6 +225,7 @@ function PublicPaymentResultContent() {
 	useEffect(() => {
 		if (context.kind !== "waiting") return;
 		const resultHint = context.hint;
+		const pendingReservation = context.reservation;
 
 		let disposed = false;
 		let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -127,6 +233,7 @@ function PublicPaymentResultContent() {
 
 		setPaymentState(null);
 		setPollingError(null);
+		setCheckoutError(null);
 
 		function clearScheduledRequest() {
 			if (timeoutId === null) return;
@@ -145,6 +252,19 @@ function PublicPaymentResultContent() {
 		function handleRequestError(error: unknown) {
 			const presentation = getPublicPaymentErrorPresentation(error);
 			setPollingError(presentation.message);
+			if (presentation.code === "PUBLIC_PAYMENT_NOT_FOUND") {
+				removePublicReservation(
+					pendingReservation.restaurantSlug,
+					pendingReservation.branchSlug,
+				);
+				removePublicCheckoutReturn();
+				setContext({
+					kind: "invalid",
+					reason:
+						"No encontramos una reserva accesible para este pago. Conservamos tu carrito para que puedas iniciar otra reserva.",
+				});
+				return;
+			}
 
 			if (
 				resultHint === "success" &&
@@ -174,6 +294,19 @@ function PublicPaymentResultContent() {
 				const nextState = classifyPublicPaymentStatus(result.data);
 				setPaymentState(nextState);
 
+				if (nextState.kind === "reservation_expired") {
+					removePublicReservation(
+						pendingReservation.restaurantSlug,
+						pendingReservation.branchSlug,
+					);
+					removePublicCheckoutReturn();
+				}
+
+				if (nextState.kind === "confirmed") {
+					completeConfirmation(result.data);
+					return;
+				}
+
 				if (resultHint === "success" && nextState.shouldContinuePolling) {
 					retryDelay = 2_000;
 					scheduleRequest(2_000);
@@ -202,7 +335,107 @@ function PublicPaymentResultContent() {
 			clearScheduledRequest();
 			document.removeEventListener("visibilitychange", handleVisibilityChange);
 		};
-	}, [context, paymentStatusQuery.refetch]);
+	}, [completeConfirmation, context, paymentStatusQuery.refetch]);
+
+	function retryCheckout() {
+		if (context.kind !== "waiting") return;
+
+		const pendingReservation = context.reservation;
+		if (Date.parse(pendingReservation.expiresAt) <= Date.now()) {
+			removePublicReservation(
+				pendingReservation.restaurantSlug,
+				pendingReservation.branchSlug,
+			);
+			removePublicCheckoutReturn();
+			setContext({
+				kind: "invalid",
+				reason:
+					"La reserva venció. Conservamos tu carrito para que puedas iniciar otra reserva.",
+			});
+			return;
+		}
+
+		setCheckoutError(null);
+		setPollingError(null);
+		setPaymentState(null);
+		checkoutMutation.mutate(
+			{
+				restaurantSlug: pendingReservation.restaurantSlug,
+				branchSlug: pendingReservation.branchSlug,
+				reservationId: pendingReservation.id,
+				checkoutToken: pendingReservation.checkoutToken,
+			},
+			{
+				onError: (error) => {
+					const presentation = getPublicPaymentErrorPresentation(error);
+					if (presentation.code === "RESERVATION_ALREADY_CONFIRMED") {
+						setContext((current) =>
+							current.kind === "waiting" ? { ...current } : current,
+						);
+						return;
+					}
+					if (
+						presentation.code === "PUBLIC_PAYMENT_NOT_FOUND" ||
+						presentation.code === "RESERVATION_EXPIRED"
+					) {
+						removePublicReservation(
+							pendingReservation.restaurantSlug,
+							pendingReservation.branchSlug,
+						);
+						removePublicCheckoutReturn();
+						setContext({
+							kind: "invalid",
+							reason:
+								presentation.code === "RESERVATION_EXPIRED"
+									? "La reserva venció. Conservamos tu carrito para que puedas iniciar otra reserva."
+									: "No encontramos una reserva accesible para este pago. Conservamos tu carrito para que puedas iniciar otra reserva.",
+						});
+						return;
+					}
+					setCheckoutError(presentation.message);
+				},
+				onSuccess: (checkout) => {
+					if (!matchesPublicCheckoutReservation(checkout, pendingReservation)) {
+						setCheckoutError(
+							"La sesión de pago no coincide con tu reserva. No realizamos la redirección.",
+						);
+						return;
+					}
+					if (!isAllowedPublicCheckoutUrl(checkout.checkoutUrl)) {
+						setCheckoutError(
+							"El proveedor devolvió una dirección de pago no segura. No realizamos la redirección.",
+						);
+						return;
+					}
+
+					const markerResult = publicCheckoutReturnSchema.safeParse({
+						version: PUBLIC_PAYMENT_VERSION,
+						restaurantSlug: pendingReservation.restaurantSlug,
+						branchSlug: pendingReservation.branchSlug,
+						reservationId: pendingReservation.id,
+						paymentAttemptId: checkout.paymentAttemptId,
+						initiatedAt: new Date().toISOString(),
+						reservationExpiresAt: pendingReservation.expiresAt,
+					});
+					if (!markerResult.success) {
+						setCheckoutError(
+							"No pudimos preparar el retorno seguro del pago. Conservamos tu reserva.",
+						);
+						return;
+					}
+
+					const writeResult = writePublicCheckoutReturn(markerResult.data);
+					if (writeResult.persistence !== "persistent") {
+						setCheckoutError(
+							"No pudimos conservar el contexto para volver desde Stripe. Conservamos tu reserva; inténtalo nuevamente.",
+						);
+						return;
+					}
+					window.location.assign(checkout.checkoutUrl);
+				},
+			},
+		);
+	}
 
 	const branch = getContextBranch(context, branchesQuery.data);
 
@@ -225,9 +458,94 @@ function PublicPaymentResultContent() {
 				/>
 			) : null}
 
-			{context.kind === "waiting" ? (
+			{context.kind === "waiting" && checkoutError ? (
+				<PublicPaymentResultState
+					description={checkoutError}
+					onPrimaryAction={retryCheckout}
+					primaryActionLabel="Intentar pago nuevamente"
+					secondaryActionLabel="Volver al menú"
+					onSecondaryAction={() =>
+						window.location.assign(getBranchMenuHref(context.marker.branchSlug))
+					}
+					title="No pudimos iniciar el nuevo intento"
+					variant="destructive"
+				/>
+			) : null}
+
+			{context.kind === "waiting" &&
+			!checkoutError &&
+			paymentState?.kind === "retryable_attempt" ? (
+				<PublicPaymentResultState
+					description="El intento de pago terminó, pero la reserva puede seguir vigente. Puedes volver a intentarlo sin crear otra reserva."
+					onPrimaryAction={retryCheckout}
+					primaryActionLabel="Intentar pago nuevamente"
+					secondaryActionLabel="Volver al menú"
+					onSecondaryAction={() =>
+						window.location.assign(getBranchMenuHref(context.marker.branchSlug))
+					}
+					title="El intento de pago terminó"
+				/>
+			) : null}
+
+			{context.kind === "waiting" &&
+			!checkoutError &&
+			paymentState?.kind === "reservation_expired" ? (
+				<PublicPaymentResultState
+					description="La reserva venció. Conservamos tu carrito para que puedas iniciar otra reserva."
+					onPrimaryAction={() =>
+						window.location.assign(getBranchMenuHref(context.marker.branchSlug))
+					}
+					primaryActionLabel="Volver al menú"
+					secondaryActionLabel="Ir al inicio"
+					onSecondaryAction={() => window.location.assign("/")}
+					title="La reserva venció"
+					variant="destructive"
+				/>
+			) : null}
+
+			{context.kind === "waiting" &&
+			!checkoutError &&
+			paymentState?.kind === "refund" ? (
+				<PublicPaymentResultState
+					description={getBranchContactMessage(branch)}
+					onPrimaryAction={() =>
+						window.location.assign(getBranchMenuHref(context.marker.branchSlug))
+					}
+					primaryActionLabel="Volver al menú"
+					secondaryActionLabel="Ir al inicio"
+					onSecondaryAction={() => window.location.assign("/")}
+					title="El pago requiere atención"
+				/>
+			) : null}
+
+			{context.kind === "waiting" &&
+			!checkoutError &&
+			paymentState?.kind === "inconsistent" ? (
+				<PublicPaymentResultState
+					description="Recibimos un estado que no podemos validar de forma segura. No iniciaremos otro cobro automáticamente."
+					onPrimaryAction={() =>
+						setContext((current) =>
+							current.kind === "waiting" ? { ...current } : current,
+						)
+					}
+					primaryActionLabel="Consultar nuevamente"
+					secondaryActionLabel="Volver al menú"
+					onSecondaryAction={() =>
+						window.location.assign(getBranchMenuHref(context.marker.branchSlug))
+					}
+					title="No pudimos validar el pago"
+					variant="destructive"
+				/>
+			) : null}
+
+			{context.kind === "waiting" &&
+			!checkoutError &&
+			(paymentState === null ||
+				paymentState.kind === "waiting_confirmation") ? (
 				<PublicPaymentWaiting
-					isRetrying={paymentStatusQuery.isFetching}
+					isRetrying={
+						paymentStatusQuery.isFetching || checkoutMutation.isPending
+					}
 					message={getWaitingMessage(context.hint, paymentState, pollingError)}
 					onRetry={
 						pollingError || context.hint !== "success"
@@ -246,6 +564,7 @@ function PublicPaymentResultContent() {
 				<PublicPaymentConfirmation
 					branchName={branch?.name}
 					confirmation={context.confirmation}
+					storageWarning={confirmationStorageWarning}
 					onGoHome={() => window.location.assign("/")}
 					onReturnToMenu={() =>
 						window.location.assign(
@@ -272,6 +591,21 @@ function getContextBranch(
 	return branchSlug
 		? branches?.find((branch) => branch.branchSlug === branchSlug)
 		: undefined;
+}
+
+function getBranchMenuHref(branchSlug: string): string {
+	return `/menu?branch=${encodeURIComponent(branchSlug)}`;
+}
+
+function getBranchContactMessage(branch: PublicBranch | undefined): string {
+	if (!branch) {
+		return "El pago requiere revisión manual. Contacta a la sucursal para recibir asistencia.";
+	}
+
+	const contact = branch.email
+		? `${branch.phone} o ${branch.email}`
+		: branch.phone;
+	return `El pago requiere revisión manual. Contacta a ${branch.name} en ${contact}. No iniciaremos otro cobro.`;
 }
 
 function readPaymentReturnHint(search: string): PaymentReturnHint {

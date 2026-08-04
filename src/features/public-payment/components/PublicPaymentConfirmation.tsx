@@ -19,6 +19,7 @@ interface PublicPaymentConfirmationProps {
 	confirmation: StoredPublicPaymentConfirmation;
 	onGoHome(): void;
 	onReturnToMenu(): void;
+	storageWarning?: boolean;
 }
 
 export function PublicPaymentConfirmation({
@@ -26,6 +27,7 @@ export function PublicPaymentConfirmation({
 	confirmation,
 	onGoHome,
 	onReturnToMenu,
+	storageWarning = false,
 }: PublicPaymentConfirmationProps) {
 	const dateLabel = formatReservationDateLabel(
 		reservationDateToCalendarDate(confirmation.date),
@@ -55,6 +57,16 @@ export function PublicPaymentConfirmation({
 					La confirmación por correo se procesa por separado y puede tardar.
 				</AlertDescription>
 			</Alert>
+
+			{storageWarning ? (
+				<Alert className="mt-4" variant="destructive">
+					<AlertTitle>No pudimos guardar este resumen</AlertTitle>
+					<AlertDescription>
+						La confirmación permanecerá visible mientras esta pestaña siga
+						abierta, pero podría perderse al recargar.
+					</AlertDescription>
+				</Alert>
+			) : null}
 
 			<dl className="mt-6 grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-3">
 				<div>
