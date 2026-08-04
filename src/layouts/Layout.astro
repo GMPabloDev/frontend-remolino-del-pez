@@ -2,13 +2,15 @@
 import "../styles/global.css";
 
 interface Props {
-	title?: string;
 	description?: string;
+	robots?: string;
+	title?: string;
 }
 
 const {
-	title = "El Molino del Pez · Menú",
 	description = "Consulta la carta pública de El Molino del Pez.",
+	robots,
+	title = "El Molino del Pez · Menú",
 } = Astro.props;
 ---
 
@@ -18,6 +20,7 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
+    {robots ? <meta name="robots" content={robots} /> : null}
     <meta name="theme-color" content="#12324a" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />

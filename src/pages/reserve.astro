@@ -1,0 +1,47 @@
+---
+import { restaurantBrand } from "../config/restaurant-brand";
+import { PublicReservationApp } from "../features/public-reservation/PublicReservationApp";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title={`${restaurantBrand.name} · Reserva temporal`}
+  description={`Consulta disponibilidad y crea una reserva temporal en ${restaurantBrand.name}.`}
+  robots="noindex, nofollow"
+>
+  <header class="mx-auto flex max-w-6xl items-center justify-between gap-5 px-5 pb-8 pt-6 sm:px-8 sm:pb-10 sm:pt-8 lg:px-12">
+    <a class="group inline-flex items-center gap-3 rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25" href="/">
+      <span class="grid size-14 place-items-center overflow-hidden rounded-2xl bg-white shadow-[0_12px_30px_rgba(18,50,74,0.12)] transition-transform duration-300 group-hover:-rotate-3 sm:size-16">
+        <img class="size-full object-cover" src={restaurantBrand.logoPath} alt="" />
+      </span>
+      <span class="hidden sm:block">
+        <span class="block font-heading text-xl font-semibold tracking-[-0.04em] text-[#12324a]">{restaurantBrand.name}</span>
+        <span class="mt-0.5 block text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#12324a]/50">{restaurantBrand.slogan}</span>
+      </span>
+      <span class="sr-only">Ir al inicio</span>
+    </a>
+    <a class="rounded-full px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#12324a]/65 underline decoration-[#e76832]/50 decoration-2 underline-offset-4 transition-colors hover:text-[#e76832] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25" href="/">
+      Cambiar sucursal
+    </a>
+  </header>
+
+  <section class="mx-auto max-w-3xl px-5 pb-4 sm:px-8">
+    <p class="mb-4 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.25em] text-[#e76832]">
+      <span class="h-px w-10 bg-[#e76832]" aria-hidden="true"></span>
+      Reserva temporal
+    </p>
+    <h1 class="font-heading text-[clamp(2.8rem,8vw,5.5rem)] font-semibold leading-[0.9] tracking-[-0.08em] text-[#12324a]">
+      Encuentra tu <em class="font-normal text-[#e76832]">momento</em> en la mesa.
+    </h1>
+    <p class="mt-5 max-w-2xl text-base leading-7 text-[#12324a]/70">
+      Consulta un horario, confirma tus datos y mantén tu selección bloqueada temporalmente.
+    </p>
+  </section>
+
+  <PublicReservationApp client:load />
+
+  <footer class="mx-auto mt-8 flex max-w-6xl flex-col gap-3 border-t border-[#12324a]/15 px-5 py-8 text-xs text-[#12324a]/55 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
+    <p class="font-heading text-lg font-semibold tracking-[-0.03em] text-[#12324a]">{restaurantBrand.name}</p>
+    <p>El pago se integrará en un siguiente paso.</p>
+  </footer>
+</Layout>
