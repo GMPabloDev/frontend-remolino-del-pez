@@ -25,6 +25,7 @@ import {
 } from "./lib/public-cart-reconciliation";
 import {
 	addPublicCartItem,
+	type CartMutationReason,
 	type CartMutationResult,
 	clearPublicCart,
 	decrementPublicCartItem,
@@ -47,6 +48,7 @@ interface PublicCartProviderProps extends PropsWithChildren {
 interface PublicCartContextValue {
 	items: PublicCartItem[];
 	totals: PublicCartTotals;
+	announcement: string;
 	isRestoring: boolean;
 	persistence: PublicCartPersistence;
 	persistenceWarning: boolean;
@@ -67,6 +69,7 @@ export function PublicCartProvider({
 	children,
 }: PublicCartProviderProps) {
 	const [items, setItems] = useState<PublicCartItem[]>([]);
+	const [announcement, setAnnouncement] = useState("");
 	const [isRestoring, setIsRestoring] = useState(true);
 	const [persistence, setPersistence] =
 		useState<PublicCartPersistence>("persistent");
@@ -103,6 +106,7 @@ export function PublicCartProvider({
 			setItems(
 				result.cart ? markPublicCartItemsUnverified(result.cart.items) : [],
 			);
+			setAnnouncement("Tu selección se actualizó en otra pestaña.");
 		}
 
 		window.addEventListener("storage", handleStorage);
@@ -115,6 +119,14 @@ export function PublicCartProvider({
 			availability: PublicCartItem["availability"] = "unverified",
 			updatedDish?: PublicDish,
 		): CartMutationResult => {
+			const mutationAnnouncement = getMutationAnnouncement(
+				mutation.reason,
+				items,
+				mutation.items,
+				updatedDish?.name,
+			);
+			setAnnouncement(mutationAnnouncement);
+
 			if (!mutation.changed) return mutation;
 
 			const nextItems = mutation.items.map((item) => {
@@ -203,6 +215,14 @@ export function PublicCartProvider({
 			if (!areStoredItemsEqual(currentStoredItems, toStoredItems(nextItems))) {
 				persistItems(nextItems);
 			}
+			const reconciliationAnnouncement = getReconciliationAnnouncement(
+				reconciliation,
+				items,
+				nextItems,
+			);
+			if (reconciliationAnnouncement) {
+				setAnnouncement(reconciliationAnnouncement);
+			}
 
 			return reconciliation;
 		},
@@ -213,8 +233,11 @@ export function PublicCartProvider({
 		setItems((currentItems) =>
 			currentItems.map((item) => ({
 				...item,
-				availability: "unverified",
+				availability: "unverified" as const,
 			})),
+		);
+		setAnnouncement(
+			"La disponibilidad de tu selección está pendiente de verificación.",
 		);
 	}, []);
 
@@ -223,6 +246,8 @@ export function PublicCartProvider({
 		() => ({
 			items,
 			totals,
+			announcement,
+
 			isRestoring,
 			persistence,
 			persistenceWarning: persistence === "memory",
@@ -236,6 +261,7 @@ export function PublicCartProvider({
 		}),
 		[
 			addItem,
+			announcement,
 			clearCart,
 			decrementItem,
 			incrementItem,
@@ -289,4 +315,78 @@ function areStoredItemsEqual(
 	secondItems: ReadonlyArray<StoredPublicCartItem>,
 ): boolean {
 	return JSON.stringify(firstItems) === JSON.stringify(secondItems);
+}
+
+function getMutationAnnouncement(
+	reason: CartMutationReason,
+	previousItems: ReadonlyArray<PublicCartItem>,
+	nextItems: ReadonlyArray<StoredPublicCartItem>,
+	updatedDishName?: string,
+): string {
+	const changedItem = nextItems.find((item) => {
+		const previousItem = previousItems.find(
+			(currentItem) => currentItem.dishId === item.dishId,
+		);
+		return previousItem?.quantity !== item.quantity;
+	});
+	const removedItem = previousItems.find(
+		(item) => !nextItems.some((nextItem) => nextItem.dishId === item.dishId),
+	);
+	const itemName =
+		updatedDishName ?? changedItem?.name ?? removedItem?.name ?? "este plato";
+	const quantity = changedItem?.quantity;
+
+	switch (reason) {
+		case "added":
+			return `Añadido ${itemName} al carrito.`;
+		case "incremented":
+			return `Cantidad de ${itemName}: ${quantity ?? 1}.`;
+		case "decremented":
+			return `Cantidad de ${itemName}: ${quantity ?? 1}.`;
+		case "removed":
+			return `Eliminado ${itemName} del carrito.`;
+		case "cleared":
+			return "Carrito vacío.";
+		case "quantity-limit":
+			return `No se puede aumentar ${itemName}: máximo 99 unidades.`;
+		case "item-limit":
+			return "No se pueden añadir más de 50 platos distintos.";
+		case "unavailable":
+			return `${itemName} no está disponible para selección.`;
+		case "item-not-found":
+			return "El plato ya no está en el carrito.";
+		case "minimum-quantity":
+			return `La cantidad mínima de ${itemName} es 1. Usa Eliminar para retirarlo.`;
+	}
+}
+
+function getReconciliationAnnouncement(
+	reconciliation: CartReconciliationResult,
+	previousItems: ReadonlyArray<PublicCartItem>,
+	nextItems: ReadonlyArray<PublicCartItem>,
+): string {
+	const getNames = (dishIds: ReadonlyArray<string>) =>
+		dishIds
+			.map(
+				(dishId) =>
+					nextItems.find((item) => item.dishId === dishId)?.name ??
+					previousItems.find((item) => item.dishId === dishId)?.name,
+			)
+			.filter((name): name is string => Boolean(name));
+	const messages: string[] = [];
+	const changedPriceNames = getNames(reconciliation.changedPriceDishIds);
+	const soldOutNames = getNames(reconciliation.soldOutDishIds);
+	const removedNames = getNames(reconciliation.removedDishIds);
+
+	if (changedPriceNames.length > 0) {
+		messages.push(`Precio actualizado para ${changedPriceNames.join(", ")}.`);
+	}
+	if (soldOutNames.length > 0) {
+		messages.push(`${soldOutNames.join(", ")} ahora está agotado.`);
+	}
+	if (removedNames.length > 0) {
+		messages.push(`${removedNames.join(", ")} ya no está publicado.`);
+	}
+
+	return messages.join(" ");
 }

@@ -87,6 +87,11 @@ export function PublicCartItem({ item }: PublicCartItemProps) {
 					</AlertDescription>
 				</Alert>
 			) : null}
+			{item.availability === "unverified" ? (
+				<Badge className="mt-3" variant="outline">
+					No verificado
+				</Badge>
+			) : null}
 			{item.priceChanged ? (
 				<Badge className="mt-3" variant="outline">
 					Precio actualizado

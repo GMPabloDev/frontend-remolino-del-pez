@@ -28,10 +28,7 @@ export function PublicCartQuantityControl({
 			>
 				<Minus aria-hidden="true" />
 			</Button>
-			<span
-				aria-live="polite"
-				className="min-w-10 text-center text-sm font-semibold text-[#12324a]"
-			>
+			<span className="min-w-10 text-center text-sm font-semibold text-[#12324a]">
 				{quantity}
 			</span>
 			<Button

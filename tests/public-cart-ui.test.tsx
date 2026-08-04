@@ -48,6 +48,7 @@ describe("public cart UI", () => {
 			screen.getByRole("button", { name: "Añadir Causa de pollo al carrito" }),
 		);
 		expect(screen.getByText("En tu selección")).toBeTruthy();
+		expect(screen.getByText("Añadido Causa de pollo al carrito.")).toBeTruthy();
 		expect(screen.queryByText("Tu selección")).toBeNull();
 
 		await user.click(screen.getByRole("button", { name: /Abrir carrito/ }));
@@ -67,6 +68,7 @@ describe("public cart UI", () => {
 		expect(firstIncreaseButton).toBeTruthy();
 		await user.click(firstIncreaseButton as HTMLElement);
 		expect(screen.getAllByText("2").length).toBeGreaterThan(0);
+		expect(screen.getByText("Cantidad de Causa de pollo: 2.")).toBeTruthy();
 	});
 
 	test("does not allow adding sold-out dishes", () => {
