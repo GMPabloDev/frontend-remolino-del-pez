@@ -2,18 +2,29 @@ import type { z } from "zod";
 
 import { ApiClientError, parseApiErrorResponse } from "@/lib/api/api-error";
 
+export interface PublicJsonRequestOptions {
+	method?: RequestInit["method"];
+	body?: RequestInit["body"];
+	headers?: HeadersInit;
+}
+
 export async function requestPublicJson<T>(
 	baseUrl: string,
 	path: string,
 	schema: z.ZodType<T>,
 	networkMessage: string,
+	options: PublicJsonRequestOptions = {},
 ): Promise<T> {
 	const endpoint = new URL(path, `${baseUrl}/`);
 	let response: Response;
 
+	const headers = new Headers(options.headers);
+	headers.set("Accept", "application/json");
+
 	try {
 		response = await fetch(endpoint, {
-			headers: { Accept: "application/json" },
+			...options,
+			headers,
 		});
 	} catch {
 		throw new ApiClientError(0, "NETWORK_ERROR", networkMessage);
