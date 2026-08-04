@@ -8,6 +8,7 @@
 - [Formato de errores](#formato-de-errores)
 - [Códigos de error](#códigos-de-error)
 - [Autenticación y tokens](#autenticación-y-tokens)
+- [Autenticación de clientes](#autenticación-de-clientes)
 - [Convención de estados (casing)](#convención-de-estados-casing)
 - [Fechas y zona horaria](#fechas-y-zona-horaria)
 - [Moneda y montos](#moneda-y-montos)
@@ -21,7 +22,7 @@
 http://localhost:3000
 ```
 
-Todas las rutas de gestión requieren `Authorization: Bearer <accessToken>`. Las rutas públicas (`/public/**`) y los webhooks no requieren sesión interna.
+Todas las rutas de gestión requieren `Authorization: Bearer <accessToken>`. Las rutas públicas (`/public/**`) y los webhooks no requieren sesión interna. `GET /customer-auth/me` requiere un access token de cliente separado.
 
 ---
 
@@ -53,7 +54,10 @@ Regla para el frontend: ante un `401 UNAUTHORIZED` intenta el flujo de refresh (
 | 400 | `INVALID_STRIPE_SIGNATURE` | Firma de webhook Stripe inválida |
 | 401 | `UNAUTHORIZED` | Token requerido, inválido o expirado |
 | 401 | `INVALID_CREDENTIALS` | Email o contraseña incorrectos (también si el email no existe o el usuario está inactivo) |
-| 401 | `INVALID_REFRESH_TOKEN` | Refresh token inválido o expirado |
+| 401 | `INVALID_REFRESH_TOKEN` | Refresh token interno inválido o expirado |
+| 401 | `INVALID_MAGIC_LINK` | Magic link inexistente, vencido, consumido o invalidado |
+| 401 | `INVALID_CUSTOMER_REFRESH_TOKEN` | Refresh token de cliente inválido, vencido, reemplazado o revocado |
+| 401 | `CUSTOMER_AUTH_REQUIRED` | Access token de cliente ausente, inválido, vencido o sin sesión activa |
 | 403 | `FORBIDDEN` | Sin permisos para la acción o la sucursal |
 | 404 | `RESTAURANT_NOT_FOUND` | Restaurante no existe |
 | 404 | `BRANCH_NOT_FOUND` | Sucursal no existe o no pertenece al restaurante |
@@ -109,6 +113,35 @@ Regla para el frontend: ante un `401 UNAUTHORIZED` intenta el flujo de refresh (
   - El usuario hace logout.
 - `401 INVALID_CREDENTIALS` es la misma respuesta si el email no existe, la contraseña es incorrecta o el usuario está inactivo: no filtres información.
 
+### Autenticación de clientes
+
+El flujo de clientes no usa contraseñas ni comparte sesiones con trabajadores:
+
+1. Después de un pago confirmado, el backend crea o reutiliza la cuenta y envía un correo con un magic link de un solo uso.
+2. `POST /public/customer-auth/magic-links/exchange` intercambia el enlace por `accessToken`, `refreshToken` y el perfil mínimo.
+3. El access token de cliente es JWT con audiencia `customer`, dura 25 minutos y se envía como `Authorization: Bearer <customerAccessToken>`.
+4. `POST /customer-auth/refresh` rota el refresh token y entrega un par nuevo. Serializa los refresh para evitar reutilización accidental.
+5. Si se reutiliza un refresh token ya rotado, el backend revoca todas las sesiones del cliente.
+6. `POST /customer-auth/logout` revoca solo la sesión indicada y siempre responde `204`.
+7. Los access tokens de cliente nunca son válidos en rutas administrativas.
+
+El perfil devuelto contiene únicamente `fullName`, `email`, `phone` y `restaurantSlug`. La consulta de reservas queda para una spec posterior.
+
+### Checkout token después del pago
+
+- Mientras la reserva está `pending_payment`, el `checkoutToken` conserva las reglas públicas vigentes.
+- Una reserva confirmada acepta su token hasta antes de `confirmedAt + 24 horas`.
+- Desde `confirmedAt + 24 horas`, checkout y estado de pago responden `404 PUBLIC_PAYMENT_NOT_FOUND` sin revelar la reserva.
+- Después de esa ventana el acceso del cliente se realiza mediante customer-auth.
+
+### Correos de clientes
+
+- Los correos automáticos se envían después del commit de confirmación mediante SMTP.
+- El correo combina agradecimiento, resumen de reserva y magic link.
+- El correo tiene versiones HTML y texto plano en español.
+- Un fallo SMTP no revierte el pago, la reserva ni la cuenta.
+- `SMTP_PASS` debe ser una contraseña de aplicación de Gmail y nunca se expone en logs, respuestas o documentación real.
+
 ---
 
 ## Convención de estados (casing)
@@ -134,7 +167,7 @@ Los **payloads de entrada** también usan minúsculas (`{"status": "active"}`, `
 
 - **Zona horaria de negocio: `America/Lima` (UTC-5).**
 - Las rutas públicas de reservas (`availability`, `POST /temporary`) interpretan `date` (`YYYY-MM-DD`) y `time` (`HH:mm`) como **hora local de Lima**, no UTC. El frontend debe enviar la fecha/hora que el usuario ve en Lima (no convertir a UTC).
-- Los campos `createdAt`, `updatedAt`, `expiresAt`, `confirmedAt`, `reservationExpiresAt`, `checkoutExpiresAt` vienen como **ISO 8601 con offset (UTC)**.
+- Los campos `createdAt`, `updatedAt`, `expiresAt`, `confirmedAt`, `reservationExpiresAt`, `checkoutExpiresAt`, `emailVerifiedAt` vienen como **ISO 8601 con offset (UTC)**.
 - La reserva expira 15 minutos después de crearse. Para el countdown del frontend, usa `expiresAt` de la respuesta; no asumas que el reloj del dispositivo está sincronizado.
 
 ## Moneda y montos

@@ -1,6 +1,6 @@
-# 01 — API pública (frontend de clientes)
+# 01 — API pública y autenticación de clientes (frontend de clientes)
 
-> Sin autenticación. Este es el flujo que sigue la app del cliente para descubrir, reservar y pagar.
+> El descubrimiento, la reserva y el pago son públicos. El acceso a la cuenta usa customer-auth y no comparte sesiones con trabajadores.
 
 ## Flujo recomendado (de extremo a extremo)
 
@@ -10,6 +10,8 @@
 4. **Reservar**: `POST .../reservations/temporary` con `Idempotency-Key` → obtiene la reserva `pending_payment` y el `checkoutToken`.
 5. **Pagar**: `POST .../reservations/:reservationId/checkout` (Bearer = `checkoutToken`) → redirige al usuario a `checkoutUrl` de Stripe.
 6. **Regreso y confirmación**: tras el redirect (success/cancel), consulta `GET .../reservations/:reservationId/payment` **en polling** hasta que `reservationStatus` sea `confirmed` (o `payment.status` deje de ser `pending`). No existe un endpoint de confirmación manual: la confirma el webhook de Stripe de forma asíncrona.
+7. **Correo postpago**: cuando el webhook confirma el pago, el backend crea o reutiliza la cuenta y envía un correo combinado de agradecimiento, resumen y acceso.
+8. **Acceso**: el cliente intercambia el magic link por tokens, o solicita otro enlace desde el endpoint manual si necesita volver a entrar.
 
 Contenido:
 
@@ -20,6 +22,11 @@ Contenido:
 - [POST .../reservations/temporary](#post-reservationstemporary)
 - [POST .../reservations/:reservationId/checkout](#post-reservationsreservationidcheckout)
 - [GET .../reservations/:reservationId/payment](#get-reservationsreservationidpayment)
+- [POST /public/restaurants/:restaurantSlug/customer-auth/magic-links](#post-publicrestaurantsrestaurantslugcustomer-authmagic-links)
+- [POST /public/customer-auth/magic-links/exchange](#post-publiccustomer-authmagic-linksexchange)
+- [POST /customer-auth/refresh](#post-customer-authrefresh)
+- [POST /customer-auth/logout](#post-customer-authlogout)
+- [GET /customer-auth/me](#get-customer-authme)
 - [POST /webhooks/stripe](#post-webhooksstripe)
 - [Gotchas de pago y expiración](#gotchas-de-pago-y-expiracion)
 
@@ -286,7 +293,7 @@ Crea o reutiliza una Stripe Checkout Session. Body vacío. El importe y moneda s
 - `checkoutExpiresAt` puede ser `null` si el proveedor no reporta expiración; trátalo como "desconocido", no como error.
 
 **Errores:**
-- `404 PUBLIC_PAYMENT_NOT_FOUND` (reserva no encontrada, token inválido o token ausente)
+- `404 PUBLIC_PAYMENT_NOT_FOUND` (reserva no encontrada, token inválido, token ausente o checkout token confirmado con más de 24 horas)
 - `409 RESERVATION_EXPIRED`
 - `409 RESERVATION_ALREADY_CONFIRMED`
 - `503 PAYMENT_PROVIDER_UNAVAILABLE`
@@ -331,6 +338,115 @@ Consulta el estado de la reserva y su último intento de pago. No expone URL de 
 
 ---
 
+## POST /public/restaurants/:restaurantSlug/customer-auth/magic-links
+
+Solicita un nuevo enlace de acceso para una cuenta existente del restaurante. No requiere autenticación.
+
+**Request:**
+```json
+{
+  "email": "ana@example.com"
+}
+```
+
+**Response 202:**
+```json
+{
+  "message": "Si existe una cuenta elegible, enviaremos un enlace de acceso."
+}
+```
+
+La misma respuesta se devuelve si el restaurante, correo o cuenta no existen, o si la solicitud está dentro del cooldown de un minuto. Una solicitud aceptada invalida los magic links anteriores no consumidos. Los correos automáticos enviados tras pagos confirmados no están sujetos a este cooldown.
+
+**Errores:** `400 VALIDATION_ERROR` si el slug o email tienen formato inválido.
+
+---
+
+## POST /public/customer-auth/magic-links/exchange
+
+Intercambia un magic link válido de un solo uso por una sesión de cliente. El frontend debe retirar el token de la URL con `history.replaceState` inmediatamente después del intercambio.
+
+**Request:**
+```json
+{
+  "token": "opaque-base64url-token"
+}
+```
+
+**Response 200:**
+```json
+{
+  "accessToken": "jwt",
+  "refreshToken": "opaque-token",
+  "customer": {
+    "fullName": "Ana Pérez",
+    "email": "ana@example.com",
+    "phone": "+51987654321",
+    "restaurantSlug": "central"
+  }
+}
+```
+
+El magic link vence en 15 minutos y solo puede consumirse una vez. El access token dura 25 minutos y el refresh token 30 días.
+
+**Errores:** `400 VALIDATION_ERROR`, `401 INVALID_MAGIC_LINK`.
+
+---
+
+## POST /customer-auth/refresh
+
+Rota el refresh token del cliente. El token usado queda invalidado inmediatamente.
+
+**Request:**
+```json
+{
+  "refreshToken": "opaque-token"
+}
+```
+
+**Response 200:** mismo formato que el intercambio del magic link, con un nuevo par de tokens.
+
+Si se reutiliza un refresh token reemplazado, se revocan todas las sesiones activas del cliente.
+
+**Errores:** `400 VALIDATION_ERROR`, `401 INVALID_CUSTOMER_REFRESH_TOKEN`.
+
+---
+
+## POST /customer-auth/logout
+
+Revoca únicamente la sesión asociada al refresh token. Es idempotente.
+
+**Request:**
+```json
+{
+  "refreshToken": "opaque-token"
+}
+```
+
+**Response 204:** sin contenido.
+
+---
+
+## GET /customer-auth/me
+
+Devuelve el perfil mínimo del cliente autenticado. Requiere `Authorization: Bearer <customerAccessToken>`.
+
+**Response 200:**
+```json
+{
+  "fullName": "Ana Pérez",
+  "email": "ana@example.com",
+  "phone": "+51987654321",
+  "restaurantSlug": "central"
+}
+```
+
+No lista reservas ni pagos.
+
+**Errores:** `401 CUSTOMER_AUTH_REQUIRED`.
+
+---
+
 ## POST /webhooks/stripe
 
 Recibe eventos de Stripe. Autenticado por `Stripe-Signature`. Procesa idempotentemente (`event.id` único). Eventos no utilizados responden `200` sin cambios.
@@ -359,5 +475,7 @@ stripe events resend <event-id>
 - **Expiración de la reserva:** 15 minutos tras su creación. Pasada `expiresAt`, `/checkout` responde `409 RESERVATION_EXPIRED`. Deshabilita el botón de pago con un countdown basado en `expiresAt`.
 - **`failed` / `expired` NO cancelan la reserva.** Si un intento de pago falla o expira, la reserva sigue `pending_payment` y se puede volver a llamar a `/checkout`: se creará un intento nuevo. No obligues al cliente a reservar de nuevo.
 - **Confirmación asíncrona:** no hay endpoint de confirmación. Tras regresar de Stripe (URL de éxito/cancel configuradas en el backend), haz polling a `GET .../payment` con un intervalo (ej. 2s) hasta que `reservationStatus` sea `confirmed` o `payment.status` sea `paid`/`failed`. Detén el polling al alcanzar `expiresAt`.
+- **Token postpago:** una reserva confirmada acepta su `checkoutToken` hasta antes de `confirmedAt + 24 horas`. Después, checkout y estado de pago responden `404 PUBLIC_PAYMENT_NOT_FOUND`; usa customer-auth.
+- **Correo postpago:** el webhook crea o vincula la cuenta y envía un correo HTML/texto con agradecimiento, resumen y magic link. Un fallo SMTP no revierte el pago ni la reserva.
 - **`confirmedAt`** pasa de `null` a ISO8601 cuando la reserva se confirma.
 - Si el cliente cancela en Stripe, el intento quedará `expired` por webhook; el polling terminará con `payment.status: "expired"` y podrás ofrecer reintentar.
