@@ -50,13 +50,27 @@ export interface CustomerAuthChannel {
 	subscribeSessionRefreshed(
 		listener: (authentication: CustomerSessionResponse) => void,
 	): () => void;
+	publishRefreshStarted(ownerId: string): void;
+	subscribeRefreshStarted(
+		listener: (message: CustomerRefreshStartedMessage) => void,
+	): () => void;
 	publishLogout(): void;
 	publishSessionInvalidated(): void;
 	subscribeInvalidation(listener: () => void): () => void;
 	close(): void;
 }
 
-type CustomerAuthMessage = SessionRefreshedMessage | AuthSignalMessage;
+export interface CustomerRefreshStartedMessage {
+	type: "refresh-started";
+	nonce: string;
+	ownerId: string;
+	timestamp: number;
+}
+
+type CustomerAuthMessage =
+	| SessionRefreshedMessage
+	| CustomerRefreshStartedMessage
+	| AuthSignalMessage;
 
 interface SessionRefreshedMessage {
 	type: "session-refreshed";
@@ -82,6 +96,9 @@ export function createCustomerAuthChannel(
 	const refreshedListeners = new Set<
 		(authentication: CustomerSessionResponse) => void
 	>();
+	const refreshStartedListeners = new Set<
+		(message: CustomerRefreshStartedMessage) => void
+	>();
 	const invalidationListeners = new Set<() => void>();
 	const handledNonces = new Set<string>();
 
@@ -101,6 +118,13 @@ export function createCustomerAuthChannel(
 
 			for (const listener of refreshedListeners) {
 				listener(result.data);
+			}
+			return;
+		}
+
+		if (message.type === "refresh-started") {
+			for (const listener of refreshStartedListeners) {
+				listener(message);
 			}
 			return;
 		}
@@ -159,6 +183,27 @@ export function createCustomerAuthChannel(
 			refreshedListeners.add(listener);
 			return () => refreshedListeners.delete(listener);
 		},
+		publishRefreshStarted(ownerId): void {
+			const message: CustomerRefreshStartedMessage = {
+				type: "refresh-started",
+				nonce: nonceFactory(),
+				ownerId,
+				timestamp: now(),
+			};
+
+			try {
+				channel?.postMessage(message);
+			} catch {
+				publishStorageSignal(storage, storageKey, message);
+				return;
+			}
+
+			publishStorageSignal(storage, storageKey, message);
+		},
+		subscribeRefreshStarted(listener): () => void {
+			refreshStartedListeners.add(listener);
+			return () => refreshStartedListeners.delete(listener);
+		},
 		publishLogout(): void {
 			publishSignal("logout");
 		},
@@ -174,6 +219,7 @@ export function createCustomerAuthChannel(
 			eventTarget?.removeEventListener("storage", onStorageEvent);
 			channel?.close();
 			refreshedListeners.clear();
+			refreshStartedListeners.clear();
 			invalidationListeners.clear();
 			handledNonces.clear();
 		},
@@ -200,7 +246,7 @@ export function createCustomerAuthChannel(
 function publishStorageSignal(
 	storage: StorageLike | null,
 	storageKey: string,
-	message: AuthSignalMessage,
+	message: CustomerRefreshStartedMessage | AuthSignalMessage,
 ): void {
 	if (!storage) {
 		return;
@@ -223,6 +269,14 @@ function isCustomerAuthMessage(value: unknown): value is CustomerAuthMessage {
 
 	if (message.type === "session-refreshed") {
 		return "authentication" in message;
+	}
+
+	if (message.type === "refresh-started") {
+		return (
+			typeof message.nonce === "string" &&
+			typeof message.ownerId === "string" &&
+			typeof message.timestamp === "number"
+		);
 	}
 
 	return (

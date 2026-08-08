@@ -13,10 +13,15 @@ import type {
 } from "../contracts/customer-auth.schemas";
 import {
 	type CustomerAuthChannel,
+	type CustomerRefreshStartedMessage,
 	createCustomerAuthChannel,
 } from "./customer-auth-channel";
 
 export const CUSTOMER_REFRESH_LOCK = "customer-auth:refresh-lock:v1";
+
+const REFRESH_ELECTION_DELAY_MS = 25;
+const REFRESH_WAIT_TIMEOUT_MS = 10_000;
+const REFRESH_ANNOUNCEMENT_TTL_MS = 10_000;
 
 export type CustomerSessionStatus =
 	| "checking"
@@ -49,6 +54,9 @@ interface CustomerSessionOptions {
 	authClient?: CustomerAuthBffClient;
 	refreshCoordinator?: RefreshCoordinator;
 	channel?: CustomerAuthChannel;
+	now?: () => number;
+	sleep?: (milliseconds: number) => Promise<void>;
+	ownerId?: string;
 }
 
 const anonymousSnapshot: CustomerSessionSnapshot = {
@@ -70,9 +78,18 @@ export function createCustomerSession(
 		options.refreshCoordinator ??
 		createRefreshCoordinator({ lockName: CUSTOMER_REFRESH_LOCK });
 	const channel = options.channel ?? createCustomerAuthChannel();
+	const now = options.now ?? Date.now;
+	const sleep = options.sleep ?? defaultSleep;
+	const ownerId = options.ownerId ?? createOwnerId();
 	const listeners = new Set<() => void>();
+	const refreshWaiters = new Set<
+		(authentication: CustomerSessionResponse) => void
+	>();
 	let snapshot: CustomerSessionSnapshot = checkingSnapshot;
 	let accessToken: string | null = null;
+	let latestAuthentication: CustomerSessionResponse | null = null;
+	let refreshVersion = 0;
+	let remoteRefreshStarted: CustomerRefreshStartedMessage | null = null;
 
 	const notify = (): void => {
 		for (const listener of listeners) {
@@ -90,6 +107,8 @@ export function createCustomerSession(
 		broadcast: boolean,
 	): CustomerSessionSnapshot => {
 		accessToken = authentication.accessToken;
+		latestAuthentication = authentication;
+		remoteRefreshStarted = null;
 		const nextSnapshot: CustomerSessionSnapshot = {
 			status: "authenticated",
 			customer: authentication.customer,
@@ -108,6 +127,8 @@ export function createCustomerSession(
 		status: "anonymous" | "unavailable" = "anonymous",
 	): void => {
 		accessToken = null;
+		latestAuthentication = null;
+		remoteRefreshStarted = null;
 		setSnapshot(
 			status === "anonymous"
 				? anonymousSnapshot
@@ -131,7 +152,23 @@ export function createCustomerSession(
 
 	const unsubscribeRefreshed = channel.subscribeSessionRefreshed(
 		(authentication) => {
+			refreshVersion += 1;
 			setAuthenticated(authentication, false);
+
+			for (const waiter of refreshWaiters) {
+				waiter(authentication);
+			}
+			refreshWaiters.clear();
+		},
+	);
+	const unsubscribeRefreshStarted = channel.subscribeRefreshStarted(
+		(message) => {
+			if (
+				message.ownerId !== ownerId &&
+				message.timestamp + REFRESH_ANNOUNCEMENT_TTL_MS >= now()
+			) {
+				remoteRefreshStarted = message;
+			}
 		},
 	);
 	const unsubscribeInvalidation = channel.subscribeInvalidation(() => {
@@ -154,10 +191,15 @@ export function createCustomerSession(
 			accessToken = null;
 
 			try {
-				const authentication = await refreshCoordinator.run(() =>
-					authClient.refresh(),
+				const beforeRefreshVersion = refreshVersion;
+				const authentication = await runCoordinatedRefresh(
+					beforeRefreshVersion,
+					() => authClient.refresh(),
 				);
-				return setAuthenticated(authentication, true);
+				return setAuthenticated(
+					authentication,
+					refreshVersion === beforeRefreshVersion,
+				);
 			} catch (error) {
 				if (isInvalidRefreshToken(error)) {
 					clearMemory();
@@ -174,10 +216,15 @@ export function createCustomerSession(
 		},
 		async refreshAccessToken(): Promise<string> {
 			try {
-				const authentication = await refreshCoordinator.run(() =>
-					authClient.refresh(),
+				const beforeRefreshVersion = refreshVersion;
+				const authentication = await runCoordinatedRefresh(
+					beforeRefreshVersion,
+					() => authClient.refresh(),
 				);
-				setAuthenticated(authentication, true);
+				setAuthenticated(
+					authentication,
+					refreshVersion === beforeRefreshVersion,
+				);
 				return authentication.accessToken;
 			} catch (error) {
 				if (isInvalidRefreshToken(error)) {
@@ -202,12 +249,69 @@ export function createCustomerSession(
 		},
 		destroy(): void {
 			unsubscribeRefreshed();
+			unsubscribeRefreshStarted();
 			unsubscribeInvalidation();
 			channel.close();
 			listeners.clear();
+			refreshWaiters.clear();
 			clearMemory();
 		},
 	};
+
+	async function runCoordinatedRefresh(
+		beforeRefreshVersion: number,
+		operation: () => Promise<CustomerSessionResponse>,
+	): Promise<CustomerSessionResponse> {
+		channel.publishRefreshStarted(ownerId);
+		await sleep(REFRESH_ELECTION_DELAY_MS);
+
+		if (refreshVersion > beforeRefreshVersion && latestAuthentication) {
+			return latestAuthentication;
+		}
+
+		const remote = remoteRefreshStarted;
+		if (
+			remote &&
+			remote.timestamp + REFRESH_ANNOUNCEMENT_TTL_MS >= now() &&
+			remote.ownerId < ownerId
+		) {
+			try {
+				return await waitForRemoteRefresh(beforeRefreshVersion);
+			} catch {
+				remoteRefreshStarted = null;
+			}
+		}
+
+		return refreshCoordinator.run(operation);
+	}
+
+	function waitForRemoteRefresh(
+		beforeRefreshVersion: number,
+	): Promise<CustomerSessionResponse> {
+		if (refreshVersion > beforeRefreshVersion && latestAuthentication) {
+			return Promise.resolve(latestAuthentication);
+		}
+
+		return new Promise((resolve, reject) => {
+			const timeout = setTimeout(() => {
+				refreshWaiters.delete(onRefresh);
+				reject(
+					new ApiClientError(
+						503,
+						"REFRESH_COORDINATION_TIMEOUT",
+						"No se pudo coordinar la renovación de la sesión.",
+					),
+				);
+			}, REFRESH_WAIT_TIMEOUT_MS);
+			const onRefresh = (authentication: CustomerSessionResponse): void => {
+				clearTimeout(timeout);
+				refreshWaiters.delete(onRefresh);
+				resolve(authentication);
+			};
+
+			refreshWaiters.add(onRefresh);
+		});
+	}
 }
 
 function isInvalidRefreshToken(error: unknown): error is ApiClientError {
@@ -215,4 +319,12 @@ function isInvalidRefreshToken(error: unknown): error is ApiClientError {
 		error instanceof ApiClientError &&
 		error.code === "INVALID_CUSTOMER_REFRESH_TOKEN"
 	);
+}
+
+function createOwnerId(): string {
+	return globalThis.crypto?.randomUUID?.() ?? `customer-refresh-${Date.now()}`;
+}
+
+function defaultSleep(milliseconds: number): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
