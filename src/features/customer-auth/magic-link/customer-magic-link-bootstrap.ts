@@ -81,7 +81,3 @@ function getTokenStore(): CustomerMagicLinkTokenStore {
 
 	return store;
 }
-
-if (typeof window !== "undefined") {
-	bootstrapCustomerMagicLink();
-}
