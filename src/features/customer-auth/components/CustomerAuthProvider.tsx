@@ -26,7 +26,14 @@ const CustomerAuthContext = createContext<CustomerAuthContextValue | null>(
 );
 let sharedCustomerSession: CustomerSessionController | null = null;
 
-export function CustomerAuthProvider({ children }: PropsWithChildren) {
+interface CustomerAuthProviderProps extends PropsWithChildren {
+	autoBootstrap?: boolean;
+}
+
+export function CustomerAuthProvider({
+	autoBootstrap = true,
+	children,
+}: CustomerAuthProviderProps) {
 	const [session] = useState(() => {
 		sharedCustomerSession ??= createCustomerSession();
 		return sharedCustomerSession;
@@ -40,10 +47,10 @@ export function CustomerAuthProvider({ children }: PropsWithChildren) {
 	);
 
 	useEffect(() => {
-		if (session.getSnapshot().status === "checking") {
+		if (autoBootstrap && session.getSnapshot().status === "checking") {
 			void session.bootstrap();
 		}
-	}, [session]);
+	}, [autoBootstrap, session]);
 
 	useEffect(() => {
 		if (
