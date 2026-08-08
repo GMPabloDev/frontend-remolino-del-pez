@@ -8,7 +8,7 @@ import {
 	staffAuthErrorResponse,
 	staffAuthNoContentResponse,
 } from "@/features/staff-auth/server/staff-auth-http";
-import { assertRequestOrigin } from "@/features/staff-auth/server/validate-request-origin";
+import { assertRequestOrigin } from "@/lib/server/validate-request-origin";
 
 export const prerender = false;
 

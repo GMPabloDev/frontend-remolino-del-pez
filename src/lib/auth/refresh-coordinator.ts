@@ -1,6 +1,6 @@
 import { ApiClientError } from "@/lib/api/api-error";
 
-export const STAFF_REFRESH_LOCK = "staff-auth:refresh-lock:v1";
+export const DEFAULT_REFRESH_LOCK = "auth:refresh-lock:v1";
 
 const DEFAULT_LEASE_DURATION_MS = 30_000;
 const DEFAULT_MAX_WAIT_MS = 10_000;
@@ -44,7 +44,7 @@ interface RefreshLease {
 export function createRefreshCoordinator(
 	options: RefreshCoordinatorOptions = {},
 ): RefreshCoordinator {
-	const lockName = options.lockName ?? STAFF_REFRESH_LOCK;
+	const lockName = options.lockName ?? DEFAULT_REFRESH_LOCK;
 	const now = options.now ?? Date.now;
 	const sleep = options.sleep ?? defaultSleep;
 	const ownerId = options.ownerId ?? createOwnerId();
@@ -274,7 +274,7 @@ function isRefreshLease(value: unknown): value is RefreshLease {
 
 function isStorageAvailable(storage: StorageLike): boolean {
 	try {
-		storage.getItem(STAFF_REFRESH_LOCK);
+		storage.getItem(DEFAULT_REFRESH_LOCK);
 		return true;
 	} catch {
 		return false;

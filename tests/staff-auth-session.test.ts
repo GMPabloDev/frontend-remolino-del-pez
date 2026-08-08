@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { z } from "zod";
 import { createStaffApiClient } from "../src/features/staff-auth/api/staff-api-client";
 import { sanitizeStaffReturnTo } from "../src/features/staff-auth/lib/staff-return-to";
-import {
-	createRefreshCoordinator,
-	STAFF_REFRESH_LOCK,
-} from "../src/features/staff-auth/session/refresh-coordinator";
+import { createRefreshCoordinator } from "../src/lib/auth/refresh-coordinator";
 import {
 	createStaffAuthChannel,
 	STAFF_AUTH_LOGOUT_STORAGE_KEY,
 } from "../src/features/staff-auth/session/staff-auth-channel";
-import { createStaffSession } from "../src/features/staff-auth/session/staff-session";
+import {
+	STAFF_REFRESH_LOCK,
+	createStaffSession,
+} from "../src/features/staff-auth/session/staff-session";
 
 const originalFetch = globalThis.fetch;
 const user = {
@@ -56,6 +56,7 @@ describe("refresh coordinator", () => {
 		const coordinator = createRefreshCoordinator({
 			lockManager: null,
 			storage: null,
+			lockName: STAFF_REFRESH_LOCK,
 		});
 		let resolveOperation: ((value: string) => void) | undefined;
 		let calls = 0;
@@ -103,6 +104,7 @@ describe("refresh coordinator", () => {
 		const coordinator = createRefreshCoordinator({
 			lockManager: null,
 			storage,
+			lockName: STAFF_REFRESH_LOCK,
 			ownerId: "owner-a",
 			now: () => 100,
 		});
@@ -122,6 +124,7 @@ describe("refresh coordinator", () => {
 		const coordinator = createRefreshCoordinator({
 			lockManager: null,
 			storage,
+			lockName: STAFF_REFRESH_LOCK,
 			ownerId: "owner-b",
 			now: () => 100,
 		});

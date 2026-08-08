@@ -11,11 +11,13 @@ import type {
 import {
 	createRefreshCoordinator,
 	type RefreshCoordinator,
-} from "./refresh-coordinator";
+} from "@/lib/auth/refresh-coordinator";
 import {
 	createStaffAuthChannel,
 	type StaffAuthChannel,
 } from "./staff-auth-channel";
+
+export const STAFF_REFRESH_LOCK = "staff-auth:refresh-lock:v1";
 
 export type StaffSessionStatus =
 	| "checking"
@@ -66,7 +68,8 @@ export function createStaffSession(
 ): StaffSessionController {
 	const authClient = options.authClient ?? createStaffAuthBffClient();
 	const refreshCoordinator =
-		options.refreshCoordinator ?? createRefreshCoordinator();
+		options.refreshCoordinator ??
+		createRefreshCoordinator({ lockName: STAFF_REFRESH_LOCK });
 	const channel = options.channel ?? createStaffAuthChannel();
 	const listeners = new Set<() => void>();
 	let snapshot: StaffSessionSnapshot = checkingSnapshot;
