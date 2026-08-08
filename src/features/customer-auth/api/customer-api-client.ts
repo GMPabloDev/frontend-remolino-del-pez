@@ -102,6 +102,10 @@ async function requestWithRefresh(
 		return requestWithRefresh(session, apiBaseUrl, path, init, true);
 	}
 
+	if (error.status === 401 && error.code === "CUSTOMER_AUTH_REQUIRED") {
+		session.invalidateSession();
+	}
+
 	throw error;
 }
 
