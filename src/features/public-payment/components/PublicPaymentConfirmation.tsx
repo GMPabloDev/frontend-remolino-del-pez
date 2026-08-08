@@ -54,7 +54,15 @@ export function PublicPaymentConfirmation({
 				<CheckCircle2 aria-hidden="true" />
 				<AlertTitle>Pago recibido correctamente</AlertTitle>
 				<AlertDescription>
-					La confirmación por correo se procesa por separado y puede tardar.
+					<p>
+						La confirmación por correo se procesa por separado y puede tardar.
+					</p>
+					<a
+						className="mt-2 inline-flex font-medium text-primary underline underline-offset-4 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+						href="/customer/access"
+					>
+						Acceso clientes
+					</a>
 				</AlertDescription>
 			</Alert>
 
