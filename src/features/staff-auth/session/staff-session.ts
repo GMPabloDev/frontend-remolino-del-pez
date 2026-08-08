@@ -1,5 +1,9 @@
 import { ApiClientError } from "@/lib/api/api-error";
 import {
+	createRefreshCoordinator,
+	type RefreshCoordinator,
+} from "@/lib/auth/refresh-coordinator";
+import {
 	createStaffAuthBffClient,
 	type StaffAuthBffClient,
 } from "../api/staff-auth-bff-client";
@@ -8,10 +12,6 @@ import type {
 	StaffSessionResponse,
 	StaffUser,
 } from "../contracts/staff-auth.schemas";
-import {
-	createRefreshCoordinator,
-	type RefreshCoordinator,
-} from "@/lib/auth/refresh-coordinator";
 import {
 	createStaffAuthChannel,
 	type StaffAuthChannel,

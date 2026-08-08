@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { z } from "zod";
 import { createStaffApiClient } from "../src/features/staff-auth/api/staff-api-client";
 import { sanitizeStaffReturnTo } from "../src/features/staff-auth/lib/staff-return-to";
-import { createRefreshCoordinator } from "../src/lib/auth/refresh-coordinator";
 import {
 	createStaffAuthChannel,
 	STAFF_AUTH_LOGOUT_STORAGE_KEY,
 } from "../src/features/staff-auth/session/staff-auth-channel";
 import {
-	STAFF_REFRESH_LOCK,
 	createStaffSession,
+	STAFF_REFRESH_LOCK,
 } from "../src/features/staff-auth/session/staff-session";
+import { createRefreshCoordinator } from "../src/lib/auth/refresh-coordinator";
 
 const originalFetch = globalThis.fetch;
 const user = {

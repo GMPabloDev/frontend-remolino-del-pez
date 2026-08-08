@@ -11,8 +11,8 @@ import {
 	staffAuthErrorResponse,
 	staffAuthJsonResponse,
 } from "@/features/staff-auth/server/staff-auth-http";
-import { assertRequestOrigin } from "@/lib/server/validate-request-origin";
 import { ApiClientError } from "@/lib/api/api-error";
+import { assertRequestOrigin } from "@/lib/server/validate-request-origin";
 
 export const prerender = false;
 
