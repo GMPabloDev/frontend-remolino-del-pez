@@ -96,96 +96,96 @@
 
 ### CU-001: Visualizar sucursales disponibles
 
-El cliente ingresa al sistema y visualiza las sucursales disponibles del restaurante.
+Como cliente, quiero ingresar al sistema para visualizar las sucursales disponibles del restaurante.
 
 ### CU-002: Seleccionar una sucursal
 
-El cliente selecciona una sucursal para consultar su menú y realizar una reserva.
+Como cliente, quiero seleccionar una sucursal para consultar su menú y realizar una reserva.
 
 ### CU-003: Consultar el menú público de una sucursal
 
-El sistema muestra las categorías y los platos disponibles de la sucursal seleccionada.
+Como cliente, quiero consultar el menú público de una sucursal para conocer sus categorías y platos disponibles.
 
 ### CU-004: Agregar platos al carrito
 
-El cliente selecciona uno o más platos del menú y los agrega al carrito.
+Como cliente, quiero agregar platos al carrito para preparar mi selección antes de realizar una reserva.
 
 ### CU-005: Modificar cantidades del carrito
 
-El cliente aumenta o disminuye la cantidad de los platos seleccionados antes de continuar.
+Como cliente, quiero modificar las cantidades de los platos del carrito para ajustar mi selección.
 
 ### CU-006: Eliminar platos o vaciar el carrito
 
-El cliente elimina un plato específico o vacía todo el carrito después de confirmar la acción.
+Como cliente, quiero eliminar platos o vaciar el carrito para corregir o reiniciar mi selección.
 
 ### CU-007: Consultar disponibilidad de horarios
 
-El cliente indica una fecha y cantidad de personas para consultar los horarios disponibles.
+Como cliente, quiero indicar una fecha y cantidad de personas para consultar los horarios disponibles.
 
 ### CU-008: Registrar una reserva temporal
 
-El cliente selecciona un horario, ingresa sus datos y confirma una reserva temporal.
+Como cliente, quiero seleccionar un horario e ingresar mis datos para registrar una reserva temporal.
 
 ### CU-009: Realizar el pago de la reserva
 
-El cliente continúa al proceso de pago y completa la operación de su reserva.
+Como cliente, quiero realizar el pago de mi reserva para confirmar la operación.
 
 ### CU-010: Visualizar el resultado del pago
 
-El sistema informa si el pago fue confirmado o cancelado y muestra el estado de la reserva.
+Como cliente, quiero visualizar el resultado del pago para saber si mi reserva fue confirmada o cancelada.
 
 ### CU-011: Solicitar el enlace de acceso por correo
 
-El cliente ingresa su correo electrónico y solicita un enlace para acceder a su cuenta.
+Como cliente, quiero solicitar un enlace de acceso por correo para ingresar a mi cuenta sin utilizar una contraseña.
 
 ### CU-012: Ingresar a la cuenta mediante Magic Link
 
-El cliente abre el enlace recibido en su correo y accede de forma segura a su cuenta.
+Como cliente, quiero ingresar a mi cuenta mediante el Magic Link recibido para acceder de forma segura.
 
 ### CU-013: Visualizar los datos de la cuenta
 
-El cliente visualiza su nombre, correo, teléfono y restaurante asociado.
+Como cliente, quiero visualizar los datos de mi cuenta para revisar mi información registrada.
 
 ### CU-014: Cerrar sesión del cliente
 
-El cliente finaliza su sesión y vuelve a la pantalla de acceso.
+Como cliente, quiero cerrar mi sesión para proteger el acceso a mi cuenta.
 
 ### CU-015: Iniciar sesión administrativo
 
-El personal administrativo ingresa sus credenciales válidas para acceder al panel privado.
+Como personal administrativo, quiero iniciar sesión para acceder al panel privado del restaurante.
 
 ### CU-016: Gestionar sucursales
 
-El personal administrativo crea, consulta y actualiza la información de las sucursales.
+Como personal administrativo, quiero gestionar las sucursales para mantener actualizada la información del restaurante.
 
 ### CU-017: Configurar horarios, reglas y estado de una sucursal
 
-El personal administrativo configura los horarios de atención, las reglas y el estado de una sucursal.
+Como personal administrativo, quiero configurar los horarios, reglas y estado de una sucursal para controlar su disponibilidad.
 
 ### CU-018: Gestionar mesas de una sucursal
 
-El personal administrativo registra, consulta y actualiza las mesas, su código, capacidad y estado.
+Como personal administrativo, quiero gestionar las mesas para registrar su código, capacidad y estado.
 
 ### CU-019: Gestionar categorías del menú
 
-El personal administrativo crea, consulta y actualiza las categorías que organizan el menú.
+Como personal administrativo, quiero gestionar las categorías para organizar los platos del menú.
 
 ### CU-020: Gestionar platos del menú
 
-El personal administrativo registra y actualiza los datos, categoría, imagen y estado de los platos.
+Como personal administrativo, quiero gestionar los platos para mantener actualizados sus datos, categoría, imagen y estado.
 
 ### CU-021: Configurar el menú publicado de una sucursal
 
-El personal administrativo define qué platos están disponibles y en qué orden aparecen en cada sucursal.
+Como personal administrativo, quiero configurar el menú publicado de una sucursal para definir qué platos están disponibles y en qué orden aparecen.
 
 ### CU-022: Actualizar la contraseña administrativa
 
-El personal administrativo cambia su contraseña desde la sección de cuenta.
+Como personal administrativo, quiero actualizar mi contraseña para mantener protegido mi acceso al panel.
 
 ### CU-023: Procesar el pago de la reserva
 
-El sistema de pago recibe la información de la operación y devuelve el resultado del pago.
+Como sistema de pago, quiero procesar la información de la operación para devolver el resultado del pago de la reserva.
 
 ### CU-024: Enviar el enlace de acceso al cliente
 
-El sistema de correo envía al cliente el enlace que le permite ingresar a su cuenta.
+Como sistema de correo, quiero enviar al cliente el enlace de acceso para que pueda ingresar a su cuenta.
