@@ -9,7 +9,7 @@ export const DISCOVERY_FIXTURE_SCENARIOS = [
 ] as const;
 
 const DEFAULT_API_BASE_URL = "http://localhost:3000";
-const DEFAULT_RESTAURANT_SLUG = "restaurante-olimpico";
+const DEFAULT_RESTAURANT_SLUG = "el-remolino-del-pez";
 
 const publicEnvironmentSchema = z
 	.object({

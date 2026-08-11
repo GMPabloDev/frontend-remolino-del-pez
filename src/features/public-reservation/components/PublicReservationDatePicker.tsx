@@ -80,7 +80,10 @@ export function PublicReservationDatePicker({
 							: "Selecciona una fecha"}
 					</span>
 				</PopoverTrigger>
-				<PopoverContent align="start" className="w-auto p-0">
+				<PopoverContent
+					align="start"
+					className="w-auto border-[#12324a]/15 bg-[#fffdf8] p-0 shadow-[0_18px_50px_rgba(18,50,74,0.18)]"
+				>
 					<Calendar
 						captionLayout="dropdown"
 						defaultMonth={selectedDate ?? minDate}

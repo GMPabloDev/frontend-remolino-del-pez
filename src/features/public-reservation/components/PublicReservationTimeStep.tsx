@@ -150,7 +150,7 @@ export function PublicReservationTimeStep({
 										value={time}
 									/>
 									<FieldLabel
-										className="cursor-pointer justify-center rounded-lg border px-3 py-2 text-center font-medium has-checked:border-primary has-checked:bg-primary/10"
+										className="cursor-pointer justify-center rounded-lg border border-[#12324a]/15 bg-white px-3 py-2 text-center font-medium text-[#12324a] shadow-sm transition-colors hover:border-[#e76832] hover:bg-[#fff7f1] has-checked:border-[#e76832] has-checked:bg-[#e76832] has-checked:text-white has-checked:shadow-[0_8px_20px_rgba(231,104,50,0.22)]"
 										htmlFor={inputId}
 									>
 										{time}

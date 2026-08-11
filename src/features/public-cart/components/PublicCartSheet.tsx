@@ -73,7 +73,7 @@ export function PublicCartSheet() {
 				<SheetTrigger render={<PublicCartTrigger />} />
 				<SheetContent
 					aria-describedby="public-cart-description"
-					className="w-[min(100%-1rem,28rem)] gap-0 p-0 sm:max-w-md"
+					className="w-[min(100%-1rem,28rem)] gap-0 bg-[#fffdf8] p-0 sm:max-w-md"
 					side="right"
 				>
 					<SheetHeader className="border-b border-[#12324a]/10 bg-[#f7faf8] pr-14">
@@ -213,9 +213,10 @@ export function PublicCartSheet() {
 										onOpenChange={setClearDialogOpen}
 									>
 										<Button
+											className="border-[#b34b25]/30 bg-[#fff4ef] text-[#8f3d20] hover:border-[#b34b25] hover:bg-[#b34b25] hover:text-white"
 											onClick={() => setClearDialogOpen(true)}
 											size="sm"
-											variant="ghost"
+											variant="outline"
 										>
 											Vaciar carrito
 										</Button>

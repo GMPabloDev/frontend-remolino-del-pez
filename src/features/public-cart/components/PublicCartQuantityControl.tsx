@@ -16,11 +16,11 @@ export function PublicCartQuantityControl({
 	onIncrease,
 }: PublicCartQuantityControlProps) {
 	return (
-		<fieldset className="inline-flex items-center gap-1 rounded-full border border-[#12324a]/15 bg-[#f7faf8] p-1">
+		<fieldset className="inline-flex items-center gap-1 rounded-full border border-[#12324a]/15 bg-white p-1 shadow-sm">
 			<legend className="sr-only">Cantidad de {itemName}</legend>
 			<Button
 				aria-label={`Reducir cantidad de ${itemName}`}
-				className="size-10"
+				className="size-10 border border-[#12324a]/10 bg-[#f7faf8] hover:border-[#e76832]/40 hover:bg-[#fff7f1]"
 				disabled={quantity <= 1}
 				onClick={onDecrease}
 				size="icon"
@@ -33,7 +33,7 @@ export function PublicCartQuantityControl({
 			</span>
 			<Button
 				aria-label={`Aumentar cantidad de ${itemName}`}
-				className="size-10"
+				className="size-10 border border-[#12324a]/10 bg-[#f7faf8] hover:border-[#e76832]/40 hover:bg-[#fff7f1]"
 				disabled={quantity >= 99}
 				onClick={onIncrease}
 				size="icon"

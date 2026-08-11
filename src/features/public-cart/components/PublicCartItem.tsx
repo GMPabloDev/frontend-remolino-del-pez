@@ -70,9 +70,10 @@ export function PublicCartItem({ item }: PublicCartItemProps) {
 				/>
 				<Button
 					aria-label={`Eliminar ${item.name} del carrito`}
+					className="border-[#b34b25]/30 bg-[#fff4ef] text-[#8f3d20] hover:border-[#b34b25] hover:bg-[#b34b25] hover:text-white"
 					onClick={() => removeItem(item.dishId)}
 					size="sm"
-					variant="ghost"
+					variant="outline"
 				>
 					<Trash2 data-icon="inline-start" />
 					Eliminar

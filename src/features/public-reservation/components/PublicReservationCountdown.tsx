@@ -59,7 +59,7 @@ export function PublicReservationCountdown({
 		return (
 			<div
 				aria-live="polite"
-				className="rounded-lg border border-destructive/30 p-3"
+				className="rounded-lg border border-[#b34b25]/30 bg-[#fff4ef] p-3"
 			>
 				<p className="font-medium text-destructive">Reserva vencida</p>
 				<p className="mt-1 text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ export function PublicReservationCountdown({
 	}
 
 	return (
-		<div className="rounded-lg border border-primary/25 bg-primary/5 p-3">
+		<div className="rounded-lg border border-[#12324a]/15 bg-[#e8f2f4] p-3 shadow-sm">
 			<div className="flex items-center justify-between gap-4">
 				<p className="text-sm font-medium">Tiempo para continuar</p>
 				<time
