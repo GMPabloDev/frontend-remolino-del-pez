@@ -1,6 +1,6 @@
 # SPEC 11 — Acceso passwordless y sesión del cliente
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 03, SPEC 10
 > **Fecha:** 2026-08-04
 > **Objetivo:** Permitir que el cliente acceda sin contraseña mediante magic links, mantenga una sesión segura y consulte su perfil mínimo desde un área protegida.
