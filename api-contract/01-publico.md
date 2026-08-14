@@ -10,8 +10,9 @@
 4. **Reservar**: `POST .../reservations/temporary` con `Idempotency-Key` → obtiene la reserva `pending_payment` y el `checkoutToken`.
 5. **Pagar**: `POST .../reservations/:reservationId/checkout` (Bearer = `checkoutToken`) → redirige al usuario a `checkoutUrl` de Stripe.
 6. **Regreso y confirmación**: tras el redirect (success/cancel), consulta `GET .../reservations/:reservationId/payment` **en polling** hasta que `reservationStatus` sea `confirmed` (o `payment.status` deje de ser `pending`). No existe un endpoint de confirmación manual: la confirma el webhook de Stripe de forma asíncrona.
-7. **Correo postpago**: cuando el webhook confirma el pago, el backend crea o reutiliza la cuenta y envía un correo combinado de agradecimiento, resumen y acceso.
-8. **Acceso**: el cliente intercambia el magic link por tokens, o solicita otro enlace desde el endpoint manual si necesita volver a entrar.
+7. **Correo postpago**: cuando el webhook confirma el pago, el backend crea o reutiliza la cuenta y envía un correo combinado de agradecimiento, resumen, comprobante PDF adjunto y acceso.
+8. **Acceso**: el cliente intercambia el magic link por tokens, o solicita otro enlace desde el endpoint manual.
+9. **Historial**: el cliente autenticado consulta `GET /customer/reservations` y solicita la descarga desde `GET /customer/reservations/:reservationId/receipt/download`.
 
 Contenido:
 
@@ -28,6 +29,8 @@ Contenido:
 - [POST /customer-auth/refresh](#post-customer-authrefresh)
 - [POST /customer-auth/logout](#post-customer-authlogout)
 - [GET /customer-auth/me](#get-customer-authme)
+- [GET /customer/reservations](#get-customerreservations)
+- [GET /customer/reservations/:reservationId/receipt/download](#get-customerreservationsreservationidreceiptdownload)
 - [POST /webhooks/stripe](#post-webhooksstripe)
 - [Gotchas de pago y expiración](#gotchas-de-pago-y-expiracion)
 
@@ -430,13 +433,6 @@ Si se reutiliza un refresh token reemplazado, se revocan todas las sesiones acti
 
 Revoca únicamente la sesión asociada al refresh token. Es idempotente.
 
-**Request:**
-```json
-{
-  "refreshToken": "opaque-token"
-}
-```
-
 **Response 204:** sin contenido.
 
 ---
@@ -455,9 +451,76 @@ Devuelve el perfil mínimo del cliente autenticado. Requiere `Authorization: Bea
 }
 ```
 
-No lista reservas ni pagos.
+---
+
+## GET /customer/reservations
+
+Devuelve todas las reservas confirmadas del cliente autenticado, ordenadas de la más reciente a la más antigua.
+
+**Headers:** `Authorization: Bearer <customerAccessToken>`
+
+**Response 200:**
+```json
+[
+  {
+    "id": "uuid",
+    "status": "confirmed",
+    "branch": {
+      "slug": "miraflores",
+      "name": "Sucursal Miraflores",
+      "address": "Av. Ejemplo 123",
+      "district": "Miraflores",
+      "province": "Lima",
+      "department": "Lima"
+    },
+    "startAt": "ISO8601",
+    "endAt": "ISO8601",
+    "timezone": "America/Lima",
+    "partySize": 4,
+    "items": [],
+    "currency": "PEN",
+    "total": "71.80",
+    "confirmedAt": "ISO8601",
+    "receipt": {
+      "number": "CP-000001",
+      "status": "available",
+      "generatedAt": "ISO8601"
+    }
+  }
+]
+```
+
+- Devuelve `200 []` si no hay reservas.
+- La reserva puede devolver `receipt: null` mientras no tenga comprobante.
+- No expone mesa, IDs Stripe, tokens ni metadata de Cloudinary.
 
 **Errores:** `401 CUSTOMER_AUTH_REQUIRED`.
+
+---
+
+## GET /customer/reservations/:reservationId/receipt/download
+
+Genera una URL firmada y temporal para descargar el comprobante del cliente autenticado.
+
+**Headers:** `Authorization: Bearer <customerAccessToken>`
+
+**Response 200:**
+```json
+{
+  "fileName": "comprobante-CP-000001.pdf",
+  "downloadUrl": "https://res.cloudinary.com/...",
+  "expiresAt": "ISO8601"
+}
+```
+
+La URL dura cinco minutos, no se persiste y la respuesta usa `Cache-Control: no-store`.
+
+**Errores:**
+
+- `401 CUSTOMER_AUTH_REQUIRED`
+- `404 CUSTOMER_RESERVATION_NOT_FOUND` si no pertenece al cliente o no tiene comprobante.
+- `409 PAYMENT_RECEIPT_NOT_READY` si el comprobante está pendiente o falló.
+- `503 DOCUMENT_STORAGE_UNAVAILABLE` si Cloudinary no puede firmar la descarga.
 
 ---
 
@@ -490,6 +553,7 @@ stripe events resend <event-id>
 - **`failed` / `expired` NO cancelan la reserva.** Si un intento de pago falla o expira, la reserva sigue `pending_payment` y se puede volver a llamar a `/checkout`: se creará un intento nuevo. No obligues al cliente a reservar de nuevo.
 - **Confirmación asíncrona:** no hay endpoint de confirmación. Tras regresar de Stripe (URL de éxito/cancel configuradas en el backend), haz polling a `GET .../payment` con un intervalo (ej. 2s) hasta que `reservationStatus` sea `confirmed` o `payment.status` sea `paid`/`failed`. Detén el polling al alcanzar `expiresAt`.
 - **Token postpago:** una reserva confirmada acepta su `checkoutToken` hasta antes de `confirmedAt + 24 horas`. Después, checkout y estado de pago responden `404 PUBLIC_PAYMENT_NOT_FOUND`; usa customer-auth.
-- **Correo postpago:** el webhook crea o vincula la cuenta y envía un correo HTML/texto con agradecimiento, resumen y magic link. Un fallo SMTP no revierte el pago ni la reserva.
+- **Correo postpago:** el webhook crea o vincula la cuenta y envía un correo HTML/texto con agradecimiento, resumen, comprobante PDF adjunto y magic link. Un fallo SMTP no revierte el pago ni la reserva.
+- **Comprobante:** el PDF se almacena en Cloudinary como recurso restringido. El cliente autenticado obtiene una URL firmada temporal desde su historial.
 - **`confirmedAt`** pasa de `null` a ISO8601 cuando la reserva se confirma.
 - Si el cliente cancela en Stripe, el intento quedará `expired` por webhook; el polling terminará con `payment.status: "expired"` y podrás ofrecer reintentar.
