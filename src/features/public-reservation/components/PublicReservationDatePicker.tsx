@@ -56,7 +56,7 @@ export function PublicReservationDatePicker({
 		.join(" ");
 
 	return (
-		<Field data-invalid={Boolean(error)}>
+		<Field className="min-w-0" data-invalid={Boolean(error)}>
 			<FieldLabel htmlFor={id}>{label}</FieldLabel>
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger
@@ -66,7 +66,7 @@ export function PublicReservationDatePicker({
 							aria-expanded={open}
 							aria-invalid={Boolean(error)}
 							aria-haspopup="dialog"
-							className="w-full justify-between"
+							className="min-h-12 w-full justify-between rounded-xl border-[#12324a]/20 bg-[#f4f0e8]/35 px-4 text-base hover:bg-white aria-expanded:bg-white"
 							disabled={disabled}
 							id={id}
 							variant="outline"

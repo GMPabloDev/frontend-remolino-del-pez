@@ -16,19 +16,16 @@ interface DiscoveryStateProps {
 
 const stateCopy = {
 	configuration: {
-		eyebrow: "Configuración pendiente",
 		title: "No podemos encontrar el restaurante todavía.",
 		description:
 			"El enlace público necesita una configuración válida para mostrar sus sucursales.",
 	},
 	empty: {
-		eyebrow: "Próximamente",
-		title: "No hay sucursales abiertas para mostrar.",
+		title: "Todavía no hay sucursales publicadas.",
 		description: "Vuelve pronto para descubrir dónde encontrarnos.",
 	},
 	error: {
-		eyebrow: "No pudimos cargar las sucursales",
-		title: "La carta está temporalmente fuera de alcance.",
+		title: "No pudimos cargar las sucursales.",
 		description:
 			"Inténtalo nuevamente en unos segundos. Si el problema continúa, vuelve a abrir el enlace.",
 	},
@@ -43,23 +40,22 @@ export function DiscoveryState({
 		return (
 			<section
 				id="main-content"
-				className="mx-auto flex min-h-[24rem] max-w-xl flex-col items-center justify-center rounded-[2rem] border border-[#12324a]/10 bg-white/70 px-6 py-16 text-center shadow-[0_24px_70px_rgba(18,50,74,0.08)]"
+				className="mx-auto flex min-h-[22rem] max-w-2xl flex-col items-center justify-center px-5 py-16 text-center sm:px-8 sm:py-20"
 				role="status"
 				aria-live="polite"
 			>
-				<LoaderCircle
-					className="mb-5 animate-spin text-[#e76832]"
-					size={28}
-					aria-hidden="true"
-				/>
-				<p className="mb-2 text-xs font-bold uppercase tracking-[0.24em] text-[#e76832]">
-					Un momento
-				</p>
-				<h1 className="font-heading text-3xl font-semibold tracking-[-0.04em] text-[#12324a]">
-					Estamos buscando tu mesa.
-				</h1>
-				<p className="mt-3 max-w-sm text-sm leading-6 text-[#12324a]/65">
-					Cargando las sucursales disponibles del restaurante.
+				<span className="mb-6 grid size-16 place-items-center rounded-full bg-[#dcecef] text-[#12324a] shadow-[0_16px_35px_rgba(18,50,74,0.08)]">
+					<LoaderCircle
+						className="animate-spin text-[#e76832]"
+						size={27}
+						aria-hidden="true"
+					/>
+				</span>
+				<h2 className="font-heading text-3xl font-semibold tracking-[-0.05em] text-[#12324a] sm:text-4xl">
+					Buscando tus sucursales.
+				</h2>
+				<p className="mt-4 max-w-sm text-sm leading-6 text-[#587080] sm:text-base">
+					Estamos preparando los lugares donde puedes comenzar tu reserva.
 				</p>
 			</section>
 		);
@@ -76,27 +72,24 @@ export function DiscoveryState({
 	return (
 		<section
 			id="main-content"
-			className="mx-auto flex min-h-[24rem] max-w-xl flex-col items-center justify-center rounded-[2rem] border border-[#12324a]/10 bg-white/70 px-6 py-16 text-center shadow-[0_24px_70px_rgba(18,50,74,0.08)]"
+			className="mx-auto flex min-h-[22rem] max-w-2xl flex-col items-center justify-center px-5 py-16 text-center sm:px-8 sm:py-20"
 			role={kind === "error" || kind === "configuration" ? "alert" : "status"}
 			aria-live="polite"
 		>
 			<span
-				className="mb-5 grid size-14 place-items-center rounded-full bg-[#dcecef] text-[#12324a]"
+				className="mb-6 grid size-16 place-items-center rounded-full bg-[#dcecef] text-[#12324a] shadow-[0_16px_35px_rgba(18,50,74,0.08)]"
 				aria-hidden="true"
 			>
-				<Icon size={24} strokeWidth={1.8} />
+				<Icon size={26} strokeWidth={1.8} />
 			</span>
-			<p className="mb-2 text-xs font-bold uppercase tracking-[0.24em] text-[#e76832]">
-				{copy.eyebrow}
-			</p>
-			<h1 className="max-w-md font-heading text-3xl font-semibold tracking-[-0.04em] text-[#12324a]">
+			<h2 className="max-w-xl font-heading text-3xl font-semibold leading-tight tracking-[-0.05em] text-[#12324a] sm:text-4xl">
 				{copy.title}
-			</h1>
-			<p className="mt-3 max-w-sm text-sm leading-6 text-[#12324a]/65">
+			</h2>
+			<p className="mt-4 max-w-sm text-sm leading-6 text-[#587080] sm:text-base">
 				{copy.description}
 			</p>
 			{kind === "error" && errorCode === "RESTAURANT_NOT_FOUND" ? (
-				<p className="mt-3 text-xs font-medium text-[#12324a]/55">
+				<p className="mt-3 text-xs font-medium text-[#587080]">
 					El restaurante configurado no está disponible.
 				</p>
 			) : null}

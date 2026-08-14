@@ -1,4 +1,4 @@
-import { ShoppingBag } from "lucide-react";
+import { ArrowRight, ShoppingBag } from "lucide-react";
 import { type ComponentProps, forwardRef } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ export const PublicCartTrigger = forwardRef<
 					className="grid size-9 place-items-center rounded-full bg-[#e76832]"
 					aria-hidden="true"
 				>
-					<ShoppingBag />
+					<ShoppingBag size={18} />
 				</span>
 				<span className="text-left">
 					<strong className="block text-sm font-semibold">Tu carrito</strong>
@@ -35,9 +35,7 @@ export const PublicCartTrigger = forwardRef<
 					</span>
 				</span>
 			</span>
-			<span className="text-lg" aria-hidden="true">
-				→
-			</span>
+			<ArrowRight size={18} aria-hidden="true" />
 		</Button>
 	);
 });

@@ -92,23 +92,44 @@ function PublicMenuContent({ menuQuery }: PublicMenuContentProps) {
 		content = renderResponsiveMenuState(<MenuState kind="empty" />);
 	} else {
 		const menu: PublicMenuData = menuQuery.data;
+		const dishCount = menu.categories.reduce(
+			(total, category) => total + category.dishes.length,
+			0,
+		);
 		content = (
 			<main
 				id="main-content"
-				className="mx-auto w-full max-w-6xl px-5 pb-32 sm:px-8 sm:pb-36 lg:px-12"
+				className="mx-auto w-full max-w-6xl px-5 pb-32 pt-12 sm:px-8 sm:pb-36 sm:pt-16 lg:px-12"
+				aria-labelledby="menu-content-title"
 			>
+				<section className="mb-9 flex flex-col gap-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
+					<div className="max-w-2xl">
+						<h2
+							id="menu-content-title"
+							className="font-heading text-[clamp(2.5rem,6vw,4.5rem)] font-semibold leading-[0.92] tracking-[-0.07em] text-[#12324a]"
+						>
+							Elige algo para la{" "}
+							<em className="font-normal text-[#e76832]">mesa.</em>
+						</h2>
+						<p className="mt-5 max-w-xl text-base leading-7 text-[#587080] sm:text-lg sm:leading-8">
+							Explora por categorías y añade tus favoritos a la selección.
+						</p>
+					</div>
+					<p className="text-sm font-semibold text-[#587080]">
+						{dishCount}{" "}
+						{dishCount === 1 ? "plato en la carta" : "platos en la carta"}
+					</p>
+				</section>
+
 				<nav
-					className="mb-4 flex flex-col gap-4 border-y border-[#12324a]/15 py-4 sm:flex-row sm:items-center sm:justify-between"
+					className="sticky top-0 z-20 -mx-5 mb-3 overflow-x-auto border-y border-[#12324a]/12 bg-[#f4f0e8] px-5 py-3 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12"
 					aria-label="Categorías del menú"
 				>
-					<p className="shrink-0 text-xs font-bold uppercase tracking-[0.2em] text-[#12324a]/50">
-						Explora la carta
-					</p>
-					<ul className="flex list-none flex-wrap gap-x-5 gap-y-2 p-0 text-sm font-semibold text-[#12324a]">
+					<ul className="flex min-w-max list-none gap-2 p-0 text-sm font-semibold text-[#12324a]">
 						{menu.categories.map((category) => (
 							<li key={category.id}>
 								<a
-									className="break-words underline decoration-[#e76832]/50 decoration-2 underline-offset-4 transition-colors hover:text-[#e76832] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25"
+									className="inline-flex min-h-10 items-center rounded-full border border-[#12324a]/12 bg-white/70 px-4 transition-colors hover:border-[#e76832]/45 hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/25"
 									href={`#category-${category.id}`}
 								>
 									{category.name}

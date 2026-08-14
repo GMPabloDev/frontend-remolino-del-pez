@@ -20,8 +20,8 @@ export function DishCard({ dish }: DishCardProps) {
 
 	return (
 		<article
-			className={`group overflow-hidden rounded-[1.75rem] border bg-white/85 shadow-[0_18px_50px_rgba(18,50,74,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(18,50,74,0.14)] ${
-				isSoldOut ? "border-[#e76832]/25" : "border-[#12324a]/10"
+			className={`group flex h-full flex-col overflow-hidden rounded-[1.75rem] border bg-white/90 shadow-[0_20px_60px_rgba(18,50,74,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(18,50,74,0.14)] ${
+				isSoldOut ? "border-[#b34b25]/25" : "border-[#12324a]/12"
 			}`}
 		>
 			<div className="relative aspect-[4/3] overflow-hidden bg-[#dcecef]">
@@ -47,7 +47,7 @@ export function DishCard({ dish }: DishCardProps) {
 				</span>
 			</div>
 
-			<div className="p-5 sm:p-6">
+			<div className="flex flex-1 flex-col p-5 sm:p-6">
 				<div className="flex items-start justify-between gap-4">
 					<h3 className="max-w-[17ch] font-heading text-xl font-semibold leading-tight tracking-[-0.035em] text-[#12324a]">
 						{dish.name}
@@ -56,14 +56,14 @@ export function DishCard({ dish }: DishCardProps) {
 						{formatMenuPrice(dish.price)}
 					</p>
 				</div>
-				<p className="mt-3 text-sm leading-6 text-[#12324a]/68">
+				<p className="mt-3 text-sm leading-6 text-[#587080]">
 					{dish.description}
 				</p>
 
 				{dish.ingredients.length > 0 ? (
 					<div className="mt-5">
-						<p className="mb-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[#12324a]/45">
-							Lleva
+						<p className="mb-2 text-xs font-semibold text-[#587080]">
+							Ingredientes
 						</p>
 						<ul
 							className="flex flex-wrap gap-1.5"
@@ -71,7 +71,7 @@ export function DishCard({ dish }: DishCardProps) {
 						>
 							{dish.ingredients.map((ingredient) => (
 								<li
-									className="rounded-full border border-[#12324a]/10 bg-[#f3f7f5] px-2.5 py-1 text-xs font-medium text-[#12324a]/70"
+									className="rounded-full border border-[#12324a]/10 bg-[#f4f0e8] px-2.5 py-1 text-xs font-medium text-[#587080]"
 									key={ingredient}
 								>
 									{ingredient}
@@ -82,22 +82,20 @@ export function DishCard({ dish }: DishCardProps) {
 				) : null}
 
 				{dish.allergens.length > 0 ? (
-					<p className="mt-5 flex items-start gap-2 border-t border-[#12324a]/10 pt-4 text-xs leading-5 text-[#12324a]/60">
+					<p className="mt-5 flex items-start gap-2 rounded-xl bg-[#fff7f1] px-3 py-2.5 text-xs leading-5 text-[#8f3d20]">
 						<CircleAlert
 							className="mt-0.5 shrink-0 text-[#e76832]"
 							size={14}
 							aria-hidden="true"
 						/>
 						<span>
-							<strong className="font-semibold text-[#12324a]/80">
-								Alérgenos:
-							</strong>{" "}
+							<strong className="font-semibold">Alérgenos:</strong>{" "}
 							{dish.allergens.join(", ")}
 						</span>
 					</p>
 				) : null}
 
-				<div className="mt-6 flex items-center justify-between gap-3 border-t border-[#12324a]/10 pt-5">
+				<div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#12324a]/10 pt-5">
 					{isSoldOut ? (
 						<p className="text-xs font-semibold text-[#b34b25]">
 							No disponible para selección
@@ -112,7 +110,7 @@ export function DishCard({ dish }: DishCardProps) {
 					) : (
 						<Button
 							aria-label={`Añadir ${dish.name} al carrito`}
-							className="rounded-full bg-[#12324a] px-5 text-white hover:bg-[#1d4b68]"
+							className="min-h-11 rounded-full bg-[#12324a] px-5 text-white hover:bg-[#1d4b68]"
 							onClick={() => addItem(dish)}
 							variant="default"
 						>

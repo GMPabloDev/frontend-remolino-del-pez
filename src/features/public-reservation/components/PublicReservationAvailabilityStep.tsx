@@ -54,20 +54,24 @@ export function PublicReservationAvailabilityStep({
 		partySize <= maxPartySize;
 
 	return (
-		<section aria-labelledby="reservation-availability-title">
-			<div className="flex flex-col gap-2">
+		<section
+			aria-labelledby="reservation-availability-title"
+			className="px-5 py-7 sm:px-8 sm:py-9"
+		>
+			<div className="max-w-2xl">
 				<h2
-					className="font-heading text-2xl font-semibold tracking-[-0.04em]"
+					className="font-heading text-3xl font-semibold tracking-[-0.04em] text-[#12324a]"
 					id="reservation-availability-title"
 				>
-					1. Fecha y personas
+					Fecha y personas
 				</h2>
-				<p className="text-sm leading-6 text-muted-foreground">
-					Indica cuándo nos visitarás y cuántas personas asistirán.
+				<p className="mt-2 text-sm leading-6 text-[#587080] sm:text-base">
+					Cuéntanos cuándo vendrás y el tamaño de tu mesa para mostrarte
+					horarios reales.
 				</p>
 			</div>
 
-			<FieldGroup className="mt-6">
+			<FieldGroup className="mt-7 grid gap-5 sm:grid-cols-2 sm:gap-6">
 				<PublicReservationDatePicker
 					disabled={disabled}
 					error={dateError}
@@ -83,6 +87,7 @@ export function PublicReservationAvailabilityStep({
 					</FieldLabel>
 					<Input
 						aria-describedby="reservation-party-size-description reservation-party-size-error"
+						className="h-12 rounded-xl border-[#12324a]/20 bg-[#f4f0e8]/35 px-4 text-base focus-visible:bg-white"
 						aria-invalid={Boolean(partySizeError)}
 						disabled={disabled}
 						id="reservation-party-size"
@@ -108,7 +113,7 @@ export function PublicReservationAvailabilityStep({
 				</Field>
 
 				<Button
-					className="w-full sm:w-fit"
+					className="min-h-12 w-full rounded-full bg-[#12324a] px-6 text-base hover:bg-[#1d4b68] sm:col-span-2 sm:w-fit"
 					disabled={!canSearch}
 					onClick={onSearch}
 					type="button"
@@ -119,7 +124,7 @@ export function PublicReservationAvailabilityStep({
 			</FieldGroup>
 
 			{remoteError ? (
-				<Alert className="mt-6" variant="destructive">
+				<Alert className="mt-6 rounded-2xl" variant="destructive">
 					<AlertTitle>No pudimos consultar la disponibilidad</AlertTitle>
 					<AlertDescription className="flex flex-col gap-3">
 						<span>{remoteError}</span>

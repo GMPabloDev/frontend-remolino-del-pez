@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-14T03:40:08Z",
+  "title": "Design System: El Molino del Pez",
+  "extensions": {
+    "colorMeta": {
+      "azul-puerto": {
+        "role": "primary",
+        "displayName": "Azul Puerto",
+        "canonical": "#12324a",
+        "tonalRamp": ["oklch(15% 0.035 240)", "oklch(27% 0.06 240)", "oklch(39% 0.07 240)", "oklch(51% 0.07 240)", "oklch(63% 0.065 240)", "oklch(75% 0.05 240)", "oklch(87% 0.03 240)", "oklch(95% 0.012 240)"]
+      },
+      "azul-puerto-hover": {
+        "role": "primary",
+        "displayName": "Azul Puerto en interacción",
+        "canonical": "#1d4b68",
+        "tonalRamp": ["oklch(15% 0.035 238)", "oklch(27% 0.06 238)", "oklch(39% 0.075 238)", "oklch(51% 0.075 238)", "oklch(63% 0.065 238)", "oklch(75% 0.05 238)", "oklch(87% 0.03 238)", "oklch(95% 0.012 238)"]
+      },
+      "naranja-brasa": {
+        "role": "tertiary",
+        "displayName": "Naranja Brasa",
+        "canonical": "#e76832",
+        "tonalRamp": ["oklch(15% 0.07 45)", "oklch(27% 0.11 45)", "oklch(39% 0.15 45)", "oklch(51% 0.17 45)", "oklch(63% 0.17 45)", "oklch(75% 0.13 45)", "oklch(87% 0.07 45)", "oklch(95% 0.03 45)"]
+      },
+      "arena-tibia": {
+        "role": "neutral",
+        "displayName": "Arena Tibia",
+        "canonical": "#f4f0e8",
+        "tonalRamp": ["oklch(15% 0.015 85)", "oklch(27% 0.015 85)", "oklch(39% 0.015 85)", "oklch(51% 0.015 85)", "oklch(63% 0.015 85)", "oklch(75% 0.015 85)", "oklch(87% 0.015 85)", "oklch(95% 0.015 85)"]
+      },
+      "blanco-mesa": {
+        "role": "neutral",
+        "displayName": "Blanco Mesa",
+        "canonical": "#ffffff",
+        "tonalRamp": ["oklch(15% 0 0)", "oklch(27% 0 0)", "oklch(39% 0 0)", "oklch(51% 0 0)", "oklch(63% 0 0)", "oklch(75% 0 0)", "oklch(87% 0 0)", "oklch(100% 0 0)"]
+      },
+      "bruma-marina": {
+        "role": "secondary",
+        "displayName": "Bruma Marina",
+        "canonical": "#dcecef",
+        "tonalRamp": ["oklch(15% 0.02 210)", "oklch(27% 0.025 210)", "oklch(39% 0.03 210)", "oklch(51% 0.03 210)", "oklch(63% 0.03 210)", "oklch(75% 0.028 210)", "oklch(87% 0.025 210)", "oklch(95% 0.018 210)"]
+      },
+      "bruma-marina-hover": {
+        "role": "secondary",
+        "displayName": "Bruma Marina en interacción",
+        "canonical": "#c7e0e5",
+        "tonalRamp": ["oklch(15% 0.025 205)", "oklch(27% 0.03 205)", "oklch(39% 0.035 205)", "oklch(51% 0.038 205)", "oklch(63% 0.038 205)", "oklch(75% 0.035 205)", "oklch(87% 0.028 205)", "oklch(95% 0.018 205)"]
+      },
+      "arena-suave": {
+        "role": "neutral",
+        "displayName": "Arena Suave",
+        "canonical": "#e9e4da",
+        "tonalRamp": ["oklch(15% 0.014 85)", "oklch(27% 0.016 85)", "oklch(39% 0.018 85)", "oklch(51% 0.018 85)", "oklch(63% 0.018 85)", "oklch(75% 0.017 85)", "oklch(87% 0.016 85)", "oklch(95% 0.012 85)"]
+      },
+      "texto-bruma": {
+        "role": "neutral",
+        "displayName": "Texto Bruma",
+        "canonical": "#587080",
+        "tonalRamp": ["oklch(15% 0.025 230)", "oklch(27% 0.035 230)", "oklch(39% 0.045 230)", "oklch(51% 0.045 230)", "oklch(63% 0.04 230)", "oklch(75% 0.032 230)", "oklch(87% 0.022 230)", "oklch(95% 0.01 230)"]
+      },
+      "arcilla-alerta": {
+        "role": "error",
+        "displayName": "Arcilla Alerta",
+        "canonical": "#b34b25",
+        "tonalRamp": ["oklch(15% 0.06 45)", "oklch(27% 0.1 45)", "oklch(39% 0.13 45)", "oklch(51% 0.14 45)", "oklch(63% 0.13 45)", "oklch(75% 0.1 45)", "oklch(87% 0.055 45)", "oklch(95% 0.025 45)"]
+      },
+      "arcilla-profunda": {
+        "role": "error",
+        "displayName": "Arcilla Profunda",
+        "canonical": "#8f3d20",
+        "tonalRamp": ["oklch(15% 0.055 43)", "oklch(27% 0.085 43)", "oklch(39% 0.11 43)", "oklch(51% 0.11 43)", "oklch(63% 0.1 43)", "oklch(75% 0.075 43)", "oklch(87% 0.045 43)", "oklch(95% 0.02 43)"]
+      },
+      "verde-disponible": {
+        "role": "success",
+        "displayName": "Verde Disponible",
+        "canonical": "#22624e",
+        "tonalRamp": ["oklch(15% 0.035 165)", "oklch(27% 0.06 165)", "oklch(39% 0.08 165)", "oklch(51% 0.08 165)", "oklch(63% 0.07 165)", "oklch(75% 0.055 165)", "oklch(87% 0.032 165)", "oklch(95% 0.015 165)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Declaraciones principales de superficies públicas." },
+      "headline": { "displayName": "Headline", "purpose": "Títulos de página y cabeceras principales." },
+      "title": { "displayName": "Title", "purpose": "Nombres de platos, sucursales, reservas y grupos." },
+      "body": { "displayName": "Body", "purpose": "Lectura, instrucciones, datos y formularios." },
+      "label": { "displayName": "Label", "purpose": "Cejas, estados y metadatos breves en mayúsculas." }
+    },
+    "shadows": [
+      { "name": "ambient-low", "value": "0 20px 60px rgba(18, 50, 74, 0.06)", "purpose": "Paneles administrativos, estados y contenedores en reposo." },
+      { "name": "ambient-standard", "value": "0 20px 60px rgba(18, 50, 74, 0.08)", "purpose": "Tarjetas y superficies públicas principales." },
+      { "name": "ambient-high", "value": "0 24px 80px rgba(18, 50, 74, 0.12)", "purpose": "Autenticación, cuenta y regiones que concentran una tarea." },
+      { "name": "interactive-lift", "value": "0 24px 60px rgba(18, 50, 74, 0.14)", "purpose": "Hover de tarjetas accionables junto con una elevación de 4px." },
+      { "name": "overlay", "value": "0 24px 80px rgba(18, 50, 74, 0.22)", "purpose": "Paneles laterales y capas modales." }
+    ],
+    "motion": [
+      { "name": "state-fast", "value": "150ms ease-in-out", "purpose": "Opacidad de overlays y feedback inmediato." },
+      { "name": "state-standard", "value": "200ms ease-in-out", "purpose": "Paneles, campos y estados de controles." },
+      { "name": "card-lift", "value": "300ms ease", "purpose": "Elevación discreta de tarjetas accionables." },
+      { "name": "image-reveal", "value": "700ms ease", "purpose": "Escala sutil de fotografía culinaria en hover." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal operativa, compacta y confiable.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Continuar</button>",
+      "css": ".ds-btn-primary { min-height: 2rem; display: inline-flex; align-items: center; justify-content: center; padding: .375rem .625rem; border: 1px solid transparent; border-radius: .75rem; background: var(--primary, #12324a); color: var(--primary-foreground, #fff); font-family: 'Geist Variable', sans-serif; font-size: .875rem; font-weight: 500; transition: background 200ms ease-in-out, transform 150ms ease; } .ds-btn-primary:hover { background: #1d4b68; } .ds-btn-primary:focus-visible { outline: 3px solid color-mix(in srgb, var(--ring, #e76832) 50%, transparent); outline-offset: 2px; } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Public Pill CTA",
+      "kind": "button",
+      "refersTo": "button-public-cta",
+      "description": "Acción dominante para avanzar en la experiencia del cliente.",
+      "html": "<a class=\"ds-cta-public\" href=\"#\"><span>Ver menú de la sucursal</span><span aria-hidden=\"true\">→</span></a>",
+      "css": ".ds-cta-public { min-height: 3rem; display: inline-flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 1.25rem; border-radius: 9999px; background: var(--primary, #12324a); color: #fff; font-family: 'Geist Variable', sans-serif; font-size: .875rem; font-weight: 600; text-decoration: none; transition: background 300ms ease, box-shadow 300ms ease; } .ds-cta-public:hover { background: #1d4b68; box-shadow: 0 8px 20px rgba(18, 50, 74, .16); } .ds-cta-public:focus-visible { outline: 4px solid rgba(231, 104, 50, .35); outline-offset: 2px; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Acción secundaria que mantiene presencia sin competir con la principal.",
+      "html": "<button class=\"ds-btn-outline\" type=\"button\">Volver</button>",
+      "css": ".ds-btn-outline { min-height: 2rem; display: inline-flex; align-items: center; justify-content: center; padding: .375rem .625rem; border: 1px solid rgba(18, 50, 74, .2); border-radius: .75rem; background: #fff; color: var(--primary, #12324a); font-family: 'Geist Variable', sans-serif; font-size: .875rem; font-weight: 500; transition: background 200ms ease-in-out, border-color 200ms ease-in-out; } .ds-btn-outline:hover { border-color: var(--accent, #e76832); background: #fff7f1; } .ds-btn-outline:focus-visible { outline: 3px solid rgba(231, 104, 50, .35); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Campo claro con foco cálido y etiqueta operativa directa.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Email</span><input class=\"ds-input\" type=\"email\" placeholder=\"nombre@restaurante.com\"></label>",
+      "css": ".ds-field { display: grid; gap: .5rem; color: var(--foreground, #12324a); font-family: 'Geist Variable', sans-serif; } .ds-field-label { font-size: .875rem; font-weight: 600; } .ds-input { width: 100%; min-height: 2.5rem; padding: .5rem .75rem; border: 1px solid rgba(18, 50, 74, .15); border-radius: .75rem; background: transparent; color: #12324a; font: inherit; transition: border-color 200ms ease-in-out, box-shadow 200ms ease-in-out; } .ds-input::placeholder { color: #587080; } .ds-input:focus-visible { border-color: #e76832; outline: none; box-shadow: 0 0 0 3px rgba(231, 104, 50, .25); }"
+    },
+    {
+      "name": "Availability Chip",
+      "kind": "chip",
+      "refersTo": "chip-status",
+      "description": "Estado compacto que combina color y texto explícito.",
+      "html": "<span class=\"ds-chip-available\"><span class=\"ds-chip-dot\" aria-hidden=\"true\"></span>Disponible</span>",
+      "css": ".ds-chip-available { display: inline-flex; align-items: center; gap: .375rem; padding: .375rem .75rem; border-radius: 9999px; background: #f8fbf8; color: #22624e; font-family: 'Geist Variable', sans-serif; font-size: .65rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; box-shadow: 0 1px 3px rgba(18, 50, 74, .08); } .ds-chip-dot { width: .5rem; height: .5rem; border-radius: 50%; background: currentColor; } .ds-chip-available:focus-visible { outline: 3px solid rgba(231, 104, 50, .3); outline-offset: 2px; }"
+    },
+    {
+      "name": "Public Branch Card",
+      "kind": "card",
+      "refersTo": "card-public",
+      "description": "Tarjeta hospitalaria que combina contexto, datos y una salida principal inequívoca.",
+      "html": "<article class=\"ds-branch-card\"><div class=\"ds-card-top\"><div><p class=\"ds-eyebrow\">Sucursal</p><h3>Miraflores</h3></div><span class=\"ds-icon-wrap\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><path d=\"M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg></span></div><p class=\"ds-card-copy\">Una sede cercana para descubrir la carta y reservar tu mesa.</p><a class=\"ds-card-action\" href=\"#\">Ver menú <span aria-hidden=\"true\">→</span></a></article>",
+      "css": ".ds-branch-card { max-width: 24rem; padding: 1.5rem; border: 1px solid rgba(18, 50, 74, .1); border-radius: 1.75rem; background: rgba(255, 255, 255, .85); color: #12324a; font-family: 'Geist Variable', sans-serif; box-shadow: 0 18px 50px rgba(18, 50, 74, .08); transition: transform 300ms ease, box-shadow 300ms ease; } .ds-branch-card:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(18, 50, 74, .14); } .ds-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; } .ds-eyebrow { margin: 0 0 .5rem; color: #e76832; font-size: .65rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; } .ds-branch-card h3 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 1.5rem; line-height: 1.15; letter-spacing: -.045em; } .ds-icon-wrap { width: 2.75rem; height: 2.75rem; display: grid; place-items: center; flex: none; border-radius: 1rem; background: #dcecef; } .ds-card-copy { margin: 1.5rem 0; color: rgba(18, 50, 74, .7); font-size: .875rem; line-height: 1.7; } .ds-card-action { min-height: 3rem; display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem; border-radius: 9999px; background: #12324a; color: #fff; font-size: .875rem; font-weight: 600; text-decoration: none; } .ds-card-action:hover { background: #1d4b68; } .ds-card-action:focus-visible { outline: 4px solid rgba(231, 104, 50, .35); outline-offset: 2px; }"
+    },
+    {
+      "name": "Staff Navigation",
+      "kind": "nav",
+      "description": "Navegación operativa con estado activo sobre superficie preparada.",
+      "html": "<nav class=\"ds-staff-nav\" aria-label=\"Navegación staff\"><a class=\"ds-nav-item ds-nav-active\" href=\"#\" aria-current=\"page\">Inicio</a><a class=\"ds-nav-item\" href=\"#\">Sucursales</a><a class=\"ds-nav-item\" href=\"#\">Catálogo</a></nav>",
+      "css": ".ds-staff-nav { display: flex; gap: .5rem; padding: .5rem; background: #f4f0e8; font-family: 'Geist Variable', sans-serif; } .ds-nav-item { display: inline-flex; padding: .75rem 1rem; border-radius: .75rem; color: rgba(18, 50, 74, .7); font-size: .875rem; font-weight: 600; text-decoration: none; transition: background 200ms ease-in-out, color 200ms ease-in-out; } .ds-nav-item:hover { background: #fff; color: #12324a; } .ds-nav-item:focus-visible { outline: 4px solid rgba(231, 104, 50, .25); outline-offset: 1px; } .ds-nav-active { background: #fff; color: #12324a; box-shadow: 0 8px 24px rgba(18, 50, 74, .08); }"
+    },
+    {
+      "name": "Destructive Alert",
+      "kind": "custom",
+      "description": "Error persistente y legible que no depende únicamente del color.",
+      "html": "<div class=\"ds-alert\" role=\"alert\"><strong>Revisa la información</strong><span>No pudimos completar la acción. Corrige los datos indicados.</span></div>",
+      "css": ".ds-alert { display: grid; gap: .25rem; padding: .75rem 1rem; border: 1px solid rgba(179, 75, 37, .25); border-radius: .75rem; background: rgba(179, 75, 37, .1); color: #8f3d20; font-family: 'Geist Variable', sans-serif; font-size: .875rem; line-height: 1.5; } .ds-alert strong { font-weight: 600; } .ds-alert:focus-visible { outline: 3px solid rgba(179, 75, 37, .3); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La Mesa Costera",
+    "overview": "El sistema traduce la hospitalidad de una mesa junto al mar a una interfaz cálida, confiable y directa. El fondo arena crea continuidad entre pantallas; el azul profundo aporta autoridad y legibilidad; el naranja introduce energía humana en momentos de orientación, selección y acción. La expresión es amable sin volverse infantil y distintiva sin competir con el trabajo que el usuario necesita completar.\n\nLas superficies se sienten servidas, no apiladas: amplias, suavemente redondeadas y separadas por luz ambiental. La experiencia pública admite titulares editoriales y gestos más expresivos; la operación administrativa conserva la misma identidad con mayor densidad, jerarquías más contenidas y decisiones visibles. Debe evitarse la neutralidad intercambiable del SaaS genérico, la urgencia estridente de las aplicaciones de delivery y el lujo oscuro que vuelve distante a una marisquería.",
+    "keyCharacteristics": [
+      "Hospitalidad cálida sostenida por una estructura clara.",
+      "Contraste entre títulos editoriales y texto operativo preciso.",
+      "Azul profundo como ancla, naranja como acento escaso y deliberado.",
+      "Superficies de arena y blanco cálido con profundidad ambiental.",
+      "Formas generosas, controles legibles y estados comprensibles."
+    ],
+    "rules": [
+      { "name": "The Puerto y Brasa Rule", "body": "Azul Puerto establece la estructura; Naranja Brasa señala el siguiente punto de atención. No deben competir como dos fondos dominantes en la misma región.", "section": "colors" },
+      { "name": "The Prepared Table Rule", "body": "Arena Tibia pertenece al lienzo y Blanco Mesa a la superficie preparada. Las capas adicionales deben justificar una nueva agrupación, no decorar por costumbre.", "section": "colors" },
+      { "name": "The Two Voices Rule", "body": "Georgia nombra y da bienvenida; Geist explica, permite actuar y presenta datos. No intercambiar sus responsabilidades por variedad visual.", "section": "typography" },
+      { "name": "The Short Label Rule", "body": "El tracking amplio solo pertenece a etiquetas cortas. Las instrucciones y errores deben conservar caja natural y lectura continua.", "section": "typography" },
+      { "name": "The Customer Path Rule", "body": "En superficies públicas debe existir una jerarquía dominante y una acción siguiente inequívoca. La cuadrícula nunca debe ocultar el recorrido.", "section": "layout" },
+      { "name": "The Operational Density Rule", "body": "Staff puede ser más denso, pero no más pequeño: compactar mediante estructura, agrupación y adaptación, no reduciendo legibilidad ni objetivos táctiles.", "section": "layout" },
+      { "name": "The Ambient Tide Rule", "body": "La sombra indica agrupación o interacción, nunca ornamentación. Una tarjeta dentro de otra tarjeta no recibe una segunda elevación completa.", "section": "elevation" },
+      { "name": "The Welcoming Edge Rule", "body": "Cuanto más amplia y hospitalaria sea la superficie, mayor puede ser su curva. Los controles densos conservan radios más contenidos para no perder precisión.", "section": "shapes" },
+      { "name": "The Pill With Purpose Rule", "body": "La píldora comunica acción compacta, filtro o estado. No se aplica a párrafos, paneles extensos ni grupos completos.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do usar Arena Tibia como continuidad del lienzo y Blanco Mesa para superficies que concentran contenido o acciones.",
+      "Do reservar Naranja Brasa para orientación, foco, precio y momentos de decisión.",
+      "Do combinar títulos Georgia con contenido operativo Geist según la regla de las dos voces.",
+      "Do adaptar tablas y grupos densos a tarjetas o columnas antes de reducir texto o permitir desbordamiento horizontal.",
+      "Do acompañar estados de disponibilidad, error y selección con palabras, iconos o semántica; nunca solo con color.",
+      "Do conservar objetivos táctiles cómodos y foco visible incluso cuando la interfaz staff aumente su densidad."
+    ],
+    "donts": [
+      "Don't convertir la interfaz en un SaaS genérico de tarjetas grises, tipografía intercambiable y acentos sin relación con el piloto.",
+      "Don't usar rojos, amarillos, descuentos, urgencia visual o saturación constante propios de una aplicación agresiva de delivery.",
+      "Don't oscurecer el lienzo para simular lujo ni depender de fotografía dramática, dorados o contraste distante de marisquería premium.",
+      "Don't anidar tarjetas elevadas dentro de tarjetas elevadas ni añadir sombras a elementos que no representan una nueva capa.",
+      "Don't extender etiquetas en mayúsculas y tracking amplio a instrucciones, errores o contenido de lectura.",
+      "Don't usar píldoras o contenedores de icono como decoración repetitiva sin una función de acción, filtro, estado u orientación."
+    ]
+  }
+}

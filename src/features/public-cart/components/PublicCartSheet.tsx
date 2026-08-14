@@ -19,7 +19,6 @@ import {
 	EmptyTitle,
 } from "@/components/ui/empty";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
 	Sheet,
 	SheetContent,
@@ -73,19 +72,28 @@ export function PublicCartSheet() {
 				<SheetTrigger render={<PublicCartTrigger />} />
 				<SheetContent
 					aria-describedby="public-cart-description"
-					className="w-[min(100%-1rem,28rem)] gap-0 bg-[#fffdf8] p-0 sm:max-w-md"
+					className="w-[min(100%-1rem,28rem)] gap-0 bg-[#f4f0e8] p-0 sm:max-w-md [&_[data-slot=sheet-close]]:text-white [&_[data-slot=sheet-close]]:hover:bg-white/10"
 					side="right"
 				>
-					<SheetHeader className="border-b border-[#12324a]/10 bg-[#f7faf8] pr-14">
-						<SheetTitle className="font-heading text-2xl font-semibold tracking-[-0.04em] text-[#12324a]">
+					<SheetHeader className="border-b border-white/15 bg-[#12324a] px-5 pb-5 pr-14 pt-6 text-white sm:px-6 sm:pt-7">
+						<SheetTitle className="font-heading text-3xl font-semibold tracking-[-0.05em] text-white">
 							Tu selección
 						</SheetTitle>
 						<SheetDescription
 							id="public-cart-description"
-							className="text-[#12324a]/65"
+							className="mt-1 text-white/70"
 						>
 							Revisa tus platos antes de continuar con la reserva.
 						</SheetDescription>
+						<div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold text-white/75">
+							<span className="rounded-full bg-white/10 px-3 py-1.5">
+								{totals.selectedUnits}{" "}
+								{totals.selectedUnits === 1 ? "unidad" : "unidades"}
+							</span>
+							<span className="rounded-full bg-[#e76832] px-3 py-1.5 text-white">
+								{formatPublicCartPrice(totals.availableSubtotalCents)}
+							</span>
+						</div>
 					</SheetHeader>
 
 					<div className="flex min-h-0 flex-1 flex-col">
@@ -147,11 +155,16 @@ export function PublicCartSheet() {
 						{items.length === 0 ? (
 							<Empty className="flex-1 border-0 px-8">
 								<EmptyHeader>
-									<EmptyMedia variant="icon">
+									<EmptyMedia
+										className="bg-[#dcecef] text-[#12324a]"
+										variant="icon"
+									>
 										<ShoppingBag aria-hidden="true" />
 									</EmptyMedia>
-									<EmptyTitle>Tu carrito está vacío</EmptyTitle>
-									<EmptyDescription>
+									<EmptyTitle className="font-heading text-2xl tracking-[-0.04em] text-[#12324a]">
+										Tu carrito está vacío
+									</EmptyTitle>
+									<EmptyDescription className="max-w-xs text-[#587080]">
 										Añade platos desde la carta para preparar tu próxima visita.
 									</EmptyDescription>
 								</EmptyHeader>
@@ -168,88 +181,85 @@ export function PublicCartSheet() {
 					</div>
 
 					{items.length > 0 ? (
-						<>
-							<Separator />
-							<SheetFooter className="gap-3 bg-[#f7faf8]">
-								<div className="flex items-end justify-between gap-4">
-									<div>
-										<p className="text-xs font-bold uppercase tracking-[0.16em] text-[#12324a]/50">
-											Subtotal estimado
-										</p>
-										<p className="mt-1 text-xs text-[#12324a]/60">
-											{totals.availableUnits} unidades disponibles · PEN
-										</p>
-									</div>
-									<strong className="font-heading text-2xl text-[#e76832]">
-										{formatPublicCartPrice(totals.availableSubtotalCents)}
-									</strong>
-								</div>
-								{totals.unavailableItemCount > 0 ? (
-									<p className="text-xs leading-5 text-[#12324a]/60">
-										Los platos no disponibles no están incluidos en el subtotal.
+						<SheetFooter className="gap-3 border-t border-[#12324a]/10 bg-white px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 sm:px-6">
+							<div className="flex items-end justify-between gap-4">
+								<div>
+									<p className="text-xs font-bold uppercase tracking-[0.16em] text-[#587080]">
+										Subtotal de platos
 									</p>
-								) : null}
-								<Button
-									aria-describedby="public-cart-continue-help"
-									className="w-full"
-									disabled={!canContinueToReservation}
-									onClick={handleContinueToReservation}
-									type="button"
-								>
-									Continuar con la reserva
-								</Button>
-								<p
-									id="public-cart-continue-help"
-									className="text-center text-xs leading-5 text-[#12324a]/55"
-								>
-									{getContinueHelpText({
-										fixtureMode: runtimeConfig.useMenuFixture,
-										unavailableItemCount: unavailableItems.length,
-									})}
-								</p>
-								<div className="flex justify-between gap-3">
-									<AlertDialog
-										open={clearDialogOpen}
-										onOpenChange={setClearDialogOpen}
-									>
-										<Button
-											className="border-[#b34b25]/30 bg-[#fff4ef] text-[#8f3d20] hover:border-[#b34b25] hover:bg-[#b34b25] hover:text-white"
-											onClick={() => setClearDialogOpen(true)}
-											size="sm"
-											variant="outline"
-										>
-											Vaciar carrito
-										</Button>
-										<AlertDialogContent>
-											<AlertDialogHeader>
-												<AlertDialogTitle>¿Vaciar el carrito?</AlertDialogTitle>
-												<AlertDialogDescription>
-													Se eliminarán todos los platos seleccionados de esta
-													sucursal.
-												</AlertDialogDescription>
-											</AlertDialogHeader>
-											<AlertDialogFooter>
-												<Button
-													onClick={() => setClearDialogOpen(false)}
-													variant="outline"
-												>
-													Conservar selección
-												</Button>
-												<Button
-													onClick={() => {
-														clearCart();
-														setClearDialogOpen(false);
-													}}
-													variant="destructive"
-												>
-													Vaciar carrito
-												</Button>
-											</AlertDialogFooter>
-										</AlertDialogContent>
-									</AlertDialog>
+									<p className="mt-1 text-xs text-[#587080]">
+										{totals.availableUnits} unidades disponibles · PEN
+									</p>
 								</div>
-							</SheetFooter>
-						</>
+								<strong className="font-heading text-3xl tracking-[-0.04em] text-[#e76832]">
+									{formatPublicCartPrice(totals.availableSubtotalCents)}
+								</strong>
+							</div>
+							{totals.unavailableItemCount > 0 ? (
+								<p className="text-xs leading-5 text-[#587080]">
+									Los platos no disponibles no están incluidos en el subtotal.
+								</p>
+							) : null}
+							<Button
+								aria-describedby="public-cart-continue-help"
+								className="min-h-12 w-full rounded-full bg-[#12324a] hover:bg-[#1d4b68]"
+								disabled={!canContinueToReservation}
+								onClick={handleContinueToReservation}
+								type="button"
+							>
+								Continuar con la reserva
+							</Button>
+							<p
+								id="public-cart-continue-help"
+								className="text-center text-xs leading-5 text-[#587080]"
+							>
+								{getContinueHelpText({
+									fixtureMode: runtimeConfig.useMenuFixture,
+									unavailableItemCount: unavailableItems.length,
+								})}
+							</p>
+							<div className="flex justify-end">
+								<AlertDialog
+									open={clearDialogOpen}
+									onOpenChange={setClearDialogOpen}
+								>
+									<Button
+										className="border-[#b34b25]/30 bg-[#fff4ef] text-[#8f3d20] hover:border-[#b34b25] hover:bg-[#b34b25] hover:text-white"
+										onClick={() => setClearDialogOpen(true)}
+										size="sm"
+										variant="outline"
+									>
+										Vaciar carrito
+									</Button>
+									<AlertDialogContent>
+										<AlertDialogHeader>
+											<AlertDialogTitle>¿Vaciar el carrito?</AlertDialogTitle>
+											<AlertDialogDescription>
+												Se eliminarán todos los platos seleccionados de esta
+												sucursal.
+											</AlertDialogDescription>
+										</AlertDialogHeader>
+										<AlertDialogFooter>
+											<Button
+												onClick={() => setClearDialogOpen(false)}
+												variant="outline"
+											>
+												Conservar selección
+											</Button>
+											<Button
+												onClick={() => {
+													clearCart();
+													setClearDialogOpen(false);
+												}}
+												variant="destructive"
+											>
+												Vaciar carrito
+											</Button>
+										</AlertDialogFooter>
+									</AlertDialogContent>
+								</AlertDialog>
+							</div>
+						</SheetFooter>
 					) : null}
 				</SheetContent>
 			</Sheet>

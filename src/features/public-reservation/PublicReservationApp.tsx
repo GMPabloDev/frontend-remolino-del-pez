@@ -512,7 +512,7 @@ function PublicReservationFormContent({
 function ReservationShell({ children }: { children: ReactNode }) {
 	return (
 		<main
-			className="mx-auto w-full max-w-3xl px-5 py-10 sm:px-8 sm:py-14"
+			className="mx-auto w-full max-w-4xl px-5 pb-14 pt-8 sm:px-8 sm:pb-20 sm:pt-10"
 			id="main-content"
 		>
 			{children}
@@ -537,18 +537,21 @@ function ReservationState({
 }: ReservationStateProps) {
 	return (
 		<ReservationShell>
-			<section aria-live="polite" className="rounded-2xl border bg-card p-6">
-				<h1 className="font-heading text-2xl font-semibold tracking-[-0.04em]">
+			<section
+				aria-live="polite"
+				className="rounded-[2rem] border border-[#12324a]/12 bg-white/90 p-6 shadow-[0_24px_80px_rgba(18,50,74,0.09)] sm:p-8"
+			>
+				<h1 className="font-heading text-3xl font-semibold tracking-[-0.04em] text-[#12324a]">
 					{title}
 				</h1>
 				{description ? (
-					<p className="mt-2 text-sm leading-6 text-muted-foreground">
+					<p className="mt-2 max-w-2xl text-sm leading-6 text-[#587080] sm:text-base">
 						{description}
 					</p>
 				) : null}
 				{actionLabel && actionHref ? (
 					<Button
-						className="mt-5"
+						className="mt-5 min-h-11 rounded-full px-5"
 						onClick={() => window.location.assign(actionHref)}
 						variant="outline"
 					>
@@ -556,7 +559,11 @@ function ReservationState({
 					</Button>
 				) : null}
 				{actionLabel && onAction ? (
-					<Button className="mt-5" onClick={onAction} variant="outline">
+					<Button
+						className="mt-5 min-h-11 rounded-full px-5"
+						onClick={onAction}
+						variant="outline"
+					>
 						{actionLabel}
 					</Button>
 				) : null}

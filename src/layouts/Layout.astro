@@ -28,6 +28,39 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <title>{title}</title>
+    <script is:inline>
+      document.addEventListener("astro:hydration-error", (event) => {
+        const island = event.target;
+        if (!(island instanceof HTMLElement)) return;
+
+        const status = document.createElement("section");
+        status.className =
+          "mx-auto my-8 w-[calc(100%-2.5rem)] max-w-3xl rounded-[1.75rem] border border-[#b34b25]/25 bg-white p-6 text-[#12324a] shadow-[0_20px_60px_rgba(18,50,74,0.08)] sm:p-8";
+        status.setAttribute("role", "alert");
+        status.setAttribute("tabindex", "-1");
+
+        const heading = document.createElement("h2");
+        heading.className =
+          "font-heading text-2xl font-semibold tracking-[-0.04em]";
+        heading.textContent = "No pudimos iniciar esta pantalla";
+
+        const description = document.createElement("p");
+        description.className = "mt-2 max-w-prose text-sm leading-6 text-[#587080]";
+        description.textContent =
+          "La aplicación no terminó de cargar. Recarga la página para intentarlo nuevamente.";
+
+        const reloadButton = document.createElement("button");
+        reloadButton.className =
+          "mt-5 min-h-11 rounded-full bg-[#12324a] px-5 text-sm font-semibold text-white hover:bg-[#1d4b68] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/30";
+        reloadButton.type = "button";
+        reloadButton.textContent = "Recargar página";
+        reloadButton.addEventListener("click", () => window.location.reload());
+
+        status.append(heading, description, reloadButton);
+        island.replaceChildren(status);
+        status.focus();
+      });
+    </script>
   </head>
   <body>
     <a

@@ -51,22 +51,25 @@ export function PublicReservationTimeStep({
 	);
 
 	return (
-		<section aria-labelledby="reservation-time-title">
-			<div className="flex flex-col gap-2">
+		<section
+			aria-labelledby="reservation-time-title"
+			className={`border-t border-[#12324a]/10 px-5 py-7 sm:px-8 sm:py-9 ${disabled && !hasSearched ? "bg-[#f4f0e8]/35" : "bg-white"}`}
+		>
+			<div className="max-w-2xl">
 				<h2
-					className="font-heading text-2xl font-semibold tracking-[-0.04em]"
+					className="font-heading text-3xl font-semibold tracking-[-0.04em] text-[#12324a]"
 					id="reservation-time-title"
 				>
-					2. Elige un horario
+					Elige un horario
 				</h2>
-				<p className="text-sm leading-6 text-muted-foreground">
-					Los horarios se muestran según la disponibilidad actual de la
-					sucursal.
+				<p className="mt-2 text-sm leading-6 text-[#587080] sm:text-base">
+					Te mostramos únicamente los turnos disponibles para los datos que
+					elegiste.
 				</p>
 			</div>
 
 			{disabled && !hasSearched ? (
-				<Alert className="mt-6">
+				<Alert className="mt-6 rounded-2xl border-[#12324a]/10 bg-white/70">
 					<Clock3 aria-hidden="true" />
 					<AlertTitle>Consulta primero la disponibilidad</AlertTitle>
 					<AlertDescription>
@@ -76,7 +79,11 @@ export function PublicReservationTimeStep({
 			) : null}
 
 			{isLoading ? (
-				<p className="mt-6 text-sm text-muted-foreground" role="status">
+				<p
+					className="mt-6 flex min-h-20 items-center justify-center rounded-2xl bg-[#dcecef]/70 text-sm font-medium text-[#12324a]"
+					role="status"
+				>
+					<Clock3 aria-hidden="true" className="mr-2 size-4 animate-pulse" />
 					Consultando horarios disponibles…
 				</p>
 			) : null}
@@ -96,7 +103,7 @@ export function PublicReservationTimeStep({
 			) : null}
 
 			{hasSearched && !isLoading && !error && validTimes.length === 0 ? (
-				<Empty className="mt-6 border">
+				<Empty className="mt-6 rounded-2xl border border-[#12324a]/10 bg-[#f4f0e8]/40 py-8">
 					<EmptyHeader>
 						<EmptyMedia variant="icon">
 							<Clock3 aria-hidden="true" />
@@ -116,8 +123,10 @@ export function PublicReservationTimeStep({
 			) : null}
 
 			{hasSearched && !isLoading && !error && validTimes.length > 0 ? (
-				<FieldSet className="mt-6">
-					<FieldLegend>Horarios disponibles</FieldLegend>
+				<FieldSet className="mt-7">
+					<FieldLegend className="font-semibold text-[#12324a]">
+						Horarios disponibles
+					</FieldLegend>
 					<FieldDescription>
 						{durationMinutes
 							? `Cada reserva dura ${durationMinutes} minutos.`
@@ -128,7 +137,7 @@ export function PublicReservationTimeStep({
 							selectionError ? "reservation-time-error" : undefined
 						}
 						aria-invalid={Boolean(selectionError)}
-						className="grid grid-cols-2 gap-2 sm:grid-cols-3"
+						className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"
 						role="radiogroup"
 					>
 						{validTimes.map((time) => {
@@ -142,6 +151,7 @@ export function PublicReservationTimeStep({
 									<input
 										aria-label={`Reservar a las ${time}`}
 										checked={selectedTime === time}
+										className="peer sr-only"
 										disabled={disabled}
 										id={inputId}
 										name="reservation-time"
@@ -150,7 +160,7 @@ export function PublicReservationTimeStep({
 										value={time}
 									/>
 									<FieldLabel
-										className="cursor-pointer justify-center rounded-lg border border-[#12324a]/15 bg-white px-3 py-2 text-center font-medium text-[#12324a] shadow-sm transition-colors hover:border-[#e76832] hover:bg-[#fff7f1] has-checked:border-[#e76832] has-checked:bg-[#e76832] has-checked:text-white has-checked:shadow-[0_8px_20px_rgba(231,104,50,0.22)]"
+										className="min-h-12 cursor-pointer justify-center rounded-xl border border-[#12324a]/15 bg-white px-3 py-2 text-center text-base font-semibold text-[#12324a] shadow-[0_8px_24px_rgba(18,50,74,0.05)] transition-[border-color,background-color,color,box-shadow] hover:border-[#e76832] hover:bg-[#fff7f1] peer-focus-visible:border-[#e76832] peer-focus-visible:ring-4 peer-focus-visible:ring-[#e76832]/25 has-checked:border-[#e76832] has-checked:bg-[#e76832] has-checked:text-white has-checked:shadow-[0_10px_24px_rgba(231,104,50,0.22)]"
 										htmlFor={inputId}
 									>
 										{time}

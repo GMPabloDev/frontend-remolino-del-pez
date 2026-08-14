@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -256,9 +257,17 @@ export function PublicReservationFlow({
 		availabilityData?.availableTimes.includes(selectedTime),
 	);
 	const reviewItems = useMemo(() => [...items], [items]);
+	const currentStep = customerReady
+		? 4
+		: selectedTimeIsAvailable
+			? 3
+			: hasSearched
+				? 2
+				: 1;
 
 	return (
-		<div className="flex flex-col gap-10">
+		<div className="flex flex-col gap-5 sm:gap-6">
+			<ReservationProgress currentStep={currentStep} />
 			{flowError ? (
 				<Alert
 					className="scroll-mt-6"
@@ -305,51 +314,55 @@ export function PublicReservationFlow({
 				</Alert>
 			) : null}
 
-			<PublicReservationAvailabilityStep
-				date={date}
-				dateError={localError && !availabilityRequest ? localError : undefined}
-				disabled={reservationMutation.isPending}
-				isLoading={availabilityLoading}
-				maxDate={maxDate}
-				maxPartySize={maxPartySize}
-				minDate={minDate}
-				onDateChange={handleDateChange}
-				onPartySizeChange={handlePartySizeChange}
-				onRetry={() => void availabilityQuery.refetch()}
-				onSearch={handleAvailabilitySearch}
-				partySize={partySize}
-				partySizeError={
-					localError && !availabilityRequest ? localError : undefined
-				}
-				remoteError={availabilityRemoteMessage}
-			/>
+			<div className="overflow-hidden rounded-[2rem] border border-[#12324a]/12 bg-white/90 shadow-[0_24px_80px_rgba(18,50,74,0.09)]">
+				<PublicReservationAvailabilityStep
+					date={date}
+					dateError={
+						localError && !availabilityRequest ? localError : undefined
+					}
+					disabled={reservationMutation.isPending}
+					isLoading={availabilityLoading}
+					maxDate={maxDate}
+					maxPartySize={maxPartySize}
+					minDate={minDate}
+					onDateChange={handleDateChange}
+					onPartySizeChange={handlePartySizeChange}
+					onRetry={() => void availabilityQuery.refetch()}
+					onSearch={handleAvailabilitySearch}
+					partySize={partySize}
+					partySizeError={
+						localError && !availabilityRequest ? localError : undefined
+					}
+					remoteError={availabilityRemoteMessage}
+				/>
 
-			<PublicReservationTimeStep
-				availableTimes={availabilityData?.availableTimes ?? []}
-				disabled={!hasSearched || reservationMutation.isPending}
-				durationMinutes={availabilityData?.durationMinutes}
-				error={availabilityRemoteMessage}
-				hasSearched={hasSearched}
-				isLoading={availabilityLoading}
-				onChangeSearch={() => {
-					setAvailabilityRequest(null);
-					setSelectedTime("");
-					reservationMutation.reset();
-				}}
-				onRetry={() => void availabilityQuery.refetch()}
-				onSelect={handleTimeSelect}
-				selectedTime={selectedTime}
-				selectionError={
-					selectedTime && !selectedTimeIsAvailable
-						? "Selecciona un horario disponible."
-						: undefined
-				}
-			/>
+				<PublicReservationTimeStep
+					availableTimes={availabilityData?.availableTimes ?? []}
+					disabled={!hasSearched || reservationMutation.isPending}
+					durationMinutes={availabilityData?.durationMinutes}
+					error={availabilityRemoteMessage}
+					hasSearched={hasSearched}
+					isLoading={availabilityLoading}
+					onChangeSearch={() => {
+						setAvailabilityRequest(null);
+						setSelectedTime("");
+						reservationMutation.reset();
+					}}
+					onRetry={() => void availabilityQuery.refetch()}
+					onSelect={handleTimeSelect}
+					selectedTime={selectedTime}
+					selectionError={
+						selectedTime && !selectedTimeIsAvailable
+							? "Selecciona un horario disponible."
+							: undefined
+					}
+				/>
 
-			<PublicReservationCustomerStep
-				disabled={!selectedTimeIsAvailable || reservationMutation.isPending}
-				onSubmit={handleCustomerSubmit}
-			/>
+				<PublicReservationCustomerStep
+					disabled={!selectedTimeIsAvailable || reservationMutation.isPending}
+					onSubmit={handleCustomerSubmit}
+				/>
+			</div>
 
 			{customerReady ? (
 				<PublicReservationReview
@@ -362,6 +375,54 @@ export function PublicReservationFlow({
 				/>
 			) : null}
 		</div>
+	);
+}
+
+function ReservationProgress({ currentStep }: { currentStep: number }) {
+	const steps = ["Disponibilidad", "Horario", "Tus datos", "Confirmación"];
+
+	return (
+		<nav
+			aria-label="Progreso de la reserva"
+			className="rounded-[1.5rem] bg-[#12324a] px-3 py-4 text-white shadow-[0_20px_60px_rgba(18,50,74,0.16)] sm:px-6 sm:py-5"
+		>
+			<ol className="grid grid-cols-4">
+				{steps.map((label, index) => {
+					const step = index + 1;
+					const isComplete = step < currentStep;
+					const isCurrent = step === currentStep;
+
+					return (
+						<li
+							aria-current={isCurrent ? "step" : undefined}
+							className="relative flex min-w-0 flex-col items-center gap-2 text-center"
+							key={label}
+						>
+							{index > 0 ? (
+								<span
+									aria-hidden="true"
+									className={`absolute right-1/2 top-4 h-px w-full ${isComplete || isCurrent ? "bg-[#e76832]" : "bg-white/20"}`}
+								/>
+							) : null}
+							<span
+								className={`relative z-10 grid size-8 place-items-center rounded-full border text-xs font-bold ${isComplete || isCurrent ? "border-[#e76832] bg-[#e76832] text-white" : "border-white/30 bg-[#12324a] text-white/60"}`}
+							>
+								{isComplete ? (
+									<Check aria-hidden="true" className="size-4" />
+								) : (
+									step
+								)}
+							</span>
+							<span
+								className={`truncate text-xs font-semibold ${isCurrent ? "text-white" : "text-white/60"}`}
+							>
+								{label}
+							</span>
+						</li>
+					);
+				})}
+			</ol>
+		</nav>
 	);
 }
 

@@ -1,3 +1,4 @@
+import { Clock3 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface PublicReservationCountdownProps {
@@ -55,14 +56,20 @@ export function PublicReservationCountdown({
 		return () => window.clearInterval(intervalId);
 	}, [initialRemainingMs]);
 
+	const totalDurationMs = Math.max(1, expiresAtMs - createdAtMs);
+	const remainingPercentage = Math.min(
+		100,
+		Math.max(0, (remainingMs / totalDurationMs) * 100),
+	);
+
 	if (remainingMs === 0) {
 		return (
 			<div
 				aria-live="polite"
-				className="rounded-lg border border-[#b34b25]/30 bg-[#fff4ef] p-3"
+				className="rounded-2xl border border-[#b34b25]/30 bg-[#fff4ef] p-4"
 			>
-				<p className="font-medium text-destructive">Reserva vencida</p>
-				<p className="mt-1 text-sm text-muted-foreground">
+				<p className="font-semibold text-[#8f3d20]">Reserva vencida</p>
+				<p className="mt-1 text-sm text-[#8f3d20]/80">
 					El bloqueo temporal ya no está vigente.
 				</p>
 			</div>
@@ -70,17 +77,36 @@ export function PublicReservationCountdown({
 	}
 
 	return (
-		<div className="rounded-lg border border-[#12324a]/15 bg-[#e8f2f4] p-3 shadow-sm">
+		<div className="rounded-2xl border border-[#12324a]/12 bg-[#dcecef]/70 p-4 sm:p-5">
 			<div className="flex items-center justify-between gap-4">
-				<p className="text-sm font-medium">Tiempo para continuar</p>
+				<div className="flex items-center gap-3">
+					<span className="grid size-9 place-items-center rounded-full bg-white text-[#12324a] shadow-[0_8px_20px_rgba(18,50,74,0.08)]">
+						<Clock3 aria-hidden="true" className="size-4" />
+					</span>
+					<div>
+						<p className="text-sm font-semibold text-[#12324a]">
+							Tiempo para pagar
+						</p>
+						<p className="text-xs text-[#587080]">La mesa sigue apartada</p>
+					</div>
+				</div>
 				<time
 					aria-label={`Quedan ${formatCountdown(remainingMs)}`}
-					className="font-mono text-lg font-semibold tabular-nums"
+					className="text-2xl font-bold tabular-nums tracking-[-0.03em] text-[#12324a] sm:text-3xl"
 					dateTime={expiresAt}
 					role="timer"
 				>
 					{formatCountdown(remainingMs)}
 				</time>
+			</div>
+			<div
+				aria-hidden="true"
+				className="mt-4 h-1.5 overflow-hidden rounded-full bg-white"
+			>
+				<div
+					className="h-full rounded-full bg-[#e76832] transition-[width] duration-1000 ease-linear"
+					style={{ width: `${remainingPercentage}%` }}
+				/>
 			</div>
 			<p aria-live="polite" className="sr-only">
 				{announcement}

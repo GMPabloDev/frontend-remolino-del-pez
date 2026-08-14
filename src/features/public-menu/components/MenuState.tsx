@@ -19,18 +19,15 @@ interface MenuStateProps {
 
 const stateCopy = {
 	"invalid-query": {
-		eyebrow: "Enlace incompleto",
 		title: "Este menú necesita una sucursal válida.",
 		description:
 			"Revisa el enlace compartido o vuelve al selector para elegir una sucursal activa.",
 	},
 	empty: {
-		eyebrow: "Carta en preparación",
 		title: "Todavía no hay platos publicados aquí.",
 		description: "Vuelve pronto para descubrir las novedades de esta sucursal.",
 	},
 	error: {
-		eyebrow: "No pudimos abrir la carta",
 		title: "El menú no está disponible por ahora.",
 		description:
 			"Inténtalo nuevamente en unos segundos. Si el problema continúa, solicita un nuevo enlace.",
@@ -47,23 +44,22 @@ export function MenuState({
 		return (
 			<section
 				id="main-content"
-				className="mx-auto flex min-h-[22rem] max-w-xl flex-col items-center justify-center rounded-[2rem] border border-[#12324a]/10 bg-white/70 px-6 py-16 text-center shadow-[0_24px_70px_rgba(18,50,74,0.08)]"
+				className="mx-auto flex min-h-[22rem] max-w-2xl flex-col items-center justify-center px-5 py-16 text-center sm:px-8 sm:py-20"
 				role="status"
 				aria-live="polite"
 			>
-				<LoaderCircle
-					className="mb-5 animate-spin text-[#e76832]"
-					size={28}
-					aria-hidden="true"
-				/>
-				<p className="mb-2 text-xs font-bold uppercase tracking-[0.24em] text-[#e76832]">
-					Un momento
-				</p>
-				<h2 className="font-heading text-3xl font-semibold tracking-[-0.04em] text-[#12324a]">
-					Estamos preparando la carta.
+				<span className="mb-6 grid size-16 place-items-center rounded-full bg-[#dcecef] text-[#12324a] shadow-[0_16px_35px_rgba(18,50,74,0.08)]">
+					<LoaderCircle
+						className="animate-spin text-[#e76832]"
+						size={27}
+						aria-hidden="true"
+					/>
+				</span>
+				<h2 className="font-heading text-3xl font-semibold tracking-[-0.05em] text-[#12324a] sm:text-4xl">
+					Preparando la carta.
 				</h2>
-				<p className="mt-3 max-w-sm text-sm leading-6 text-[#12324a]/65">
-					Los sabores de la casa están a punto de llegar.
+				<p className="mt-4 max-w-sm text-sm leading-6 text-[#587080] sm:text-base">
+					Estamos reuniendo los platos disponibles para esta sucursal.
 				</p>
 			</section>
 		);
@@ -84,37 +80,34 @@ export function MenuState({
 	return (
 		<section
 			id="main-content"
-			className="mx-auto flex min-h-[22rem] max-w-xl flex-col items-center justify-center rounded-[2rem] border border-[#12324a]/10 bg-white/70 px-6 py-16 text-center shadow-[0_24px_70px_rgba(18,50,74,0.08)]"
+			className="mx-auto flex min-h-[22rem] max-w-2xl flex-col items-center justify-center px-5 py-16 text-center sm:px-8 sm:py-20"
 			role={kind === "error" || isInvalidQuery ? "alert" : "status"}
 			aria-live="polite"
 		>
 			<span
-				className="mb-5 grid size-14 place-items-center rounded-full bg-[#dcecef] text-[#12324a]"
+				className="mb-6 grid size-16 place-items-center rounded-full bg-[#dcecef] text-[#12324a] shadow-[0_16px_35px_rgba(18,50,74,0.08)]"
 				aria-hidden="true"
 			>
-				<Icon size={24} strokeWidth={1.8} />
+				<Icon size={26} strokeWidth={1.8} />
 			</span>
-			<p className="mb-2 text-xs font-bold uppercase tracking-[0.24em] text-[#e76832]">
-				{copy.eyebrow}
-			</p>
-			<h2 className="max-w-md font-heading text-3xl font-semibold tracking-[-0.04em] text-[#12324a]">
+			<h2 className="max-w-xl font-heading text-3xl font-semibold leading-tight tracking-[-0.05em] text-[#12324a] sm:text-4xl">
 				{copy.title}
 			</h2>
-			<p className="mt-3 max-w-sm text-sm leading-6 text-[#12324a]/65">
+			<p className="mt-4 max-w-sm text-sm leading-6 text-[#587080] sm:text-base">
 				{detail}
 			</p>
 			{kind === "error" && errorCode === "PUBLIC_MENU_NOT_FOUND" ? (
-				<>
-					<p className="mt-3 text-xs font-medium text-[#12324a]/55">
-						Esta sucursal podría estar temporalmente cerrada.
-					</p>
-					<a
-						className="mt-6 inline-flex min-h-11 items-center rounded-full border border-[#12324a]/15 px-5 text-sm font-semibold text-[#12324a] transition-colors hover:border-[#12324a]/35 hover:bg-[#dcecef] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/35"
-						href="/"
-					>
-						Volver a sucursales
-					</a>
-				</>
+				<p className="mt-3 text-xs font-medium text-[#587080]">
+					Esta sucursal podría estar temporalmente cerrada.
+				</p>
+			) : null}
+			{kind === "error" && errorCode === "PUBLIC_MENU_NOT_FOUND" ? (
+				<a
+					className="mt-6 inline-flex min-h-11 items-center rounded-full border border-[#12324a]/15 px-5 text-sm font-semibold text-[#12324a] transition-colors hover:border-[#12324a]/35 hover:bg-[#dcecef] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#e76832]/35"
+					href="/"
+				>
+					Volver a sucursales
+				</a>
 			) : null}
 			{isInvalidQuery ? (
 				<a
