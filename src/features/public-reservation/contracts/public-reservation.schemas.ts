@@ -9,6 +9,8 @@ const RESERVATION_TIME_REGEX = /^(?:[01]\d|2[0-3]):(?:00|15|30|45)$/;
 const RESERVATION_END_TIME_REGEX = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const E164_PHONE_REGEX = /^\+\d{8,15}$/;
 const RESERVATION_MONEY_REGEX = /^\d{1,8}\.\d{2}$/;
+const DNI_REGEX = /^\d{8}$/;
+const RUC_REGEX = /^\d{11}$/;
 
 export function isValidCalendarDate(value: string): boolean {
 	if (!CALENDAR_DATE_REGEX.test(value)) return false;
@@ -57,6 +59,29 @@ export const reservationCustomerSchema = z
 	})
 	.strict();
 
+export const reservationBillingDocumentSchema = z.discriminatedUnion("type", [
+	z
+		.object({
+			type: z.literal("BOLETA"),
+			documentNumber: z
+				.string()
+				.trim()
+				.regex(DNI_REGEX, "Ingresa un DNI de exactamente 8 dígitos."),
+		})
+		.strict(),
+	z
+		.object({
+			type: z.literal("FACTURA"),
+			ruc: z
+				.string()
+				.trim()
+				.regex(RUC_REGEX, "Ingresa un RUC de exactamente 11 dígitos."),
+			businessName: z.string().trim().min(1, "Ingresa la razón social."),
+			fiscalAddress: z.string().trim().min(1, "Ingresa la dirección fiscal."),
+		})
+		.strict(),
+]);
+
 export const availabilityRequestSchema = z.object({
 	date: reservationDateSchema,
 	partySize: z.number().int().positive(),
@@ -82,6 +107,7 @@ export const createTemporaryReservationRequestSchema = z
 		time: reservationTimeSchema,
 		partySize: z.number().int().positive(),
 		customer: reservationCustomerSchema,
+		billingDocument: reservationBillingDocumentSchema,
 		items: z.array(temporaryReservationItemRequestSchema).min(1).max(50),
 	})
 	.strict()
@@ -121,6 +147,7 @@ export const temporaryReservationResponseSchema = z.object({
 	expiresAt: z.iso.datetime({ offset: true }),
 	partySize: z.number().int().positive(),
 	customer: reservationCustomerSchema,
+	billingDocument: reservationBillingDocumentSchema,
 	items: z.array(temporaryReservationItemSchema).min(1).max(50),
 	currency: z.literal("PEN"),
 	total: reservationMoneySchema,
@@ -129,7 +156,7 @@ export const temporaryReservationResponseSchema = z.object({
 });
 
 export const storedPublicReservationSchema = temporaryReservationResponseSchema
-	.omit({ customer: true })
+	.omit({ billingDocument: true, customer: true })
 	.extend({
 		version: z.literal(1),
 		restaurantSlug: publicSlugSchema,
@@ -152,6 +179,9 @@ export const reservationAttemptSchema = z.object({
 export type AvailabilityRequest = z.infer<typeof availabilityRequestSchema>;
 export type PublicAvailability = z.infer<typeof publicAvailabilitySchema>;
 export type ReservationCustomer = z.infer<typeof reservationCustomerSchema>;
+export type ReservationBillingDocument = z.infer<
+	typeof reservationBillingDocumentSchema
+>;
 export type CreateTemporaryReservationRequest = z.infer<
 	typeof createTemporaryReservationRequestSchema
 >;

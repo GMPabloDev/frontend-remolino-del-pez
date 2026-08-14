@@ -77,6 +77,10 @@ describe("public payment contracts", () => {
 				email: "ana@example.com",
 				phone: "+51987654321",
 			},
+			billingDocument: {
+				type: "BOLETA",
+				documentNumber: "12345678",
+			},
 		};
 		expect(temporaryReservationResponseSchema.safeParse(response).success).toBe(
 			true,

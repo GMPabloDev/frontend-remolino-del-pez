@@ -24,6 +24,10 @@ const validReservation = {
 		email: " ANA@EXAMPLE.COM ",
 		phone: "+51 987-654-321",
 	},
+	billingDocument: {
+		type: "BOLETA" as const,
+		documentNumber: "12345678",
+	},
 	items: [
 		{
 			dishId: "123e4567-e89b-12d3-a456-426614174001",
@@ -59,6 +63,70 @@ describe("public reservation contracts", () => {
 		});
 	});
 
+	test("accepts only the fields required by each billing document type", () => {
+		const baseRequest = {
+			date: validReservation.date,
+			time: validReservation.startTime,
+			partySize: 2,
+			customer: validReservation.customer,
+			items: validReservation.items.map((item) => ({
+				dishId: item.dishId,
+				quantity: item.quantity,
+			})),
+		};
+
+		expect(
+			createTemporaryReservationRequestSchema.parse({
+				...baseRequest,
+				billingDocument: {
+					type: "BOLETA",
+					documentNumber: "12345678",
+				},
+			}).billingDocument,
+		).toEqual({ type: "BOLETA", documentNumber: "12345678" });
+		expect(
+			createTemporaryReservationRequestSchema.parse({
+				...baseRequest,
+				billingDocument: {
+					type: "FACTURA",
+					ruc: "20123456789",
+					businessName: " Empresa Demo S.A.C. ",
+					fiscalAddress: " Av. Principal 123, Lima ",
+				},
+			}).billingDocument,
+		).toEqual({
+			type: "FACTURA",
+			ruc: "20123456789",
+			businessName: "Empresa Demo S.A.C.",
+			fiscalAddress: "Av. Principal 123, Lima",
+		});
+
+		for (const billingDocument of [
+			{ type: "BOLETA", documentNumber: "1234567" },
+			{
+				type: "FACTURA",
+				ruc: "2012345678",
+				businessName: "Empresa",
+				fiscalAddress: "Lima",
+			},
+			{ type: "BOLETA", documentNumber: "12345678", ruc: "20123456789" },
+			{
+				type: "FACTURA",
+				ruc: "20123456789",
+				businessName: "Empresa",
+				fiscalAddress: "Lima",
+				documentNumber: "12345678",
+			},
+		]) {
+			expect(
+				createTemporaryReservationRequestSchema.safeParse({
+					...baseRequest,
+					billingDocument,
+				}).success,
+			).toBe(false);
+		}
+	});
+
 	test("rejects invalid phone, time and duplicate dishes", () => {
 		expect(() =>
 			reservationCustomerSchema.parse({
@@ -72,6 +140,7 @@ describe("public reservation contracts", () => {
 				time: "19:10",
 				partySize: 2,
 				customer: validReservation.customer,
+				billingDocument: validReservation.billingDocument,
 				items: [],
 			}),
 		).toThrow();
@@ -87,6 +156,7 @@ describe("public reservation contracts", () => {
 		});
 
 		expect(stored).not.toHaveProperty("customer");
+		expect(stored).not.toHaveProperty("billingDocument");
 		expect(stored).toHaveProperty("checkoutToken", "sensitive-token");
 	});
 

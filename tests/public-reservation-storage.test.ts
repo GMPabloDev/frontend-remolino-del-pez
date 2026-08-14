@@ -39,6 +39,10 @@ const reservation = {
 		email: "ana@example.com",
 		phone: "+51987654321",
 	},
+	billingDocument: {
+		type: "BOLETA" as const,
+		documentNumber: "12345678",
+	},
 	items: [
 		{
 			dishId: "123e4567-e89b-12d3-a456-426614174001",
@@ -76,9 +80,12 @@ describe("public reservation storage", () => {
 
 		expect(result.reason).toBe("available");
 		expect(result.value).not.toHaveProperty("customer");
-		expect(
-			storage.getItem(getPublicReservationKey(restaurantSlug, branchSlug)),
-		).not.toContain("Ana Pérez");
+		expect(result.value).not.toHaveProperty("billingDocument");
+		const storedValue = storage.getItem(
+			getPublicReservationKey(restaurantSlug, branchSlug),
+		);
+		expect(storedValue).not.toContain("Ana Pérez");
+		expect(storedValue).not.toContain("12345678");
 		expect(
 			readPublicReservation("other-restaurant", branchSlug, { now, storage })
 				.value,

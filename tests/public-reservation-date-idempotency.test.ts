@@ -23,6 +23,10 @@ const firstPayload = {
 	time: "19:30" as const,
 	partySize: 2,
 	customer,
+	billingDocument: {
+		type: "BOLETA" as const,
+		documentNumber: "12345678",
+	},
 	items: [
 		{
 			dishId: "123e4567-e89b-12d3-a456-426614174001",
@@ -69,9 +73,24 @@ describe("public reservation idempotency", () => {
 			{ ...firstPayload, partySize: 3 },
 			firstAttempt,
 		);
+		const changedBillingAttempt = getReservationAttemptForPayload(
+			{
+				...firstPayload,
+				billingDocument: {
+					type: "FACTURA",
+					ruc: "20123456789",
+					businessName: "Empresa Demo S.A.C.",
+					fiscalAddress: "Av. Principal 123, Lima",
+				},
+			},
+			firstAttempt,
+		);
 
 		expect(replayAttempt.idempotencyKey).toBe(firstAttempt.idempotencyKey);
 		expect(changedAttempt.idempotencyKey).not.toBe(firstAttempt.idempotencyKey);
+		expect(changedBillingAttempt.idempotencyKey).not.toBe(
+			firstAttempt.idempotencyKey,
+		);
 		expect(areReservationPayloadsEqual(firstPayload, reorderedPayload)).toBe(
 			true,
 		);

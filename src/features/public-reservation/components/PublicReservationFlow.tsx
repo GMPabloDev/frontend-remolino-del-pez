@@ -9,6 +9,7 @@ import {
 	availabilityRequestSchema,
 	createTemporaryReservationRequestSchema,
 	type ReservationAttempt,
+	type ReservationBillingDocument,
 	type ReservationCustomer,
 	type TemporaryReservationResponse,
 } from "../contracts/public-reservation.schemas";
@@ -57,6 +58,8 @@ export function PublicReservationFlow({
 	} | null>(null);
 	const [selectedTime, setSelectedTime] = useState("");
 	const [customer, setCustomer] = useState<ReservationCustomer | null>(null);
+	const [billingDocument, setBillingDocument] =
+		useState<ReservationBillingDocument | null>(null);
 	const [attempt, setAttempt] = useState<ReservationAttempt | null>(null);
 	const [localError, setLocalError] = useState<string | null>(null);
 	const handledMutationErrorReference = useRef<string | null>(null);
@@ -100,7 +103,7 @@ export function PublicReservationFlow({
 	const availabilityData = availabilityQuery.data;
 	const availabilityLoading =
 		availabilityRequest !== null && availabilityQuery.isFetching;
-	const customerReady = Boolean(selectedTime && customer);
+	const customerReady = Boolean(selectedTime && customer && billingDocument);
 
 	useEffect(() => {
 		if (flowError) {
@@ -134,6 +137,7 @@ export function PublicReservationFlow({
 		if (errorCode === "IDEMPOTENCY_KEY_REUSED") {
 			setAttempt(null);
 			setCustomer(null);
+			setBillingDocument(null);
 		}
 	}, [availabilityQuery.refetch, mutationError?.code, onDishUnavailable]);
 
@@ -176,8 +180,12 @@ export function PublicReservationFlow({
 		});
 	}
 
-	function handleCustomerSubmit(nextCustomer: ReservationCustomer) {
+	function handleCustomerSubmit(
+		nextCustomer: ReservationCustomer,
+		nextBillingDocument: ReservationBillingDocument,
+	) {
 		setCustomer(nextCustomer);
+		setBillingDocument(nextBillingDocument);
 		setLocalError(null);
 		reservationMutation.reset();
 	}
@@ -189,7 +197,13 @@ export function PublicReservationFlow({
 	}
 
 	function handleReservationSubmit() {
-		if (!customer || !selectedTime || !availabilityData || partySize === "") {
+		if (
+			!customer ||
+			!billingDocument ||
+			!selectedTime ||
+			!availabilityData ||
+			partySize === ""
+		) {
 			setLocalError(
 				"Completa la fecha, el horario y tus datos antes de continuar.",
 			);
@@ -201,6 +215,7 @@ export function PublicReservationFlow({
 			time: selectedTime,
 			partySize,
 			customer,
+			billingDocument,
 			items: items.map((item) => ({
 				dishId: item.dishId,
 				quantity: item.quantity,
@@ -248,6 +263,7 @@ export function PublicReservationFlow({
 	function handleReviewRecovery() {
 		setAttempt(null);
 		setCustomer(null);
+		setBillingDocument(null);
 		reservationMutation.reset();
 	}
 

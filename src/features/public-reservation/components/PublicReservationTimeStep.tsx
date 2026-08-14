@@ -1,4 +1,4 @@
-import { Clock3 } from "lucide-react";
+import { Check, Clock3 } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -142,6 +142,7 @@ export function PublicReservationTimeStep({
 					>
 						{validTimes.map((time) => {
 							const inputId = `reservation-time-${time.replace(":", "-")}`;
+							const isSelected = selectedTime === time;
 							return (
 								<Field
 									data-invalid={Boolean(selectionError)}
@@ -160,9 +161,16 @@ export function PublicReservationTimeStep({
 										value={time}
 									/>
 									<FieldLabel
-										className="min-h-12 cursor-pointer justify-center rounded-xl border border-[#12324a]/15 bg-white px-3 py-2 text-center text-base font-semibold text-[#12324a] shadow-[0_8px_24px_rgba(18,50,74,0.05)] transition-[border-color,background-color,color,box-shadow] hover:border-[#e76832] hover:bg-[#fff7f1] peer-focus-visible:border-[#e76832] peer-focus-visible:ring-4 peer-focus-visible:ring-[#e76832]/25 has-checked:border-[#e76832] has-checked:bg-[#e76832] has-checked:text-white has-checked:shadow-[0_10px_24px_rgba(231,104,50,0.22)]"
+										className={`min-h-12 cursor-pointer justify-center gap-2 rounded-xl border px-3 py-2 text-center text-base font-semibold text-[#12324a] transition-[border-color,background-color,box-shadow] peer-focus-visible:border-[#e76832] peer-focus-visible:ring-4 peer-focus-visible:ring-[#e76832]/25 ${isSelected ? "border-[#e76832] bg-[#fff0e6] shadow-[0_10px_24px_rgba(231,104,50,0.12)]" : "border-[#12324a]/15 bg-white shadow-[0_8px_24px_rgba(18,50,74,0.05)] hover:border-[#e76832] hover:bg-[#fff7f1]"}`}
+										data-selected={isSelected}
 										htmlFor={inputId}
 									>
+										{isSelected ? (
+											<Check
+												aria-hidden="true"
+												className="size-4 text-[#e76832]"
+											/>
+										) : null}
 										{time}
 									</FieldLabel>
 								</Field>

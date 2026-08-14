@@ -42,6 +42,10 @@ const reservation: TemporaryReservationResponse = {
 		email: "ana@example.com",
 		phone: "+51987654321",
 	},
+	billingDocument: {
+		type: "BOLETA",
+		documentNumber: "12345678",
+	},
 	items: [
 		{
 			dishId: "123e4567-e89b-12d3-a456-426614174001",
@@ -99,7 +103,7 @@ describe("public reservation UI", () => {
 	test("renders available times as a single keyboard-operable selection", async () => {
 		const user = userEvent.setup();
 		const selected: string[] = [];
-		render(
+		const view = render(
 			<PublicReservationTimeStep
 				availableTimes={["19:30", "20:00"]}
 				hasSearched
@@ -108,19 +112,31 @@ describe("public reservation UI", () => {
 			/>,
 		);
 
-		const time = screen.getByRole("radio", { name: "Reservar a las 19:30" });
+		const time = screen.getByRole("radio", {
+			name: "Reservar a las 19:30",
+		}) as HTMLInputElement;
 		await user.click(time);
 		expect(selected).toEqual(["19:30"]);
+		view.rerender(
+			<PublicReservationTimeStep
+				availableTimes={["19:30", "20:00"]}
+				hasSearched
+				onSelect={(nextTime) => selected.push(nextTime)}
+				selectedTime="19:30"
+			/>,
+		);
+		expect(time.checked).toBe(true);
+		expect(time.nextElementSibling?.getAttribute("data-selected")).toBe("true");
 		expect(screen.getByRole("radiogroup")).toBeTruthy();
 	});
 
-	test("focuses the first customer field and normalizes valid data", async () => {
+	test("focuses the first field and submits a strict boleta document", async () => {
 		const user = userEvent.setup();
 		const submitted: unknown[] = [];
 		render(
 			<PublicReservationCustomerStep
-				onSubmit={(value) => {
-					submitted.push(value);
+				onSubmit={(customer, billingDocument) => {
+					submitted.push({ billingDocument, customer });
 				}}
 			/>,
 		);
@@ -133,15 +149,61 @@ describe("public reservation UI", () => {
 		await user.type(screen.getByLabelText("Nombre completo"), " Ana Pérez ");
 		await user.type(screen.getByLabelText("Email"), "ANA@EXAMPLE.COM");
 		await user.type(screen.getByLabelText("Teléfono"), "+51 987-654-321");
+		await user.type(screen.getByLabelText("DNI"), "12345678");
 		await user.click(screen.getByRole("button", { name: "Revisar reserva" }));
 
 		expect(submitted).toEqual([
 			{
-				fullName: "Ana Pérez",
-				email: "ana@example.com",
-				phone: "+51987654321",
+				customer: {
+					fullName: "Ana Pérez",
+					email: "ana@example.com",
+					phone: "+51987654321",
+				},
+				billingDocument: {
+					type: "BOLETA",
+					documentNumber: "12345678",
+				},
 			},
 		]);
+	});
+
+	test("shows only factura fields and submits its strict document shape", async () => {
+		const user = userEvent.setup();
+		const submitted: unknown[] = [];
+		render(
+			<PublicReservationCustomerStep
+				onSubmit={(customer, billingDocument) => {
+					submitted.push({ billingDocument, customer });
+				}}
+			/>,
+		);
+
+		await user.click(screen.getByRole("radio", { name: /Factura/ }));
+		expect(screen.queryByLabelText("DNI")).toBeNull();
+		await user.type(screen.getByLabelText("Nombre completo"), "Ana Pérez");
+		await user.type(screen.getByLabelText("Email"), "ana@example.com");
+		await user.type(screen.getByLabelText("Teléfono"), "+51987654321");
+		await user.type(screen.getByLabelText("RUC"), "20123456789");
+		await user.type(
+			screen.getByLabelText("Razón social"),
+			"Empresa Demo S.A.C.",
+		);
+		await user.type(
+			screen.getByLabelText("Dirección fiscal"),
+			"Av. Principal 123, Lima",
+		);
+		await user.click(screen.getByRole("button", { name: "Revisar reserva" }));
+
+		expect(submitted).toHaveLength(1);
+		expect(submitted[0]).toMatchObject({
+			billingDocument: {
+				type: "FACTURA",
+				ruc: "20123456789",
+				businessName: "Empresa Demo S.A.C.",
+				fiscalAddress: "Av. Principal 123, Lima",
+			},
+		});
+		expect(submitted[0]).not.toHaveProperty("billingDocument.documentNumber");
 	});
 
 	test("disables review confirmation when an item is unavailable", () => {

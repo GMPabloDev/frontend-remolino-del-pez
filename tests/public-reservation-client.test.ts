@@ -28,6 +28,10 @@ const reservationResponse = {
 		email: "ana@example.com",
 		phone: "+51987654321",
 	},
+	billingDocument: {
+		type: "BOLETA" as const,
+		documentNumber: "12345678",
+	},
 	items: [
 		{
 			dishId: "123e4567-e89b-12d3-a456-426614174001",
@@ -87,6 +91,7 @@ describe("public reservation client", () => {
 				time: "19:30",
 				partySize: 2,
 				customer: reservationResponse.customer,
+				billingDocument: reservationResponse.billingDocument,
 				items: [
 					{
 						dishId: "123e4567-e89b-12d3-a456-426614174001",
@@ -101,9 +106,21 @@ describe("public reservation client", () => {
 			"123e4567-e89b-12d3-a456-426614174002",
 		);
 		expect(request?.headers.get("Content-Type")).toBe("application/json");
-		expect(await request?.json()).toMatchObject({
+		expect(await request?.json()).toEqual({
+			date: "2026-08-04",
 			time: "19:30",
 			partySize: 2,
+			customer: reservationResponse.customer,
+			billingDocument: {
+				type: "BOLETA",
+				documentNumber: "12345678",
+			},
+			items: [
+				{
+					dishId: "123e4567-e89b-12d3-a456-426614174001",
+					quantity: 1,
+				},
+			],
 		});
 	});
 
