@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { runtimeConfig } from "@/config/runtime";
 import { ApiClientError } from "@/lib/api/api-error";
+import { createCustomerReservationsClient } from "../customer-reservations/api/customer-reservations-client";
+import { CustomerReservationHistory } from "../customer-reservations/components/CustomerReservationHistory";
 import { createCustomerApiClient } from "./api/customer-api-client";
 import {
 	CustomerAuthProvider,
@@ -30,6 +32,10 @@ function CustomerAccountScreen() {
 	const { session, snapshot } = useCustomerAuth();
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 	const apiClient = useMemo(() => createCustomerApiClient(session), [session]);
+	const reservationsClient = useMemo(
+		() => createCustomerReservationsClient(apiClient),
+		[apiClient],
+	);
 	const profileQuery = useQuery({
 		queryKey: customerQueryKeys.profile(runtimeConfig.restaurantSlug),
 		queryFn: () =>
@@ -115,8 +121,8 @@ function CustomerAccountScreen() {
 				<Alert className="mt-8">
 					<AlertTitle>Tu acceso está protegido</AlertTitle>
 					<AlertDescription>
-						Desde aquí puedes revisar los datos asociados a tu cuenta. La
-						consulta de reservas estará disponible próximamente.
+						Desde aquí puedes revisar tus datos y consultar tus reservas
+						confirmadas.
 					</AlertDescription>
 				</Alert>
 
@@ -126,6 +132,8 @@ function CustomerAccountScreen() {
 					<ProfileField label="Teléfono" value={profile.phone} />
 					<ProfileField label="Restaurante" value={profile.restaurantSlug} />
 				</dl>
+
+				<CustomerReservationHistory client={reservationsClient} />
 
 				<Separator className="my-8" />
 
