@@ -214,12 +214,27 @@ Idempotency-Key: UUID   # debe ser un UUID válido
     "email": "ana@example.com",
     "phone": "+51987654321"
   },
+  "billingDocument": {
+    "type": "BOLETA",
+    "documentNumber": "12345678"
+  },
   "items": [
     {
       "dishId": "uuid",
       "quantity": 2
     }
   ]
+}
+```
+
+Para solicitar factura, reemplaza `billingDocument` por:
+
+```json
+{
+  "type": "FACTURA",
+  "ruc": "20123456789",
+  "businessName": "Empresa Demo S.A.C.",
+  "fiscalAddress": "Av. Principal 123, Lima"
 }
 ```
 
@@ -231,6 +246,9 @@ Validaciones y reglas:
 - 1 a 50 platos distintos; cada cantidad entre 1 y 99; **un plato no puede repetirse**.
 - Solo se aceptan platos activos con configuración `available` **y cuya categoría también esté activa**.
 - `customer.phone` en formato E.164 (`+51987654321`).
+- `billingDocument` es obligatorio y usa una unión discriminada:
+  - `BOLETA`: `documentNumber` es un DNI de exactamente 8 dígitos.
+  - `FACTURA`: `ruc` debe tener exactamente 11 dígitos, además de `businessName` y `fiscalAddress`.
 - Los nombres y precios se congelan en la reserva. El total es la suma de subtotales en `PEN`.
 - La reserva queda `pending_payment` y expira lógicamente 15 minutos después de su creación; las vencidas dejan de bloquear mesas sin tarea programada.
 - Las solicitudes concurrentes se procesan con aislamiento `Serializable`. No se combinan mesas.
@@ -252,6 +270,10 @@ Validaciones y reglas:
     "fullName": "Ana Torres",
     "email": "ana@example.com",
     "phone": "+51987654321"
+  },
+  "billingDocument": {
+    "type": "BOLETA",
+    "documentNumber": "12345678"
   },
   "items": [
     {
@@ -482,7 +504,8 @@ Devuelve todas las reservas confirmadas del cliente autenticado, ordenadas de la
     "total": "71.80",
     "confirmedAt": "ISO8601",
     "receipt": {
-      "number": "CP-000001",
+      "type": "BOLETA",
+      "number": "B001-000001",
       "status": "available",
       "generatedAt": "ISO8601"
     }
@@ -492,6 +515,8 @@ Devuelve todas las reservas confirmadas del cliente autenticado, ordenadas de la
 
 - Devuelve `200 []` si no hay reservas.
 - La reserva puede devolver `receipt: null` mientras no tenga comprobante.
+- `receipt.type` identifica si es `BOLETA` o `FACTURA`.
+- La numeración usa `B001-XXXXXX` para boletas y `F001-XXXXXX` para facturas.
 - No expone mesa, IDs Stripe, tokens ni metadata de Cloudinary.
 
 **Errores:** `401 CUSTOMER_AUTH_REQUIRED`.
@@ -507,13 +532,13 @@ Genera una URL firmada y temporal para descargar el comprobante del cliente aute
 **Response 200:**
 ```json
 {
-  "fileName": "comprobante-CP-000001.pdf",
+  "fileName": "boleta-B001-000001.pdf",
   "downloadUrl": "https://res.cloudinary.com/...",
   "expiresAt": "ISO8601"
 }
 ```
 
-La URL dura cinco minutos, no se persiste y la respuesta usa `Cache-Control: no-store`.
+La URL dura cinco minutos, no se persiste y la respuesta usa `Cache-Control: no-store`. El nombre del archivo será `boleta-B001-XXXXXX.pdf` o `factura-F001-XXXXXX.pdf`, según el tipo de documento.
 
 **Errores:**
 
