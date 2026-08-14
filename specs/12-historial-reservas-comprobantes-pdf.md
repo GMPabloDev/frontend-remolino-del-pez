@@ -1,6 +1,6 @@
 # SPEC 12 — Historial de reservas y comprobantes PDF
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 11
 > **Date:** 2026-08-13
 > **Objective:** Permitir que el cliente autenticado consulte sus reservas confirmadas agrupadas en próximas y anteriores, y obtenga enlaces temporales para descargar sus comprobantes PDF disponibles.
